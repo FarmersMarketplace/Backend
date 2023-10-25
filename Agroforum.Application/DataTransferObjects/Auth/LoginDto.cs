@@ -1,4 +1,4 @@
-﻿namespace Agroforum.WebApi.DataTransferObjects
+﻿namespace Agroforum.Application.DataTransferObjects.Auth
 {
     public class LoginDto
     {

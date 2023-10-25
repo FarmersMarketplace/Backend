@@ -1,5 +1,5 @@
-﻿using Agroforum.WebApi.DataTransferObjects;
-using Agroforum.WebApi.ViewModels;
+﻿using Agroforum.Application.DataTransferObjects.Auth;
+using Agroforum.Application.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Agroforum.WebApi.Controllers
@@ -9,6 +9,8 @@ namespace Agroforum.WebApi.Controllers
     [Route("api/[controller]/[action]")]
     public class AccountsController : ControllerBase
     {
+
+
 
         [HttpPost]
         public async Task<IActionResult> Register([FromBody] RegisterDto accountDto)

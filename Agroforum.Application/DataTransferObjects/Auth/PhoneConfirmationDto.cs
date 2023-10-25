@@ -1,4 +1,4 @@
-﻿namespace Agroforum.WebApi.Controllers
+﻿namespace Agroforum.Application.DataTransferObjects.Auth
 {
     public class PhoneConfirmationDto
     {

@@ -9,13 +9,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Presentation", "Presentatio
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastructure", "{DDFF9AFF-020C-4CC0-91D1-DCBFF3EABA26}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Agroforum.WebApi", "Agroforum.WebApi\Agroforum.WebApi.csproj", "{EA78CD98-0757-4E89-9401-AAA26B23620A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Agroforum.WebApi", "Agroforum.WebApi\Agroforum.WebApi.csproj", "{EA78CD98-0757-4E89-9401-AAA26B23620A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Agroforum.Persistence", "Agroforum.Persistence\Agroforum.Persistence.csproj", "{D6E48F3A-31A8-4763-89C5-813324DF2630}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Agroforum.Persistence", "Agroforum.Persistence\Agroforum.Persistence.csproj", "{D6E48F3A-31A8-4763-89C5-813324DF2630}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Agroforum.Domain", "Agroforum.Domain\Agroforum.Domain.csproj", "{ED05015B-C9A6-43C3-8ED0-9C61D9BF4E15}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Agroforum.Domain", "Agroforum.Domain\Agroforum.Domain.csproj", "{ED05015B-C9A6-43C3-8ED0-9C61D9BF4E15}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Agroforum.Application", "Agroforum.Application\Agroforum.Application.csproj", "{1ECEC39B-8E1D-4874-B32C-97E2D3A3FBFD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Agroforum.Application", "Agroforum.Application\Agroforum.Application.csproj", "{1ECEC39B-8E1D-4874-B32C-97E2D3A3FBFD}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{F60CB11D-CE62-455E-B667-4D9EA4FCECBA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
