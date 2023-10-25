@@ -10,7 +10,7 @@ namespace Agroforum.Application.Services
 {
     public class AuthService : IAuthService
     {
-        public async Task Register(RegisterDto accountDto)
+        public async Task<RegisterVm> Register(RegisterDto accountDto)
         {
             throw new NotImplementedException();
         }
