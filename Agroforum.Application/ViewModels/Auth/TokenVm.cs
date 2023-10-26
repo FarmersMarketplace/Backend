@@ -1,4 +1,4 @@
-﻿namespace Agroforum.Application.ViewModels
+﻿namespace Agroforum.Application.ViewModels.Auth
 {
     public class TokenVm
     {
