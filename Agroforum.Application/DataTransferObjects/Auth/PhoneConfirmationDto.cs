@@ -4,5 +4,6 @@
     {
         public Guid UserId { get; set; }
         public string Code { get; set; }
+        public DateTime ConfirmationDate { get; set; }
     }
 }

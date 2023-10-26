@@ -6,4 +6,13 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.13" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Agroforum.Application\Agroforum.Application.csproj" />
+    <ProjectReference Include="..\Agroforum.Domain\Agroforum.Domain.csproj" />
+  </ItemGroup>
+
 </Project>
