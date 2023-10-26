@@ -7,11 +7,11 @@ namespace Agroforum.WebApi.Controllers
 {
     [ApiController]
     [Route("api/[controller]/[action]")]
-    public class AccountsController : ControllerBase
+    public class AuthController : ControllerBase
     {
         private IAuthService AuthService;
 
-        public AccountsController(IAuthService authService)
+        public AuthController(IAuthService authService)
         {
             AuthService = authService;
         }
@@ -31,7 +31,7 @@ namespace Agroforum.WebApi.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> AddPhoneNumber([FromBody] AddPhoneDto addPhoneDto)
+        public async Task<IActionResult> AddPhone([FromBody] AddPhoneDto addPhoneDto)
         {
             await AuthService.AddPhoneNumber(addPhoneDto);
             return NoContent();

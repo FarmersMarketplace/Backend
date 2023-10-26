@@ -1,5 +1,5 @@
 ﻿using Agroforum.Application.DataTransferObjects.Auth;
-using Agroforum.Application.ViewModels;
+using Agroforum.Application.ViewModels.Auth;
 using System;
 using System.Collections.Generic;
 using System.Linq;
