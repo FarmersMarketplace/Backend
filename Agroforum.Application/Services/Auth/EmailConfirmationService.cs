@@ -16,7 +16,7 @@ namespace Agroforum.Application.Services.Auth
         private MailAddress FromAddress { get; set; }
         private string ConfirmationLink => "";
         private int TokenLifetime => 2;
-        private string SecretKey => "";
+        private string SecretKey => "V6cwg6RphTE9e9I2uETXQDMB5l74+PfhcMeCoXNCl1Wso5pJWsnKhRrWgc/st4/C\r\nHyKKAhUwCCKZOqW1mX1MnA==";
 
         public EmailConfirmationService()
         {

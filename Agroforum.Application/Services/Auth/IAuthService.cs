@@ -12,9 +12,7 @@ namespace Agroforum.Application.Services
     {
         Task<RegisterVm> Register(RegisterDto accountDto);
 
-        Task ConfirmEmail(EmailConfirmationDto emailConfirmationDto);
-
-        Task AddPhoneNumber(AddPhoneDto addPhoneDto);
+        Task ConfirmEmail(Guid userId, string email);
 
         Task ConfirmPhone(PhoneConfirmationDto phoneConfirmationDto);
 
