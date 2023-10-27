@@ -9,6 +9,6 @@ namespace Agroforum.Domain
     public enum Role
     {
         User,
-        Entrepreneur
+        Farmer
     }
 }
