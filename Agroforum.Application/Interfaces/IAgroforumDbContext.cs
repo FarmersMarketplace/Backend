@@ -1,4 +1,5 @@
-﻿using Agroforum.Domain;
+﻿using Agroforum.Application.Models;
+using Agroforum.Domain;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -12,6 +13,7 @@ namespace Agroforum.Application.Interfaces
     public interface IAgroforumDbContext
     {
         DbSet<Account> Accounts { get; set; }
+        DbSet<UnconfirmedPhone> UnconfirmedPhones { get; set; }
         Task<int> SaveChangesAsync(CancellationToken token);
         Task<int> SaveChangesAsync();
     }
