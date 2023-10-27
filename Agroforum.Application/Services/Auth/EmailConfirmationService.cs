@@ -31,9 +31,9 @@ namespace Agroforum.Application.Services.Auth
             SmtpClient.Credentials = new NetworkCredential(FromAddress.Address, "hlaavdzwszaaohmh");
         }
         
-        public async Task SendEmailAsync(Guid userId, string toEmail)
+        public async Task SendEmailAsync(Guid accountId, string toEmail)
         {
-            string token = GenerateToken(userId, toEmail);
+            string token = GenerateToken(accountId, toEmail);
 
             string messageBody = $@"{ConfirmationLink + "/" + token}";
 
