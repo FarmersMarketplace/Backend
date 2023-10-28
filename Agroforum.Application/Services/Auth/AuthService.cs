@@ -1,12 +1,13 @@
 ﻿using Agroforum.Application.DataTransferObjects.Auth;
 using Agroforum.Application.Exceptions;
 using Agroforum.Application.Interfaces;
-using Agroforum.Application.Models;
 using Agroforum.Application.ViewModels.Auth;
 using Agroforum.Domain;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,14 +18,11 @@ namespace Agroforum.Application.Services.Auth
     {
         private IAgroforumDbContext DbContext { get; set; }
         private EmailConfirmationService EmailService { get; set; }
-        private PhoneConfirmationService PhoneService { get; set; }
-        private const int PhoneConfirmationExpirationMinutes = 5;
 
-        public AuthService(IAgroforumDbContext dbContext)
+        public AuthService(IAgroforumDbContext dbContext, IConfiguration configuration)
         {
             DbContext = dbContext;
-            EmailService = new EmailConfirmationService();
-            PhoneService = new PhoneConfirmationService();
+            EmailService = new EmailConfirmationService(configuration);
         }
 
         public async Task<RegisterVm> Register(RegisterDto accountDto)
@@ -33,7 +31,6 @@ namespace Agroforum.Application.Services.Auth
 
             await CreateAccount(id, accountDto);
             await EmailService.SendEmailAsync(id, accountDto.Email);
-            await AddPhone(id, accountDto);
 
             await DbContext.SaveChangesAsync();
             return new RegisterVm(id);
@@ -46,11 +43,6 @@ namespace Agroforum.Application.Services.Auth
 
             account.Email = email;
             await DbContext.SaveChangesAsync();
-        }
-
-        public async Task ConfirmPhone(PhoneConfirmationDto phoneConfirmationDto)
-        {
-            throw new NotImplementedException();
         }
 
         public async Task<TokenVm> Login(LoginDto loginDto)
@@ -70,23 +62,6 @@ namespace Agroforum.Application.Services.Auth
             if (accountDto.IsFarmer) account.Roles.Add(Role.Farmer);
 
             await DbContext.Accounts.AddAsync(account);
-        }
-
-        private async Task AddPhone(Guid accountId, RegisterDto accountDto)
-        {
-            string code = await PhoneService.GenerateCode();
-            await PhoneService.SendVerificationCode(accountDto.Phone, code);
-
-            var unconfirmedPhone = new UnconfirmedPhone
-            {
-                AccountId = accountId,
-                Number = accountDto.Phone,
-                Code = code,
-                Deadline = accountDto.DispatchDate.AddMinutes(PhoneConfirmationExpirationMinutes)
-            };
-
-            await DbContext.UnconfirmedPhones.AddAsync(unconfirmedPhone);
-            await DbContext.SaveChangesAsync();
         }
 
     }

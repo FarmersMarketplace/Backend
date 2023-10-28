@@ -7,6 +7,8 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.Security.Claims;
 using System.IdentityModel.Tokens.Jwt;
+using System.Configuration;
+using Microsoft.Extensions.Configuration;
 
 namespace Agroforum.Application.Services.Auth
 {
@@ -16,12 +18,13 @@ namespace Agroforum.Application.Services.Auth
         private MailAddress FromAddress { get; set; }
         private string ConfirmationLink => "";
         private int TokenLifetime => 2;
-        private string SecretKey => "V6cwg6RphTE9e9I2uETXQDMB5l74+PfhcMeCoXNCl1Wso5pJWsnKhRrWgc/st4/C2234HyKKAhUwCCKZOqW1mX1MnA==";
+        private readonly string SecretKey;
 
-        public EmailConfirmationService()
+        public EmailConfirmationService(IConfiguration configuration)
         {
-            FromAddress = new MailAddress("cprog3321@gmail.com", "MusicBlendHub.Identity");
+            SecretKey = configuration["Auth:Secret"];
 
+            FromAddress = new MailAddress("cprog3321@gmail.com", "MusicBlendHub.Identity");
             SmtpClient = new SmtpClient();
             SmtpClient.Host = "smtp.gmail.com";
             SmtpClient.Port = 587;

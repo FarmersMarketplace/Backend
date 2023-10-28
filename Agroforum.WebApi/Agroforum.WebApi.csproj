@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Agroforum.Application\Agroforum.Application.csproj" />
+    <ProjectReference Include="..\Agroforum.Persistence\Agroforum.Persistence.csproj" />
   </ItemGroup>
 
 </Project>

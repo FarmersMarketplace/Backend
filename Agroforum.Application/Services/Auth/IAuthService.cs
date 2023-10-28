@@ -14,8 +14,6 @@ namespace Agroforum.Application.Services
 
         Task ConfirmEmail(Guid userId, string email);
 
-        Task ConfirmPhone(PhoneConfirmationDto phoneConfirmationDto);
-
         Task<TokenVm> Login(LoginDto loginDto);
     }
 }

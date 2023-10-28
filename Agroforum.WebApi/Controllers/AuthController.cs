@@ -9,7 +9,6 @@ namespace Agroforum.WebApi.Controllers
 {
     [ApiController]
     [Route("api/[controller]/[action]")]
-    [Authorize]
     public class AuthController : ControllerBase
     {
         private IAuthService AuthService;
@@ -27,6 +26,7 @@ namespace Agroforum.WebApi.Controllers
         }
 
         [HttpPut]
+        [Authorize]
         public async Task<IActionResult> ConfirmEmail()
         {
             var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
@@ -34,14 +34,6 @@ namespace Agroforum.WebApi.Controllers
 
             await AuthService.ConfirmEmail(userId, email);
 
-            return NoContent();
-        }
-
-
-        [HttpPut]
-        public async Task<IActionResult> ConfirmPhone([FromBody] PhoneConfirmationDto phoneConfirmationDto)
-        {
-            await AuthService.ConfirmPhone(phoneConfirmationDto);
             return NoContent();
         }
 
