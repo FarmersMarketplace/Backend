@@ -16,15 +16,15 @@ namespace Agroforum.Application.Services.Auth
     {
         private SmtpClient SmtpClient { get; set; }
         private MailAddress FromAddress { get; set; }
+        private readonly IConfiguration Configuration;
         private string ConfirmationLink => "";
         private int TokenLifetime => 2;
-        private readonly string SecretKey;
 
         public EmailConfirmationService(IConfiguration configuration)
         {
-            SecretKey = configuration["Auth:Secret"];
+            Configuration = configuration;
 
-            FromAddress = new MailAddress("cprog3321@gmail.com", "MusicBlendHub.Identity");
+            FromAddress = new MailAddress("cprog3321@gmail.com", "Agroforum");
             SmtpClient = new SmtpClient();
             SmtpClient.Host = "smtp.gmail.com";
             SmtpClient.Port = 587;
@@ -34,11 +34,9 @@ namespace Agroforum.Application.Services.Auth
             SmtpClient.Credentials = new NetworkCredential(FromAddress.Address, "hlaavdzwszaaohmh");
         }
         
-        public async Task SendEmailAsync(Guid accountId, string toEmail)
+        public async Task SendConfirmationEmail(string token, string toEmail)
         {
-            string token = GenerateToken(accountId, toEmail);
-
-            string messageBody = $@"{ConfirmationLink + "/" + token}";
+            string messageBody = $@"{token}";
 
             var mailMessage = new MailMessage
             {
@@ -52,24 +50,20 @@ namespace Agroforum.Application.Services.Auth
             SmtpClient.Send(mailMessage);
         }
 
-        private string GenerateToken(Guid userId, string email)
+        public async Task SendPasswordResetEmail(string token, string toEmail)
         {
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(SecretKey));
-            var tokenDescriptor = new SecurityTokenDescriptor
+            string messageBody = $@"{token}";
+
+            var mailMessage = new MailMessage
             {
-                Subject = new ClaimsIdentity(new Claim[] 
-                {
-                    new Claim(ClaimTypes.NameIdentifier, userId.ToString()),
-                    new Claim(ClaimTypes.Email, email)
-                }),
-                Expires = DateTime.Now.AddHours(TokenLifetime),
-                SigningCredentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256Signature)
+                From = FromAddress,
+                Subject = "Agroforum Registration Confirmation",
+                Body = messageBody,
+                IsBodyHtml = true
             };
+            mailMessage.To.Add(toEmail);
 
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-
-            return tokenHandler.WriteToken(token);
+            SmtpClient.Send(mailMessage);
         }
     }
 }

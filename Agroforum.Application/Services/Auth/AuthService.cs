@@ -5,12 +5,8 @@ using Agroforum.Application.ViewModels.Auth;
 using Agroforum.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations;
+
 
 namespace Agroforum.Application.Services.Auth
 {
@@ -18,11 +14,13 @@ namespace Agroforum.Application.Services.Auth
     {
         private IAgroforumDbContext DbContext { get; set; }
         private EmailConfirmationService EmailService { get; set; }
+        private JwtService JwtService { get; set; }
 
         public AuthService(IAgroforumDbContext dbContext, IConfiguration configuration)
         {
             DbContext = dbContext;
             EmailService = new EmailConfirmationService(configuration);
+            JwtService = new JwtService(configuration);
         }
 
         public async Task<RegisterVm> Register(RegisterDto accountDto)
@@ -30,7 +28,7 @@ namespace Agroforum.Application.Services.Auth
             Guid id = Guid.NewGuid();
 
             await CreateAccount(id, accountDto);
-            await EmailService.SendEmailAsync(id, accountDto.Email);
+            await EmailService.SendConfirmationEmail(await JwtService.EmailConfirmationToken(id, accountDto.Email), accountDto.Email);
 
             await DbContext.SaveChangesAsync();
             return new RegisterVm(id);
@@ -45,24 +43,51 @@ namespace Agroforum.Application.Services.Auth
             await DbContext.SaveChangesAsync();
         }
 
-        public async Task<TokenVm> Login(LoginDto loginDto)
+        public async Task<JwtVm> Login(LoginDto loginDto)
         {
-            throw new NotImplementedException();
+            var account = DbContext.Accounts.FirstOrDefault(a => a.Email ==  loginDto.Email);
+            if (account == null) throw new NotFoundException($"Account with {loginDto.Email} email is not found.");
+            else if(loginDto.Password != account.Password) throw new UnauthorizedAccessException("Invalid password.");
+
+            var request = await JwtService.Authenticate(account);
+
+            return request;
         }
 
         private async Task CreateAccount(Guid id, RegisterDto accountDto)
         {
+            if(accountDto.Password != accountDto.ConfirmPassword) throw new ValidationException("The password and confirm password do not match.");
+
             var account = new Account
             {
                 Id = id,
                 Name = accountDto.Name,
                 Surname = accountDto.Surname,
                 Email = accountDto.Email,
+                Password = accountDto.Password,
+                Roles = new List<Role>()
             };
             if (accountDto.IsFarmer) account.Roles.Add(Role.Farmer);
 
             await DbContext.Accounts.AddAsync(account);
         }
 
+        public async Task ResetPassword(Guid accountId, string email, ResetPasswordDto resetPasswordDto)
+        {
+            var account = await DbContext.Accounts.FirstOrDefaultAsync(a => a.Id == accountId && a.Email == email);
+            if (account == null) throw new NotFoundException("Account not found or email does not match the provided account.");
+            else if(resetPasswordDto.Password != resetPasswordDto.ConfirmPassword) throw new UnauthorizedAccessException("Password and confirm password do not match.");
+
+            account.Password = resetPasswordDto.Password;
+            await DbContext.SaveChangesAsync();
+        }
+
+        public async Task ForgotPassword(ForgotPasswordDto forgotPasswordDto)
+        {
+            var account = await DbContext.Accounts.FirstOrDefaultAsync(a => a.Email == forgotPasswordDto.Email);
+            if (account == null) throw new NotFoundException($"Account with email {forgotPasswordDto.Email} is not found.");
+
+            await EmailService.SendPasswordResetEmail(await JwtService.EmailConfirmationToken(account.Id, account.Email), forgotPasswordDto.Email);
+        }
     }
 }

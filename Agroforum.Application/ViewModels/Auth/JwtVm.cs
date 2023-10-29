@@ -1,7 +1,12 @@
 ﻿namespace Agroforum.Application.ViewModels.Auth
 {
-    public class TokenVm
+    public class JwtVm
     {
         public string Token { get; set; }
+
+        public JwtVm(string token)
+        {
+            Token = token;
+        }
     }
 }

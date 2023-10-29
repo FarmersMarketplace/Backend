@@ -29,10 +29,10 @@ namespace Agroforum.WebApi.Controllers
         [Authorize]
         public async Task<IActionResult> ConfirmEmail()
         {
-            var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+            var accountId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
             var email = User.FindFirst(ClaimTypes.Email)?.Value;
 
-            await AuthService.ConfirmEmail(userId, email);
+            await AuthService.ConfirmEmail(accountId, email);
 
             return NoContent();
         }
@@ -43,5 +43,26 @@ namespace Agroforum.WebApi.Controllers
             var response = await AuthService.Login(loginDto);
             return Ok(response);
         }
+
+        [HttpPut]
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDto forgotPasswordDto)
+        {
+            await AuthService.ForgotPassword(forgotPasswordDto);
+
+            return NoContent();
+        }
+
+        [HttpPut]
+        [Authorize]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto resetPasswordDto)
+        {
+            var accountId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+            var email = User.FindFirst(ClaimTypes.Email)?.Value;
+
+            await AuthService.ResetPassword(accountId, email, resetPasswordDto);
+
+            return NoContent();
+        }
+
     }
 }

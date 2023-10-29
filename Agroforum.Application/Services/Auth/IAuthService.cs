@@ -14,6 +14,8 @@ namespace Agroforum.Application.Services
 
         Task ConfirmEmail(Guid userId, string email);
 
-        Task<TokenVm> Login(LoginDto loginDto);
+        Task<JwtVm> Login(LoginDto loginDto);
+        Task ResetPassword(Guid accountId, string? email, ResetPasswordDto resetPasswordDto);
+        Task ForgotPassword(ForgotPasswordDto forgotPasswordDto);
     }
 }
