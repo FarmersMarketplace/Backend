@@ -19,11 +19,11 @@ namespace Agroforum.Application.Services.Auth
         public AuthService(IAgroforumDbContext dbContext, IConfiguration configuration)
         {
             DbContext = dbContext;
-            EmailService = new EmailConfirmationService(configuration);
+            EmailService = new EmailConfirmationService();
             JwtService = new JwtService(configuration);
         }
 
-        public async Task<RegisterVm> Register(RegisterDto accountDto)
+        public async Task Register(RegisterDto accountDto)
         {
             Guid id = Guid.NewGuid();
 
@@ -31,14 +31,16 @@ namespace Agroforum.Application.Services.Auth
             await EmailService.SendConfirmationEmail(await JwtService.EmailConfirmationToken(id, accountDto.Email), accountDto.Email);
 
             await DbContext.SaveChangesAsync();
-            return new RegisterVm(id);
         }
 
         public async Task ConfirmEmail(Guid accountId, string email)
         {
+            var existingAccountWithSameEmail = await DbContext.Accounts.FirstOrDefaultAsync(a => a.Email == email);
+            if (existingAccountWithSameEmail != null) throw new DuplicateEmailException($"Email '{email}' is already associated with another account.");
+
             var account = await DbContext.Accounts.FirstOrDefaultAsync(a => a.Id == accountId);
             if (account == null) throw new NotFoundException($"Account with Id {accountId} not found in the database.");
-
+            
             account.Email = email;
             await DbContext.SaveChangesAsync();
         }
@@ -57,6 +59,8 @@ namespace Agroforum.Application.Services.Auth
         private async Task CreateAccount(Guid id, RegisterDto accountDto)
         {
             if(accountDto.Password != accountDto.ConfirmPassword) throw new ValidationException("The password and confirm password do not match.");
+            var existingAccountWithSameEmail = await DbContext.Accounts.FirstOrDefaultAsync(a => a.Email == accountDto.Email);
+            if (existingAccountWithSameEmail != null) throw new DuplicateEmailException($"Email '{accountDto.Email}' is already associated with another account.");
 
             var account = new Account
             {

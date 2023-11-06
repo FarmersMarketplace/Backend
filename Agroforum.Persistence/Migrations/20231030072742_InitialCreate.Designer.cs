@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Agroforum.Persistence.Migrations
 {
     [DbContext(typeof(PostgresDbContext))]
-    [Migration("20231029142642_InitialCreate")]
+    [Migration("20231030072742_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />

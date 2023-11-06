@@ -3,6 +3,8 @@ using Microsoft.IdentityModel.Tokens;
 using Agroforum.Persistence;
 using Agroforum.Application;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Agroforum.Persistence.DbContexts;
+using Microsoft.EntityFrameworkCore;
 
 namespace Agroforum.WebApi
 {
@@ -17,6 +19,7 @@ namespace Agroforum.WebApi
             ConfigureApp(app);
 
 
+            app.MapGet("/", () => "Hello World!");
 
             app.Run();
 
@@ -24,7 +27,14 @@ namespace Agroforum.WebApi
 
         private static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
         {
-            services.AddPersistence(configuration);
+            var dbHost = Environment.GetEnvironmentVariable("DB_HOST");
+            var dbName = Environment.GetEnvironmentVariable("DB_NAME");
+            var userName = Environment.GetEnvironmentVariable("DB_USER");
+            var dbPassword = Environment.GetEnvironmentVariable("DB_PASSWORD");
+            //string connectionString = $"Host={dbHost};Database={dbName};Username={userName};Password={dbPassword};";
+            var connectionString = configuration.GetConnectionString("PostgresConnection");
+
+            services.AddPersistence(connectionString);
             services.AddApplication();
             services.AddControllers();
 
@@ -65,6 +75,15 @@ namespace Agroforum.WebApi
         private static void ConfigureApp(WebApplication app)
         {
             if (app.Environment.IsDevelopment()) app.UseDeveloperExceptionPage();
+
+            using (var scope = app.Services.CreateScope())
+            {
+                var services = scope.ServiceProvider;
+
+                var context = services.GetRequiredService<PostgresDbContext>();
+                if (context.Database.GetPendingMigrations().Any())
+                    context.Database.Migrate();
+            }
 
             //app.UseMiddleware<ExceptionHandlerMiddleware>();
             app.UseRouting();

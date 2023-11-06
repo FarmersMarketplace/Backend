@@ -16,14 +16,10 @@ namespace Agroforum.Application.Services.Auth
     {
         private SmtpClient SmtpClient { get; set; }
         private MailAddress FromAddress { get; set; }
-        private readonly IConfiguration Configuration;
         private string ConfirmationLink => "";
-        private int TokenLifetime => 2;
 
-        public EmailConfirmationService(IConfiguration configuration)
+        public EmailConfirmationService()
         {
-            Configuration = configuration;
-
             FromAddress = new MailAddress("cprog3321@gmail.com", "Agroforum");
             SmtpClient = new SmtpClient();
             SmtpClient.Host = "smtp.gmail.com";

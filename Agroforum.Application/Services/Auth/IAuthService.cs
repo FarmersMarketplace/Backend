@@ -10,7 +10,7 @@ namespace Agroforum.Application.Services
 {
     public interface IAuthService
     {
-        Task<RegisterVm> Register(RegisterDto accountDto);
+        Task Register(RegisterDto accountDto);
 
         Task ConfirmEmail(Guid userId, string email);
 

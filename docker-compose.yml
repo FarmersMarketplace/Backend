@@ -1,0 +1,32 @@
+version: '3.4'
+
+networks:
+    backend:
+
+services:
+  agroforum.webapi:
+    image: ${DOCKER_REGISTRY-}agroforumwebapi
+    build:
+      context: .
+      dockerfile: Agroforum.WebApi/Dockerfile
+    networks: 
+      - backend
+    ports:
+      - 8081:80
+    environment:
+      - DB_HOST=agroforumdb
+      - DB_NAME=AgroforumDb
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+  agroforumDb:
+      container_name: AgroforumDb
+      image: postgres:latest
+      environment:
+        - POSTGRES_USER=postgres
+        - POSTGRES_PASSWORD=postgres
+        - POSTGRES_DB=AgroforumDb
+      networks:
+        - backend
+      ports:
+        - 8082:5432
+  

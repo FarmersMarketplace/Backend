@@ -13,14 +13,14 @@ namespace Agroforum.Persistence
 {
     public static class DependencyInjection
     {
-        public static IServiceCollection AddPersistence(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddPersistence(this IServiceCollection services, string connectionString)
         {
-            var connectionString = configuration.GetConnectionString("PostgresConnection");
             services.AddDbContext<PostgresDbContext>(options =>
             {
                 options.UseNpgsql(connectionString);
             });
             services.AddScoped<IAgroforumDbContext>(provider => provider.GetService<PostgresDbContext>());
+
 
             return services;
         }
