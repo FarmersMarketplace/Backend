@@ -29,7 +29,6 @@ namespace Agroforum.Persistence.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<string>("Email")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Name")

@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Agroforum.Persistence.Migrations
 {
     [DbContext(typeof(PostgresDbContext))]
-    [Migration("20231030072742_InitialCreate")]
+    [Migration("20231116220858_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -32,7 +32,6 @@ namespace Agroforum.Persistence.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<string>("Email")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Name")

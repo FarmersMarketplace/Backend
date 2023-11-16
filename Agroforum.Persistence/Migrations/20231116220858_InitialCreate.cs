@@ -18,7 +18,7 @@ namespace Agroforum.Persistence.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "character varying(60)", maxLength: 60, nullable: false),
                     Surname = table.Column<string>(type: "character varying(60)", maxLength: 60, nullable: false),
-                    Email = table.Column<string>(type: "text", nullable: false),
+                    Email = table.Column<string>(type: "text", nullable: true),
                     Password = table.Column<string>(type: "text", nullable: false),
                     Roles = table.Column<int[]>(type: "integer[]", nullable: false)
                 },

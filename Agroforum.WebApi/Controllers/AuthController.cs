@@ -36,7 +36,7 @@ namespace Agroforum.WebApi.Controllers
 
             return NoContent();
         }
-
+        
         [HttpPut]
         public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
         {

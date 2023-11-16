@@ -9,6 +9,8 @@ using System.Security.Claims;
 using System.IdentityModel.Tokens.Jwt;
 using System.Configuration;
 using Microsoft.Extensions.Configuration;
+using Agroforum.Application.DataTransferObjects.Auth;
+using System.Net.Http;
 
 namespace Agroforum.Application.Services.Auth
 {
@@ -30,9 +32,14 @@ namespace Agroforum.Application.Services.Auth
             SmtpClient.Credentials = new NetworkCredential(FromAddress.Address, "hlaavdzwszaaohmh");
         }
         
-        public async Task SendConfirmationEmail(string token, string toEmail)
+        public async Task SendConfirmationEmail(string token, RegisterDto dto)
         {
-            string messageBody = $@"{token}";
+            var filePath = Directory.GetParent(Environment.CurrentDirectory) + "\\Agroforum.Application\\EmailTemplates\\verifyEmail.html";
+            string messageBody = File.ReadAllText(filePath);
+            messageBody = messageBody.Replace("{0}", dto.Name);
+            messageBody = messageBody.Replace("{1}", dto.Surname);
+            messageBody = messageBody.Replace("{2}", dto.Email);
+            messageBody = messageBody.Replace("{3}", token);
 
             var mailMessage = new MailMessage
             {
@@ -41,7 +48,7 @@ namespace Agroforum.Application.Services.Auth
                 Body = messageBody,
                 IsBodyHtml = true
             };
-            mailMessage.To.Add(toEmail);
+            mailMessage.To.Add(dto.Email);
 
             SmtpClient.Send(mailMessage);
         }

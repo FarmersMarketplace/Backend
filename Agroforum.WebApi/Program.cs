@@ -32,7 +32,9 @@ namespace Agroforum.WebApi
             var userName = Environment.GetEnvironmentVariable("DB_USER");
             var dbPassword = Environment.GetEnvironmentVariable("DB_PASSWORD");
             //string connectionString = $"Host={dbHost};Database={dbName};Username={userName};Password={dbPassword};";
-            var connectionString = configuration.GetConnectionString("PostgresConnection");
+            string connectionString = configuration.GetConnectionString("PostgresConnection");
+
+           
 
             services.AddPersistence(connectionString);
             services.AddApplication();

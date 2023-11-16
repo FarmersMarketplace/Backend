@@ -28,7 +28,7 @@ namespace Agroforum.Application.Services.Auth
             Guid id = Guid.NewGuid();
 
             await CreateAccount(id, accountDto);
-            await EmailService.SendConfirmationEmail(await JwtService.EmailConfirmationToken(id, accountDto.Email), accountDto.Email);
+            await EmailService.SendConfirmationEmail(await JwtService.EmailConfirmationToken(id, accountDto.Email), accountDto);
 
             await DbContext.SaveChangesAsync();
         }
@@ -39,9 +39,11 @@ namespace Agroforum.Application.Services.Auth
             if (existingAccountWithSameEmail != null) throw new DuplicateEmailException($"Email '{email}' is already associated with another account.");
 
             var account = await DbContext.Accounts.FirstOrDefaultAsync(a => a.Id == accountId);
+
             if (account == null) throw new NotFoundException($"Account with Id {accountId} not found in the database.");
             
             account.Email = email;
+            account.Roles.Add(Role.User);
             await DbContext.SaveChangesAsync();
         }
 
@@ -67,7 +69,7 @@ namespace Agroforum.Application.Services.Auth
                 Id = id,
                 Name = accountDto.Name,
                 Surname = accountDto.Surname,
-                Email = accountDto.Email,
+                //Email = accountDto.Email,
                 Password = accountDto.Password,
                 Roles = new List<Role>()
             };
