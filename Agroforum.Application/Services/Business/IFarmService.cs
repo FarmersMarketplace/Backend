@@ -10,5 +10,6 @@ namespace Agroforum.Application.Services.Business
     public interface IFarmService
     {
         Task Create(CreateFarmDto createFarmDto);
+        Task Update(UpdateFarmDto UpdateFarmDto);
     }
 }
