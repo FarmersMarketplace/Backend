@@ -20,8 +20,8 @@ namespace Agroforum.Persistence.EntityTypeConfigurations
             builder.Property(farm => farm.AddressId).IsRequired();
 
             builder.HasOne<Address>()
-                .WithMany()
-                .HasForeignKey(f => f.AddressId);
+                .WithOne()
+                .HasForeignKey<Farm>(f => f.Id);
         }
     }
 }

@@ -13,6 +13,8 @@ namespace Agroforum.Persistence.EntityTypeConfigurations
     {
         public void Configure(EntityTypeBuilder<Account> builder)
         {
+            builder.ToTable("Accounts");
+
             builder.HasKey(account => account.Id);
             builder.Property(account => account.Name).HasMaxLength(60).IsRequired();
             builder.Property(account => account.Surname).HasMaxLength(60).IsRequired();
