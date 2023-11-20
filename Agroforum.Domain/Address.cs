@@ -9,7 +9,6 @@ namespace Agroforum.Domain
     public class Address
     {
         public Guid Id { get; set; }
-        public string Country { get; set; }
         public string Region { get; set; }
         public string Settlement { get; set; }
         public string Street { get; set; } 
