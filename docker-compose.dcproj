@@ -3,7 +3,7 @@
   <PropertyGroup Label="Globals">
     <ProjectVersion>2.1</ProjectVersion>
     <DockerTargetOS>Linux</DockerTargetOS>
-    <ProjectGuid>b179860c-f45a-44e0-86f1-ee7c8096d3e5</ProjectGuid>
+    <ProjectGuid>678c1263-b558-47a0-8782-348981e57668</ProjectGuid>
     <DockerLaunchAction>LaunchBrowser</DockerLaunchAction>
     <DockerServiceUrl>{Scheme}://localhost:{ServicePort}</DockerServiceUrl>
     <DockerServiceName>agroforum.webapi</DockerServiceName>
