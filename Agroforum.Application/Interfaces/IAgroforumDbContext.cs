@@ -12,6 +12,8 @@ namespace Agroforum.Application.Interfaces
     public interface IAgroforumDbContext
     {
         DbSet<Account> Accounts { get; set; }
+        DbSet<Address> Addresses { get; set; }
+        DbSet<Farm> Farms { get; set; }
         Task<int> SaveChangesAsync(CancellationToken token);
         Task<int> SaveChangesAsync();
     }

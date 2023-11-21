@@ -9,7 +9,7 @@ namespace Agroforum.Persistence.DbContexts
     {
         public DbSet<Account> Accounts { get; set; }
         public DbSet<Address> Addresses { get; set; }
-        public DbSet<Farm> Farm { get; set; }
+        public DbSet<Farm> Farms { get; set; }
 
         public PostgresDbContext(DbContextOptions<PostgresDbContext> options) : base(options)
         {

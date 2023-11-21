@@ -69,7 +69,6 @@ namespace Agroforum.Application.Services.Auth
                 Id = id,
                 Name = accountDto.Name,
                 Surname = accountDto.Surname,
-                //Email = accountDto.Email,
                 Password = accountDto.Password,
                 Roles = new List<Role>()
             };
