@@ -160,5 +160,28 @@ namespace Agroforum.Application.Services.Business
         {
             throw new NotImplementedException();
         }
+
+        public async Task UpdateImages(UpdateFarmImagesDto updateFarmImagesDto)
+        {
+            var farm = await DbContext.Farms.FirstOrDefaultAsync(f => f.Id == updateFarmImagesDto.FarmId);
+            if (farm != null) throw new NotFoundException($"Farm with Id {updateFarmImagesDto.FarmId} does not exist.");
+
+            await DeleteFarmImages(farm.ImagePaths);
+            var paths = await AddFarmImages(updateFarmImagesDto.Images);
+            farm.ImagePaths = paths;
+            await DbContext.SaveChangesAsync();
+        }
+
+        private async Task DeleteFarmImages(List<string>? imagePaths)
+        {
+            foreach (var imagePath in imagePaths)
+            {
+                var fullPath = Path.Combine(Configuration["Environment:ImagesPath"], imagePath);
+                if (File.Exists(fullPath))
+                {
+                    File.Delete(fullPath);
+                }
+            }
+        }
     }
 }

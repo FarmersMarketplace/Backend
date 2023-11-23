@@ -60,9 +60,9 @@ namespace Agroforum.WebApi.Controllers
 
         [Authorize(Roles = "Farmer, User")]
         [HttpPut]
-        public async Task<IActionResult> UpdateImages([FromBody] UpdateFarmImagesDto updateFarmDto)
+        public async Task<IActionResult> UpdateImages([FromBody] UpdateFarmImagesDto updateFarmImagesDto)
         {
-            await FarmService.Update(updateFarmDto);
+            await FarmService.UpdateImages(updateFarmImagesDto);
             return NoContent();
         }
     }

@@ -8,7 +8,7 @@ namespace Agroforum.Application.DataTransferObjects.Farm
 {
     public class UpdateFarmImagesDto
     {
-        public Guid Id { get; set; }
+        public Guid FarmId { get; set; }
         public List<byte[]> Images { get; set; }
     }
 }
