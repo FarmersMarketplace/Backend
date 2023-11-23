@@ -33,7 +33,6 @@ namespace Agroforum.WebApi.Controllers
             var email = User.FindFirst(ClaimTypes.Email)?.Value;
 
             await AuthService.ConfirmEmail(accountId, email);
-
             return NoContent();
         }
         
@@ -44,25 +43,22 @@ namespace Agroforum.WebApi.Controllers
             return Ok(response);
         }
 
-        //[HttpPut]
-        //public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDto forgotPasswordDto)
-        //{
-        //    await AuthService.ForgotPassword(forgotPasswordDto);
+        [HttpPut]
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDto forgotPasswordDto)
+        {
+            await AuthService.ForgotPassword(forgotPasswordDto);
+            return NoContent();
+        }
 
-        //    return NoContent();
-        //}
+        [HttpPut]
+        [Authorize]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto resetPasswordDto)
+        {
+            var accountId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+            var email = User.FindFirst(ClaimTypes.Email)?.Value;
+            await AuthService.ResetPassword(accountId, email, resetPasswordDto);
 
-        //[HttpPut]
-        //[Authorize]
-        //public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto resetPasswordDto)
-        //{
-        //    var accountId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
-        //    var email = User.FindFirst(ClaimTypes.Email)?.Value;
-
-        //    await AuthService.ResetPassword(accountId, email, resetPasswordDto);
-
-        //    return NoContent();
-        //}
-
+            return NoContent();
+        }
     }
 }

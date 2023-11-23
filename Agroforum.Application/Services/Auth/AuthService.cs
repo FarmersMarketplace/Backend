@@ -92,7 +92,7 @@ namespace Agroforum.Application.Services.Auth
             var account = await DbContext.Accounts.FirstOrDefaultAsync(a => a.Email == forgotPasswordDto.Email);
             if (account == null) throw new NotFoundException($"Account with email {forgotPasswordDto.Email} is not found.");
 
-            await EmailService.SendPasswordResetEmail(await JwtService.EmailConfirmationToken(account.Id, account.Email), forgotPasswordDto.Email);
+            await EmailService.SendResetPasswordEmail(await JwtService.EmailConfirmationToken(account.Id, account.Email), forgotPasswordDto.Email);
         }
     }
 }

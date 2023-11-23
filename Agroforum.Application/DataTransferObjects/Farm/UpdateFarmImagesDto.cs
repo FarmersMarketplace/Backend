@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Agroforum.Application.DataTransferObjects.Farm
 {
-    public class DeleteFarmDto
+    public class UpdateFarmImagesDto
     {
-        public Guid FarmId { get; set; }
-        public Guid OwnerId { get; set; }
+        public Guid Id { get; set; }
+        public List<byte[]> Images { get; set; }
     }
 }

@@ -19,7 +19,21 @@ namespace Agroforum.Application.Services.Auth
         private SmtpClient SmtpClient { get; set; }
         private MailAddress FromAddress { get; set; }
         private string ConfirmationLink => "";
-        private string MessageBody = @"
+        
+
+        public EmailConfirmationService()
+        {
+            FromAddress = new MailAddress("cprog3321@gmail.com", "Agroforum");
+            SmtpClient = new SmtpClient();
+            SmtpClient.Host = "smtp.gmail.com";
+            SmtpClient.Port = 587;
+            SmtpClient.EnableSsl = true;
+            SmtpClient.DeliveryMethod = SmtpDeliveryMethod.Network;
+            SmtpClient.UseDefaultCredentials = false;
+            SmtpClient.Credentials = new NetworkCredential(FromAddress.Address, "hlaavdzwszaaohmh");
+        }
+
+        private string ConfirmationMessageBody = @"
 <!DOCTYPE html>
 <html lang=""en"">
 
@@ -79,32 +93,18 @@ namespace Agroforum.Application.Services.Auth
 </body>
 
 </html>";
-
-        public EmailConfirmationService()
-        {
-            FromAddress = new MailAddress("cprog3321@gmail.com", "Agroforum");
-            SmtpClient = new SmtpClient();
-            SmtpClient.Host = "smtp.gmail.com";
-            SmtpClient.Port = 587;
-            SmtpClient.EnableSsl = true;
-            SmtpClient.DeliveryMethod = SmtpDeliveryMethod.Network;
-            SmtpClient.UseDefaultCredentials = false;
-            SmtpClient.Credentials = new NetworkCredential(FromAddress.Address, "hlaavdzwszaaohmh");
-        }
-        
         public async Task SendConfirmationEmail(string token, RegisterDto dto)
         {
-            MessageBody = MessageBody.Replace("{0}", dto.Name);
-            MessageBody = MessageBody.Replace("{1}", dto.Surname);
-            MessageBody = MessageBody.Replace("{2}", dto.Email);
-            MessageBody = MessageBody.Replace("{3}", token);
-
+            ConfirmationMessageBody = ConfirmationMessageBody.Replace("{0}", dto.Name);
+            ConfirmationMessageBody = ConfirmationMessageBody.Replace("{1}", dto.Surname);
+            ConfirmationMessageBody = ConfirmationMessageBody.Replace("{2}", dto.Email);
+            ConfirmationMessageBody = ConfirmationMessageBody.Replace("{3}", token);
 
             var mailMessage = new MailMessage
             {
                 From = FromAddress,
                 Subject = "Agroforum Registration Confirmation",
-                Body = MessageBody,
+                Body = ConfirmationMessageBody,
                 IsBodyHtml = true
             };
             mailMessage.To.Add(dto.Email);
@@ -112,15 +112,17 @@ namespace Agroforum.Application.Services.Auth
             SmtpClient.Send(mailMessage);
         }
 
-        public async Task SendPasswordResetEmail(string token, string toEmail)
+        private string ResetPasswordMessageBody = @"{0} {1}";
+        public async Task SendResetPasswordEmail(string token, string toEmail)
         {
-            string messageBody = $@"{token}";
+            ResetPasswordMessageBody = ResetPasswordMessageBody.Replace("{0}", token);
+            ResetPasswordMessageBody = ResetPasswordMessageBody.Replace("{1}", toEmail);
 
             var mailMessage = new MailMessage
             {
                 From = FromAddress,
-                Subject = "Agroforum Registration Confirmation",
-                Body = messageBody,
+                Subject = "Password reset request for Agroforum account",
+                Body = ResetPasswordMessageBody,
                 IsBodyHtml = true
             };
             mailMessage.To.Add(toEmail);

@@ -154,6 +154,11 @@ namespace Agroforum.Application.Services.Business
             }
 
             return imageBytesList;
-        } 
+        }
+
+        public async Task<FarmListVm> GetAll(Guid userId)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
