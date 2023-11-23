@@ -7,7 +7,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System.ComponentModel.DataAnnotations;
 
-
 namespace Agroforum.Application.Services.Auth
 {
     public class AuthService : IAuthService
