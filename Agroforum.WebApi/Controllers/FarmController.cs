@@ -58,12 +58,5 @@ namespace Agroforum.WebApi.Controllers
             return NoContent();
         }
 
-        [Authorize(Roles = "Farmer, User")]
-        [HttpPut]
-        public async Task<IActionResult> UpdateImages([FromBody] UpdateFarmImagesDto updateFarmImagesDto)
-        {
-            await FarmService.UpdateImages(updateFarmImagesDto);
-            return NoContent();
-        }
     }
 }

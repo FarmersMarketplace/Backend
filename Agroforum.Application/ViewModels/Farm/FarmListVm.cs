@@ -8,6 +8,11 @@ namespace Agroforum.Application.ViewModels.Farm
 {
     public class FarmListVm
     {
-        public List<FarmLookupDto> Farms { get; set; }
+        public List<FarmLookupVm> Farms { get; set; }
+
+        public FarmListVm()
+        {
+            Farms = new List<FarmLookupVm>();
+        }
     }
 }

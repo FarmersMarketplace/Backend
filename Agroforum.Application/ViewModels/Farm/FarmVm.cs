@@ -15,6 +15,5 @@ namespace Agroforum.Application.ViewModels.Farm
         public string ContactEmail { get; set; }
         public string OwnerName { get; set; }
         public Address Address { get; set; }
-        public List<byte[]> Images { get; set; }
     }
 }

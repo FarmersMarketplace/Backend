@@ -15,6 +15,5 @@ namespace Agroforum.Domain
         public string ContactEmail { get; set; }
         public Guid OwnerId { get; set; }
         public Guid AddressId { get; set; }
-        public List<string>? ImagePaths { get; set; }
     }
 }

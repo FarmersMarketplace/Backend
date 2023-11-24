@@ -16,6 +16,5 @@ namespace Agroforum.Application.Services.Business
         Task Update(UpdateFarmDto updateFarmDto);
         Task Delete(DeleteFarmDto deleteFarmDto);
         Task<FarmListVm> GetAll(Guid userId);
-        Task UpdateImages(UpdateFarmImagesDto updateFarmImagesDto);
     }
 }
