@@ -76,7 +76,7 @@ namespace Agroforum.Application.Services.Business
         public async Task Delete(DeleteFarmDto deleteFarmDto)
         {
             var farm = await DbContext.Farms.FirstOrDefaultAsync(f => f.Id == deleteFarmDto.FarmId);
-            if (farm != null) throw new NotFoundException($"Farm with Id {deleteFarmDto.FarmId} does not exist.");
+            if (farm == null) throw new NotFoundException($"Farm with Id {deleteFarmDto.FarmId} does not exist.");
 
             DbContext.Farms.Remove(farm);
             await DbContext.SaveChangesAsync();
@@ -85,7 +85,7 @@ namespace Agroforum.Application.Services.Business
         public async Task Update(UpdateFarmDto updateFarmDto)
         {
             var farm = await DbContext.Farms.FirstOrDefaultAsync(f => f.Id == updateFarmDto.FarmId);
-            if (farm != null) throw new NotFoundException($"Farm with Id {updateFarmDto.FarmId} does not exist.");
+            if (farm == null) throw new NotFoundException($"Farm with Id {updateFarmDto.FarmId} does not exist.");
 
             var address = await DbContext.Addresses.FirstOrDefaultAsync(f => f.Id == updateFarmDto.FarmId);
             if (address == null)
@@ -111,7 +111,7 @@ namespace Agroforum.Application.Services.Business
         public async Task<FarmVm> Get(GetFarmDto getFarmDto)
         {
             var farm = await DbContext.Farms.FirstOrDefaultAsync(f => f.Id == getFarmDto.FarmId);
-            if (farm != null) throw new NotFoundException($"Farm with Id {getFarmDto.FarmId} does not exist.");
+            if (farm == null) throw new NotFoundException($"Farm with Id {getFarmDto.FarmId} does not exist.");
             var owner = await DbContext.Accounts.FirstOrDefaultAsync(a => a.Id == farm.OwnerId);
             if(owner == null) throw new NotFoundException($"Farm with Id {getFarmDto.FarmId} does not have owner.");
             var address = await DbContext.Addresses.FirstOrDefaultAsync(f => f.Id == getFarmDto.FarmId);

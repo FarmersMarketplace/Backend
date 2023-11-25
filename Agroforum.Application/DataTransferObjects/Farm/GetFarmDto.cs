@@ -14,5 +14,10 @@ namespace Agroforum.Application.DataTransferObjects.Farm
         {
             FarmId = id;
         }
+
+        public GetFarmDto()
+        {
+            
+        }
     }
 }

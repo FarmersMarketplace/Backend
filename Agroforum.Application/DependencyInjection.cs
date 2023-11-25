@@ -1,5 +1,6 @@
 ﻿using Agroforum.Application.Services;
 using Agroforum.Application.Services.Auth;
+using Agroforum.Application.Services.Business;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -15,6 +16,7 @@ namespace Agroforum.Application
         public static IServiceCollection AddApplication(this IServiceCollection services)
         {
             services.AddTransient<IAuthService, AuthService>();
+            services.AddTransient<IFarmService, FarmService>();
             return services;
         }
     }
