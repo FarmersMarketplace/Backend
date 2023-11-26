@@ -17,9 +17,7 @@ namespace Agroforum.Application.Services.Auth
     public class EmailConfirmationService
     {
         private SmtpClient SmtpClient { get; set; }
-        private MailAddress FromAddress { get; set; }
-        private string ConfirmationLink => "";
-        
+        private MailAddress FromAddress { get; set; }        
 
         public EmailConfirmationService()
         {
@@ -112,11 +110,24 @@ namespace Agroforum.Application.Services.Auth
             SmtpClient.Send(mailMessage);
         }
 
-        private string ResetPasswordMessageBody = @"{0} {1}";
+        private string ResetPasswordMessageBody = @"
+<!DOCTYPE html>
+<html lang=""en"">
+<head>
+  <meta charset=""UTF-8"">
+  <meta name=""viewport"" content=""width=device-width, initial-scale=1.0"">
+  <title>Password Reset Instructions</title>
+</head>
+<body>
+  <p>You are receiving this email because you or someone else has requested a password reset for your account.</p>
+  <p>If it was you, please click the link below to reset your password:</p>
+  <a href=""http://localhost:5173/#/resetPassword/{0}"">Reset Password</a>
+  <p>If you did not request a password reset, please ignore this email.</p>
+</body>
+</html>";
         public async Task SendResetPasswordEmail(string token, string toEmail)
         {
             ResetPasswordMessageBody = ResetPasswordMessageBody.Replace("{0}", token);
-            ResetPasswordMessageBody = ResetPasswordMessageBody.Replace("{1}", toEmail);
 
             var mailMessage = new MailMessage
             {
