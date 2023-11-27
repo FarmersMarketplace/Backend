@@ -10,6 +10,7 @@ namespace Agroforum.Persistence.DbContexts
         public DbSet<Account> Accounts { get; set; }
         public DbSet<Address> Addresses { get; set; }
         public DbSet<Farm> Farms { get; set; }
+        public DbSet<EmployeePermissions> EmployeesPermissions { get; set; }
 
         public PostgresDbContext(DbContextOptions<PostgresDbContext> options) : base(options)
         {

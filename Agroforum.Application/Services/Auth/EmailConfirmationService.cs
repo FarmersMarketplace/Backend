@@ -1,16 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Mail;
+﻿using System.Net.Mail;
 using System.Net;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
-using System.Security.Claims;
-using System.IdentityModel.Tokens.Jwt;
-using System.Configuration;
-using Microsoft.Extensions.Configuration;
 using Agroforum.Application.DataTransferObjects.Auth;
-using System.Net.Http;
+
 
 namespace Agroforum.Application.Services.Auth
 {
@@ -30,7 +21,7 @@ namespace Agroforum.Application.Services.Auth
             SmtpClient.UseDefaultCredentials = false;
             SmtpClient.Credentials = new NetworkCredential(FromAddress.Address, "hlaavdzwszaaohmh");
         }
-
+        
         private string ConfirmationMessageBody = @"
 <!DOCTYPE html>
 <html lang=""en"">
