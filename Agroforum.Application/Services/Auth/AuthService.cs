@@ -12,13 +12,13 @@ namespace Agroforum.Application.Services.Auth
     public class AuthService : IAuthService
     {
         private IAgroforumDbContext DbContext { get; set; }
-        private EmailConfirmationService EmailService { get; set; }
+        private EmailService EmailService { get; set; }
         private JwtService JwtService { get; set; }
 
         public AuthService(IAgroforumDbContext dbContext, IConfiguration configuration)
         {
             DbContext = dbContext;
-            EmailService = new EmailConfirmationService();
+            EmailService = new EmailService(configuration);
             JwtService = new JwtService(configuration);
         }
 
@@ -27,8 +27,8 @@ namespace Agroforum.Application.Services.Auth
             Guid id = Guid.NewGuid();
 
             await CreateAccount(id, accountDto);
-            await EmailService.SendConfirmationEmail(await JwtService.EmailConfirmationToken(id, accountDto.Email), accountDto);
-
+            string message = EmailContentBuilder.ConfirmationMessageBody(accountDto.Name, accountDto.Surname, accountDto.Email, await JwtService.EmailConfirmationToken(id, accountDto.Email));
+            await EmailService.SendEmail(message, accountDto.Email, "Agroforum Registration Confirmation");
             await DbContext.SaveChangesAsync();
         }
 
@@ -90,8 +90,8 @@ namespace Agroforum.Application.Services.Auth
         {
             var account = await DbContext.Accounts.FirstOrDefaultAsync(a => a.Email == forgotPasswordDto.Email);
             if (account == null) throw new NotFoundException($"Account with email {forgotPasswordDto.Email} is not found.");
-
-            await EmailService.SendResetPasswordEmail(await JwtService.EmailConfirmationToken(account.Id, account.Email), forgotPasswordDto.Email);
+            string message = EmailContentBuilder.ResetPasswordMessageBody(await JwtService.EmailConfirmationToken(account.Id, account.Email));
+            await EmailService.SendEmail(message, forgotPasswordDto.Email, "Password reset request for Agroforum account");
         }
     }
 }
