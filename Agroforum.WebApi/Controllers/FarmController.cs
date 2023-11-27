@@ -17,15 +17,15 @@ namespace Agroforum.WebApi.Controllers
             FarmService = farmService;
         }
 
-        [HttpGet]
-        public async Task<IActionResult> Get([FromBody] GetFarmDto getFarmDto)
+        [HttpGet("{farmId}")]
+        public async Task<IActionResult> Get([FromRoute] Guid farmId)
         {
-            var request = await FarmService.Get(getFarmDto);
+            var request = await FarmService.Get(farmId);
             return Ok(request);
         }
 
         [HttpGet]
-        [Authorize]
+        [Authorize(Roles = "User")]
         public async Task<IActionResult> GetAll()
         {
             var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
@@ -33,8 +33,8 @@ namespace Agroforum.WebApi.Controllers
             return Ok(request);
         }
 
-        [Authorize(Roles = "Farmer, User")]
         [HttpPost]
+        [Authorize(Roles = "Farmer")]
         public async Task<IActionResult> Create([FromBody] CreateFarmDto createFarmDto)
         {
             createFarmDto.OwnerId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
@@ -42,15 +42,15 @@ namespace Agroforum.WebApi.Controllers
             return NoContent();
         }
 
-        [Authorize(Roles = "Farmer, User")]
-        [HttpDelete]
-        public async Task<IActionResult> Delete([FromBody] DeleteFarmDto deleteFarmDto)
+        [HttpDelete("{farmId}")]
+        [Authorize(Roles = "Farmer")]
+        public async Task<IActionResult> Delete([FromRoute] Guid farmId)
         {
-            await FarmService.Delete(deleteFarmDto);
+            var ownerId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+            await FarmService.Delete(farmId, ownerId);
             return NoContent();
         }
 
-        [Authorize(Roles = "Farmer, User")]
         [HttpPut]
         public async Task<IActionResult> Update([FromBody] UpdateFarmDto updateFarmDto)
         {

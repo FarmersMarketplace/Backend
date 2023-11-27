@@ -21,6 +21,7 @@ namespace Agroforum.Persistence.DbContexts
             modelBuilder.ApplyConfiguration(new AccountConfiguration());
             modelBuilder.ApplyConfiguration(new AddressConfiguration());
             modelBuilder.ApplyConfiguration(new FarmConfiguration());
+            modelBuilder.ApplyConfiguration(new EmployeePermissionsConfigurations());
 
             base.OnModelCreating(modelBuilder);
         }
