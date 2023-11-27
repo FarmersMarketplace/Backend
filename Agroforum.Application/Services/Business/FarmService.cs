@@ -73,10 +73,10 @@ namespace Agroforum.Application.Services.Business
         //    return imagePaths;
         //}
 
-        public async Task Delete(DeleteFarmDto deleteFarmDto)
+        public async Task Delete(Guid farmId, Guid ownerId)
         {
-            var farm = await DbContext.Farms.FirstOrDefaultAsync(f => f.Id == deleteFarmDto.FarmId);
-            if (farm == null) throw new NotFoundException($"Farm with Id {deleteFarmDto.FarmId} does not exist.");
+            var farm = await DbContext.Farms.FirstOrDefaultAsync(f => f.Id == farmId && f.OwnerId == ownerId);
+            if (farm == null) throw new NotFoundException($"Farm with Id {farmId} does not exist.");
 
             DbContext.Farms.Remove(farm);
             await DbContext.SaveChangesAsync();
@@ -108,13 +108,13 @@ namespace Agroforum.Application.Services.Business
             await DbContext.SaveChangesAsync();
         }
 
-        public async Task<FarmVm> Get(GetFarmDto getFarmDto)
+        public async Task<FarmVm> Get(Guid farmId)
         {
-            var farm = await DbContext.Farms.FirstOrDefaultAsync(f => f.Id == getFarmDto.FarmId);
-            if (farm == null) throw new NotFoundException($"Farm with Id {getFarmDto.FarmId} does not exist.");
+            var farm = await DbContext.Farms.FirstOrDefaultAsync(f => f.Id == farmId);
+            if (farm == null) throw new NotFoundException($"Farm with Id {farmId} does not exist.");
             var owner = await DbContext.Accounts.FirstOrDefaultAsync(a => a.Id == farm.OwnerId);
-            if(owner == null) throw new NotFoundException($"Farm with Id {getFarmDto.FarmId} does not have owner.");
-            var address = await DbContext.Addresses.FirstOrDefaultAsync(f => f.Id == getFarmDto.FarmId);
+            if(owner == null) throw new NotFoundException($"Farm with Id {farmId} does not have owner.");
+            var address = await DbContext.Addresses.FirstOrDefaultAsync(f => f.Id == farmId);
             if (address == null)
             {
                 address = new Address() { Id = Guid.NewGuid() };

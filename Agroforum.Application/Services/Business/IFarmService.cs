@@ -11,10 +11,10 @@ namespace Agroforum.Application.Services.Business
 {
     public interface IFarmService
     {
-        Task<FarmVm> Get(GetFarmDto getFarmDto);
+        Task<FarmVm> Get(Guid farmId);
         Task Create(CreateFarmDto createFarmDto);
         Task Update(UpdateFarmDto updateFarmDto);
-        Task Delete(DeleteFarmDto deleteFarmDto);
+        Task Delete(Guid farmId, Guid ownerId);
         Task<FarmListVm> GetAll(Guid userId);
     }
 }
