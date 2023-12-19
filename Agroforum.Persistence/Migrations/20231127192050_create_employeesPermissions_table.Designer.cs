@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Agroforum.Persistence.Migrations
 {
     [DbContext(typeof(MainDbContext))]
-    [Migration("20231125133324_2_create_farms_and_addresses_tables")]
-    partial class _create_farms_and_addresses_tables
+    [Migration("20231127192050_create_employeesPermissions_table")]
+    partial class create_employeesPermissions_table
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -94,6 +94,57 @@ namespace Agroforum.Persistence.Migrations
                     b.ToTable("Addresses", (string)null);
                 });
 
+            modelBuilder.Entity("Agroforum.Domain.EmployeePermissions", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("AccountId")
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("AddEmployee")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("CreateProduct")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("DeleteEmployee")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("DeleteProduct")
+                        .HasColumnType("boolean");
+
+                    b.Property<Guid>("FarmId")
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("ListProductForSale")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("UpdateEmployeePermissions")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("UpdateFarmInformation")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("UpdateProduct")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("WithdrawProductFromSale")
+                        .HasColumnType("boolean");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AccountId");
+
+                    b.HasIndex("FarmId");
+
+                    b.HasIndex("Id")
+                        .IsUnique();
+
+                    b.ToTable("EmployeesPermissions", (string)null);
+                });
+
             modelBuilder.Entity("Agroforum.Domain.Farm", b =>
                 {
                     b.Property<Guid>("Id")
@@ -124,6 +175,21 @@ namespace Agroforum.Persistence.Migrations
                         .IsUnique();
 
                     b.ToTable("Farms", (string)null);
+                });
+
+            modelBuilder.Entity("Agroforum.Domain.EmployeePermissions", b =>
+                {
+                    b.HasOne("Agroforum.Domain.Account", null)
+                        .WithMany()
+                        .HasForeignKey("AccountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Agroforum.Domain.Farm", null)
+                        .WithMany()
+                        .HasForeignKey("FarmId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Agroforum.Domain.Farm", b =>

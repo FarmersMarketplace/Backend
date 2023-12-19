@@ -15,11 +15,11 @@ namespace Agroforum.Persistence
     {
         public static IServiceCollection AddPersistence(this IServiceCollection services, string connectionString)
         {
-            services.AddDbContext<PostgresDbContext>(options =>
+            services.AddDbContext<MainDbContext>(options =>
             {
                 options.UseNpgsql(connectionString);
             });
-            services.AddScoped<IAgroforumDbContext>(provider => provider.GetService<PostgresDbContext>());
+            services.AddScoped<IAgroforumDbContext>(provider => provider.GetService<MainDbContext>());
 
 
             return services;

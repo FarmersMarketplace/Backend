@@ -1,4 +1,6 @@
-﻿namespace Agroforum.Application.DataTransferObjects.Auth
+﻿using Agroforum.Domain;
+
+namespace Agroforum.Application.DataTransferObjects.Auth
 {
     public class RegisterDto
     {
@@ -7,6 +9,6 @@
         public string Email { get; set; }
         public string Password { get; set; }
         public string ConfirmPassword{ get; set; }
-        public bool IsFarmer { get; set; }
+        public Role Role { get; set; }
     }
 }

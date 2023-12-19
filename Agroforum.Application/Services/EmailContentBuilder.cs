@@ -73,7 +73,7 @@ namespace Agroforum.Application.Services
    <div id=""container"">
       <h2>Registration Confirmation</h2>
       <p>Dear {name} {surname},</p>
-      <p>Thank you for registering on our [website/service]. We are pleased to welcome you to our community!</p>
+      <p>Thank you for registering on our website. We are pleased to welcome you to our community!</p>
       <p><strong>Name:</strong> {name} {surname}<br>
          <strong>Email:</strong> {email}<br>
 

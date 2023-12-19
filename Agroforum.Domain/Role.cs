@@ -8,7 +8,8 @@ namespace Agroforum.Domain
 {
     public enum Role
     {
-        User,
-        Farmer
+        Customer,
+        FarmOwner,
+        Seller
     }
 }

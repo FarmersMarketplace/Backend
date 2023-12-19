@@ -31,11 +31,9 @@ namespace Agroforum.WebApi
             var dbName = Environment.GetEnvironmentVariable("DB_NAME");
             var userName = Environment.GetEnvironmentVariable("DB_USER");
             var dbPassword = Environment.GetEnvironmentVariable("DB_PASSWORD");
-            //string connectionString = $"Host={dbHost};Database={dbName};Username={userName};Password={dbPassword};";
-            string connectionString = configuration.GetConnectionString("PostgresConnection");
-
+            string connectionString = $"Host={dbHost};Database={dbName};Username={userName};Password={dbPassword};";
+            //string connectionString = configuration.GetConnectionString("PostgresConnection");
             
-
             services.AddPersistence(connectionString);
             services.AddApplication();
             services.AddControllers();
@@ -82,12 +80,11 @@ namespace Agroforum.WebApi
             {
                 var services = scope.ServiceProvider;
 
-                var context = services.GetRequiredService<PostgresDbContext>();
+                var context = services.GetRequiredService<MainDbContext>();
                 if (context.Database.GetPendingMigrations().Any())
                     context.Database.Migrate();
             }
 
-            //app.UseMiddleware<ExceptionHandlerMiddleware>();
             app.UseRouting();
             app.UseHttpsRedirection();
             app.UseCors("AllowAll"); //change in future

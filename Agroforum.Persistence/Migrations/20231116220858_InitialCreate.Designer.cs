@@ -11,7 +11,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace Agroforum.Persistence.Migrations
 {
-    [DbContext(typeof(PostgresDbContext))]
+    [DbContext(typeof(MainDbContext))]
     [Migration("20231116220858_InitialCreate")]
     partial class InitialCreate
     {

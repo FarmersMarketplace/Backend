@@ -3,16 +3,17 @@ using Agroforum.Domain;
 using Agroforum.Persistence.EntityTypeConfigurations;
 using Microsoft.EntityFrameworkCore;
 
+
 namespace Agroforum.Persistence.DbContexts
 {
-    public class PostgresDbContext : DbContext, IAgroforumDbContext
+    public class MainDbContext : DbContext, IAgroforumDbContext
     {
         public DbSet<Account> Accounts { get; set; }
         public DbSet<Address> Addresses { get; set; }
         public DbSet<Farm> Farms { get; set; }
         public DbSet<EmployeePermissions> EmployeesPermissions { get; set; }
 
-        public PostgresDbContext(DbContextOptions<PostgresDbContext> options) : base(options)
+        public MainDbContext(DbContextOptions<MainDbContext> options) : base(options)
         {
         }
 

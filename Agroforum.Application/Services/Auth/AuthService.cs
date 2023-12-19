@@ -42,7 +42,7 @@ namespace Agroforum.Application.Services.Auth
             if (account == null) throw new NotFoundException($"Account with Id {accountId} not found in the database.");
             
             account.Email = email;
-            account.Roles.Add(Role.User);
+            account.Roles.Add(Role.Customer);
             await DbContext.SaveChangesAsync();
         }
 
@@ -71,7 +71,7 @@ namespace Agroforum.Application.Services.Auth
                 Password = accountDto.Password,
                 Roles = new List<Role>()
             };
-            if (accountDto.IsFarmer) account.Roles.Add(Role.Farmer);
+            if (accountDto.IsFarmer) account.Roles.Add(Role.FarmOwner);
 
             await DbContext.Accounts.AddAsync(account);
         }
