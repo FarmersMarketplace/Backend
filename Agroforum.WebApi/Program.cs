@@ -5,6 +5,7 @@ using Agroforum.Application;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Agroforum.Persistence.DbContexts;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 
 namespace Agroforum.WebApi
 {
@@ -31,10 +32,15 @@ namespace Agroforum.WebApi
             var dbName = Environment.GetEnvironmentVariable("DB_NAME");
             var userName = Environment.GetEnvironmentVariable("DB_USER");
             var dbPassword = Environment.GetEnvironmentVariable("DB_PASSWORD");
-            string connectionString = $"Host={dbHost};Database={dbName};Username={userName};Password={dbPassword};";
-            //string connectionString = configuration.GetConnectionString("PostgresConnection");
-            
+            //string connectionString = $"Host={dbHost};Database={dbName};Username={userName};Password={dbPassword};";
+            string connectionString = configuration.GetConnectionString("PostgresConnection");
             services.AddPersistence(connectionString);
+
+            Log.Logger = new LoggerConfiguration()
+                .ReadFrom.Configuration(configuration)
+                .CreateLogger();
+            Log.Information("The program has started.");
+
             services.AddApplication();
             services.AddControllers();
 
@@ -84,6 +90,12 @@ namespace Agroforum.WebApi
                 if (context.Database.GetPendingMigrations().Any())
                     context.Database.Migrate();
             }
+
+            AppDomain.CurrentDomain.ProcessExit += (sender, e) =>
+            {
+                Log.Information("Program has exited successfully.");
+                Log.CloseAndFlush();
+            };
 
             app.UseRouting();
             app.UseHttpsRedirection();

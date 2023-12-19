@@ -71,7 +71,7 @@ namespace Agroforum.Application.Services.Auth
                 Password = accountDto.Password,
                 Roles = new List<Role>()
             };
-            if (accountDto.IsFarmer) account.Roles.Add(Role.FarmOwner);
+            //if (accountDto.Role) account.Roles.Add(Role.FarmOwner);
 
             await DbContext.Accounts.AddAsync(account);
         }
