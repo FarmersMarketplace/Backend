@@ -3,9 +3,11 @@ using Agroforum.Application.Exceptions;
 using Agroforum.Application.Interfaces;
 using Agroforum.Application.ViewModels.Auth;
 using Agroforum.Domain;
+using Google.Apis.Auth;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System.ComponentModel.DataAnnotations;
+using static Google.Apis.Auth.GoogleJsonWebSignature;
 
 namespace Agroforum.Application.Services.Auth
 {
@@ -28,7 +30,7 @@ namespace Agroforum.Application.Services.Auth
 
             await CreateAccount(id, accountDto);
             string message = EmailContentBuilder.ConfirmationMessageBody(accountDto.Name, accountDto.Surname, accountDto.Email, await JwtService.EmailConfirmationToken(id, accountDto.Email));
-            await EmailService.SendEmail(message, accountDto.Email, "Agroforum Registration Confirmation");
+            await EmailService.SendEmail(message, accountDto.Email, "[ServiceName] Registration Confirmation");
             await DbContext.SaveChangesAsync();
         }
 
@@ -71,7 +73,7 @@ namespace Agroforum.Application.Services.Auth
                 Password = accountDto.Password,
                 Roles = new List<Role>()
             };
-            //if (accountDto.Role) account.Roles.Add(Role.FarmOwner);
+            account.Roles.Add(accountDto.Role);
 
             await DbContext.Accounts.AddAsync(account);
         }
@@ -90,8 +92,32 @@ namespace Agroforum.Application.Services.Auth
         {
             var account = await DbContext.Accounts.FirstOrDefaultAsync(a => a.Email == forgotPasswordDto.Email);
             if (account == null) throw new NotFoundException($"Account with email {forgotPasswordDto.Email} is not found.");
-            string message = EmailContentBuilder.ResetPasswordMessageBody(await JwtService.EmailConfirmationToken(account.Id, account.Email));
+            string message = EmailContentBuilder.ResetPasswordMessageBody(account.Name, account.Surname, await JwtService.EmailConfirmationToken(account.Id, account.Email));
             await EmailService.SendEmail(message, forgotPasswordDto.Email, "Password reset request for Agroforum account");
+        }
+
+        public async Task<JwtVm> AuthenticateWithGoogle(AuthenticateWithGoogleDto authenticateWithGoogleDto)
+        {
+            Payload payload = await GoogleJsonWebSignature.ValidateAsync(authenticateWithGoogleDto.GoogleIdToken);
+
+            var account = await DbContext.Accounts.FirstOrDefaultAsync(a => a.Email == payload.Email);
+            if (account == null) 
+            {
+                account = new Account 
+                {
+                    Id = Guid.NewGuid(),
+                    Name = payload.GivenName,
+                    Surname = payload.FamilyName,
+                    Email = payload.Email,
+                    Roles = new List<Role> { Role.Customer}
+                };
+                DbContext.Accounts.Add(account);
+                await DbContext.SaveChangesAsync();
+            }
+
+            var request = await JwtService.Authenticate(account);
+
+            return request;
         }
     }
 }

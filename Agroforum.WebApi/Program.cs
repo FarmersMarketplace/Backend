@@ -6,6 +6,9 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Agroforum.Persistence.DbContexts;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
+using Agroforum.WebApi.Middlewares;
+using System.Reflection;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Agroforum.WebApi
 {
@@ -28,21 +31,24 @@ namespace Agroforum.WebApi
 
         private static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
         {
-            var dbHost = Environment.GetEnvironmentVariable("DB_HOST");
-            var dbName = Environment.GetEnvironmentVariable("DB_NAME");
-            var userName = Environment.GetEnvironmentVariable("DB_USER");
-            var dbPassword = Environment.GetEnvironmentVariable("DB_PASSWORD");
+            //var dbHost = Environment.GetEnvironmentVariable("DB_HOST");
+            //var dbName = Environment.GetEnvironmentVariable("DB_NAME");
+            //var userName = Environment.GetEnvironmentVariable("DB_USER");
+            //var dbPassword = Environment.GetEnvironmentVariable("DB_PASSWORD");
             //string connectionString = $"Host={dbHost};Database={dbName};Username={userName};Password={dbPassword};";
-            string connectionString = configuration.GetConnectionString("PostgresConnection");
+            string connectionString = configuration.GetConnectionString("RenderConnection");
             services.AddPersistence(connectionString);
-
+            
             Log.Logger = new LoggerConfiguration()
                 .ReadFrom.Configuration(configuration)
                 .CreateLogger();
             Log.Information("The program has started.");
 
             services.AddApplication();
-            services.AddControllers();
+            services.AddControllers(options =>
+            {
+                options.Filters.Add(new ProducesAttribute("application/json"));
+            });
 
             services.AddAuthentication(options =>
             {
@@ -63,6 +69,13 @@ namespace Agroforum.WebApi
                     ValidateIssuer = false,
                     ValidateAudience = false,
                 };
+            });
+
+            services.AddSwaggerGen(config =>
+            {
+                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                config.IncludeXmlComments(xmlPath);
             });
 
             services.AddCors(options =>
@@ -97,11 +110,19 @@ namespace Agroforum.WebApi
                 Log.CloseAndFlush();
             };
 
+
+            app.UseMiddleware<ExceptionHandlerMiddleware>();
             app.UseRouting();
             app.UseHttpsRedirection();
             app.UseCors("AllowAll"); //change in future
             app.UseAuthentication();
             app.UseAuthorization();
+            app.UseSwagger();
+            app.UseSwaggerUI(options =>
+            {
+                options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
+                options.RoutePrefix = string.Empty;
+            });
 
             app.UseEndpoints(endpoints =>
             {

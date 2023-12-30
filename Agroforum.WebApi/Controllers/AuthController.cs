@@ -1,6 +1,7 @@
 ﻿using Agroforum.Application.DataTransferObjects.Auth;
 using Agroforum.Application.Services;
 using Agroforum.Application.ViewModels;
+using Agroforum.Application.ViewModels.Auth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -19,6 +20,7 @@ namespace Agroforum.WebApi.Controllers
         }
 
         [HttpPost]
+        [ProducesResponseType(204)]
         public async Task<IActionResult> Register([FromBody] RegisterDto accountDto)
         {
             await AuthService.Register(accountDto);
@@ -27,6 +29,7 @@ namespace Agroforum.WebApi.Controllers
 
         [HttpPut]
         [Authorize]
+        [ProducesResponseType(204)]
         public async Task<IActionResult> ConfirmEmail()
         {
             var accountId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
@@ -37,6 +40,7 @@ namespace Agroforum.WebApi.Controllers
         }
         
         [HttpPut]
+        [ProducesResponseType(typeof(JwtVm), 200)]
         public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
         {
             var response = await AuthService.Login(loginDto);
@@ -44,6 +48,15 @@ namespace Agroforum.WebApi.Controllers
         }
 
         [HttpPut]
+        [ProducesResponseType(typeof(JwtVm), 200)]
+        public async Task<IActionResult> AuthenticateWithGoogle([FromBody] AuthenticateWithGoogleDto authenticateWithGoogleDto)
+        {
+            var response = await AuthService.AuthenticateWithGoogle(authenticateWithGoogleDto);
+            return Ok(response);
+        }
+
+        [HttpPut]
+        [ProducesResponseType(204)]
         public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDto forgotPasswordDto)
         {
             await AuthService.ForgotPassword(forgotPasswordDto);
@@ -52,6 +65,7 @@ namespace Agroforum.WebApi.Controllers
 
         [HttpPut]
         [Authorize]
+        [ProducesResponseType(204)]
         public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto resetPasswordDto)
         {
             var accountId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);

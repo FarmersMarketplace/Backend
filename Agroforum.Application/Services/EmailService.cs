@@ -12,7 +12,7 @@ namespace Agroforum.Application.Services
 
         public EmailService(IConfiguration configuration)
         {
-            FromAddress = new MailAddress(configuration["Email:Login"], "Agroforum");
+            FromAddress = new MailAddress(configuration["Email:Login"], "[ServiceName]");
             SmtpClient = new SmtpClient();
             SmtpClient.Host = "smtp.gmail.com";
             SmtpClient.Port = 587;

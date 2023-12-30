@@ -32,7 +32,7 @@ namespace Agroforum.WebApi.Controllers
             return NoContent();
         }
 
-        [HttpDelete("{permissionId}")]
+        [HttpDelete("{permissionsId}")]
         public async Task<IActionResult> Delete([FromRoute] Guid permissionsId)
         {
             await EmployeeService.Delete(permissionsId);

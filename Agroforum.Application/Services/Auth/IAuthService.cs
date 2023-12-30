@@ -17,5 +17,6 @@ namespace Agroforum.Application.Services
         Task<JwtVm> Login(LoginDto loginDto);
         Task ResetPassword(Guid accountId, string? email, ResetPasswordDto resetPasswordDto);
         Task ForgotPassword(ForgotPasswordDto forgotPasswordDto);
+        Task<JwtVm> AuthenticateWithGoogle(AuthenticateWithGoogleDto authenticateWithGoogleDto);
     }
 }
