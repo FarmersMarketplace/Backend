@@ -13,6 +13,9 @@ namespace Agroforum.Domain
         public string Name { get; set; }
         public string Description { get; set; }
         public string ContactEmail { get; set; }
+        public string? WebsiteUrl { get; set; }
+        public bool IsVisibleOnMap { get; set; }
+        public List<string> PhotoPaths { get; set; }
         public Guid OwnerId { get; set; }
         public Guid AddressId { get; set; }
     }

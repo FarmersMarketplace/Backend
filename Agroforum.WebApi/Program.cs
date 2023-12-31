@@ -9,6 +9,7 @@ using Serilog;
 using Agroforum.WebApi.Middlewares;
 using System.Reflection;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.OpenApi.Models;
 
 namespace Agroforum.WebApi
 {
@@ -36,7 +37,7 @@ namespace Agroforum.WebApi
             //var userName = Environment.GetEnvironmentVariable("DB_USER");
             //var dbPassword = Environment.GetEnvironmentVariable("DB_PASSWORD");
             //string connectionString = $"Host={dbHost};Database={dbName};Username={userName};Password={dbPassword};";
-            string connectionString = configuration.GetConnectionString("RenderConnection");
+            string connectionString = configuration.GetConnectionString("RemoteConnection");
             services.AddPersistence(connectionString);
             
             Log.Logger = new LoggerConfiguration()
@@ -76,6 +77,11 @@ namespace Agroforum.WebApi
                 var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
                 config.IncludeXmlComments(xmlPath);
+                config.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Title = "Swagger",
+                    Version = "v1",
+                });
             });
 
             services.AddCors(options =>
