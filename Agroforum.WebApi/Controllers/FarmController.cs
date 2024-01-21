@@ -10,7 +10,7 @@ namespace Agroforum.WebApi.Controllers
     [Route("api/[controller]/[action]")]
     public class FarmController : ControllerBase
     {
-        private IFarmService FarmService;
+        private readonly IFarmService FarmService;
 
         public FarmController(IFarmService farmService)
         {
@@ -25,6 +25,7 @@ namespace Agroforum.WebApi.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "FarmOwner")]
         public async Task<IActionResult> GetAll()
         {
             var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
@@ -57,5 +58,11 @@ namespace Agroforum.WebApi.Controllers
             return NoContent();
         }
 
+        [HttpPut]
+        public async Task<IActionResult> UpdateFarmImages([FromBody] UpdateFarmImagesDto updateFarmImagesDto)
+        {
+            await FarmService.UpdateFarmImages(updateFarmImagesDto);
+            return NoContent();
+        }
     }
 }

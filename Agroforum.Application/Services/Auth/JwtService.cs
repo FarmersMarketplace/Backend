@@ -35,12 +35,14 @@ namespace Agroforum.Application.Services.Auth
                 foreach (var role in account.Roles)
                     claims.Add(new Claim(ClaimTypes.Role, role.ToString()));
             }
-
+            var notBefore = DateTime.UtcNow;
+            var expires = notBefore.AddHours(int.Parse(Configuration["Auth:TokenLifetime"]));
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Issuer = Configuration["Auth:Issuer"],
                 Audience = Configuration["Auth:Audience"],
-                Expires = DateTime.UtcNow.AddHours(int.Parse(Configuration["Auth:TokenLifetime"])),
+                Expires = expires,
+                NotBefore = notBefore,
                 Subject = new ClaimsIdentity(claims),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
             };
@@ -52,8 +54,10 @@ namespace Agroforum.Application.Services.Auth
         public async Task<string> EmailConfirmationToken(Guid id, string email)
         {
             const int tokenLifetime = 2;
-
+            var notBefore = DateTime.UtcNow;
+            var expires = notBefore.AddHours(tokenLifetime);
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Auth:Secret"]));
+
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Issuer = Configuration["Auth:Issuer"],
@@ -63,7 +67,8 @@ namespace Agroforum.Application.Services.Auth
                     new Claim(ClaimTypes.NameIdentifier, id.ToString()),
                     new Claim(ClaimTypes.Email, email)
                 }),
-                Expires = DateTime.Now.AddHours(tokenLifetime),
+                NotBefore = notBefore,
+                Expires = expires,
                 SigningCredentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256Signature)
             };
 

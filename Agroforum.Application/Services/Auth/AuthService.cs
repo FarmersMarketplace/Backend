@@ -13,7 +13,7 @@ namespace Agroforum.Application.Services.Auth
 {
     public class AuthService : IAuthService
     {
-        private IAgroforumDbContext DbContext { get; set; }
+        private readonly IAgroforumDbContext DbContext;
         private EmailService EmailService { get; set; }
         private JwtService JwtService { get; set; }
 
@@ -41,7 +41,7 @@ namespace Agroforum.Application.Services.Auth
 
             var account = await DbContext.Accounts.FirstOrDefaultAsync(a => a.Id == accountId);
 
-            if (account == null) throw new NotFoundException($"Account with Id {accountId} not found in the database.");
+            if (account == null) throw new NotFoundException($"Account with Id {accountId} not found.");
             
             account.Email = email;
             account.Roles.Add(Role.Customer);

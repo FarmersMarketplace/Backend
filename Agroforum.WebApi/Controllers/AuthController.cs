@@ -12,7 +12,7 @@ namespace Agroforum.WebApi.Controllers
     [Route("api/[controller]/[action]")]
     public class AuthController : ControllerBase
     {
-        private IAuthService AuthService;
+        private readonly IAuthService AuthService;
 
         public AuthController(IAuthService authService)
         {

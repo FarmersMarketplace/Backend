@@ -12,15 +12,18 @@ namespace Agroforum.Application.Services.Business
 {
     public class FarmService : IFarmService
     {
-        private IAgroforumDbContext DbContext { get; set; }
+        private readonly IAgroforumDbContext DbContext;
+        private IConfiguration Configuration { get; set; }
 
-        public FarmService(IAgroforumDbContext dbContext)
+        public FarmService(IAgroforumDbContext dbContext, IConfiguration configuration)
         {
             DbContext = dbContext;
+            Configuration = configuration;
         }
 
         public async Task Create(CreateFarmDto createFarmDto)
         {
+            throw new Exception("Solve images problem!");
             var address = new Address
             {
                 Id = Guid.NewGuid(),
@@ -31,12 +34,16 @@ namespace Agroforum.Application.Services.Business
                 PostalCode = createFarmDto.PostalCode
             };
 
+            //var imagesPaths = await HandleFarmImages();
+
             var farm = new Farm
             {
                 Id = Guid.NewGuid(),
                 Name = createFarmDto.Name,
                 Description = createFarmDto.Description,
                 ContactEmail = createFarmDto.ContactEmail,
+                IsVisibleOnMap = createFarmDto.IsVisibleOnMap,
+                //ImagesPaths = imagesPaths
                 OwnerId = createFarmDto.OwnerId,
                 AddressId = address.Id,
             };
@@ -46,35 +53,36 @@ namespace Agroforum.Application.Services.Business
             await DbContext.SaveChangesAsync();
         }
 
-        //public async Task<List<string>> AddFarmImages(ICollection<byte[]>? images)
-        //{
-        //    var imagePaths = new List<string>();
+        public async Task<List<string>> HandleFarmImages(ICollection<byte[]>? images)
+        {
+            var imagePaths = new List<string>();
 
-        //    foreach (var imageBytes in images)
-        //    {
-        //        var imageName = Guid.NewGuid().ToString() + ".jpg";
-        //        var imagePath = Path.Combine(Configuration["Environment:ImagesPath"], imageName);
+            foreach (var imageBytes in images)
+            {
+                var imageName = Guid.NewGuid().ToString() + ".jpg";
+                var imagePath = Path.Combine(Configuration["Environment:ImagesPath"], imageName);
 
-        //        using (var imageStream = new MemoryStream(imageBytes))
-        //        {
-        //            using (var image = Image.Load(imageStream))
-        //            {
-        //                using (var outputStream = new MemoryStream())
-        //                {
-        //                    image.Save(outputStream, new JpegEncoder());
-        //                    await File.WriteAllBytesAsync(imagePath, outputStream.ToArray());
-        //                }
-        //            }
-        //        }
+                using (var imageStream = new MemoryStream(imageBytes))
+                {
+                    using (var image = Image.Load(imageStream))
+                    {
+                        using (var outputStream = new MemoryStream())
+                        {
+                            image.Save(outputStream, new JpegEncoder());
+                            await File.WriteAllBytesAsync(imagePath, outputStream.ToArray());
+                        }
+                    }
+                }
 
-        //        imagePaths.Add(imagePath);
-        //    }
+                imagePaths.Add(imagePath);
+            }
 
-        //    return imagePaths;
-        //}
+            return imagePaths;
+        }
 
         public async Task Delete(Guid farmId, Guid ownerId)
         {
+            throw new Exception("Solve images problem!");
             var farm = await DbContext.Farms.FirstOrDefaultAsync(f => f.Id == farmId && f.OwnerId == ownerId);
             if (farm == null) throw new NotFoundException($"Farm with Id {farmId} does not exist.");
 
@@ -110,6 +118,7 @@ namespace Agroforum.Application.Services.Business
 
         public async Task<FarmVm> Get(Guid farmId)
         {
+            throw new Exception("Solve images problem!");
             var farm = await DbContext.Farms.FirstOrDefaultAsync(f => f.Id == farmId);
             if (farm == null) throw new NotFoundException($"Farm with Id {farmId} does not exist.");
             var owner = await DbContext.Accounts.FirstOrDefaultAsync(a => a.Id == farm.OwnerId);
@@ -135,18 +144,18 @@ namespace Agroforum.Application.Services.Business
             return request;
         }
 
-        //private async Task<List<byte[]>> GetFarmImages(List<string> imagePaths)
-        //{
-        //    var imageBytesList = new List<byte[]>();
+        private async Task<List<byte[]>> GetFarmImages(List<string> imagePaths)
+        {
+            var imageBytesList = new List<byte[]>();
 
-        //    foreach (var imagePath in imagePaths)
-        //    {
-        //        var imageBytes = await File.ReadAllBytesAsync(Path.Combine(Configuration["Environment:ImagesPath"], imagePath));
-        //        imageBytesList.Add(imageBytes);
-        //    }
+            foreach (var imagePath in imagePaths)
+            {
+                var imageBytes = await File.ReadAllBytesAsync(Path.Combine(Configuration["Environment:ImagesPath"], imagePath));
+                imageBytesList.Add(imageBytes);
+            }
 
-        //    return imageBytesList;
-        //}
+            return imageBytesList;
+        }
 
         public async Task<FarmListVm> GetAll(Guid userId)
         {
@@ -159,6 +168,11 @@ namespace Agroforum.Application.Services.Business
             }
 
             return response;
+        }
+
+        public Task UpdateFarmImages(UpdateFarmImagesDto updateFarmImagesDto)
+        {
+            throw new NotImplementedException();
         }
 
         //private async Task DeleteImages(List<string>? imagePaths)

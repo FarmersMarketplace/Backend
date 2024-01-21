@@ -11,9 +11,7 @@ namespace Agroforum.Application.Services
     public interface IAuthService
     {
         Task Register(RegisterDto accountDto);
-
         Task ConfirmEmail(Guid userId, string email);
-
         Task<JwtVm> Login(LoginDto loginDto);
         Task ResetPassword(Guid accountId, string? email, ResetPasswordDto resetPasswordDto);
         Task ForgotPassword(ForgotPasswordDto forgotPasswordDto);

@@ -63,7 +63,7 @@ namespace Agroforum.Application.Services
 
       </p>
       <p>Please confirm your registration by clicking the link below:</p>
-      <p><a href=""http://localhost:5173/#/ConfirmEmail/{token}"">Confirm Registration</a></p>
+      <p><a href=""http://localhost:8080/#/ConfirmEmail/{token}"">Confirm Registration</a></p>
       <p>If you did not register on our [website/service], please ignore this email.</p>
       <p>Thank you for choosing us! If you have any questions or issues, feel free to contact our support team at <a
             href=""mailto:[serviceEmail]"">[serviceEmail]</a>.</p>

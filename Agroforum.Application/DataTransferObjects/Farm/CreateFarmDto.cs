@@ -11,7 +11,10 @@ namespace Agroforum.Application.DataTransferObjects.Farm
         public string Name { get; set; }
         public string Description { get; set; }
         public string ContactEmail { get; set; }
+        public string WebsiteUrl { get; set; }
         public Guid OwnerId { get; set; }
+        public bool IsVisibleOnMap { get; set; }
+        //public List<string> Images { get; set; }
         public string Region { get; set; }
         public string Settlement { get; set; }
         public string Street { get; set; }
