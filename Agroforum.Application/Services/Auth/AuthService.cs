@@ -52,7 +52,7 @@ namespace Agroforum.Application.Services.Auth
         {
             var account = DbContext.Accounts.FirstOrDefault(a => a.Email ==  loginDto.Email);
             if (account == null) throw new NotFoundException($"Account with {loginDto.Email} email is not found.");
-            else if(loginDto.Password != account.Password) throw new UnauthorizedAccessException("Invalid password.");
+            else if(CryptoService.ComputeSha256Hash(loginDto.Password) != account.Password) throw new UnauthorizedAccessException("Invalid password.");
 
             var request = await JwtService.Authenticate(account);
 
@@ -70,7 +70,7 @@ namespace Agroforum.Application.Services.Auth
                 Id = id,
                 Name = accountDto.Name,
                 Surname = accountDto.Surname,
-                Password = accountDto.Password,
+                Password = CryptoService.ComputeSha256Hash(accountDto.Password),
                 Roles = new List<Role>()
             };
             account.Roles.Add(accountDto.Role);
@@ -84,7 +84,7 @@ namespace Agroforum.Application.Services.Auth
             if (account == null) throw new NotFoundException("Account not found or email does not match the provided account.");
             else if(resetPasswordDto.Password != resetPasswordDto.ConfirmPassword) throw new UnauthorizedAccessException("Password and confirm password do not match.");
 
-            account.Password = resetPasswordDto.Password;
+            account.Password = CryptoService.ComputeSha256Hash(resetPasswordDto.Password);
             await DbContext.SaveChangesAsync();
         }
 
