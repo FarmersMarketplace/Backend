@@ -18,7 +18,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Agroforum.Application\ProjectForFarmers.Application.csproj" />
-    <ProjectReference Include="..\Agroforum.Domain\ProjectForFarmers.Domain.csproj" />
     <ProjectReference Include="..\ProjectForFarmers.Application\ProjectForFarmers.Application.csproj" />
     <ProjectReference Include="..\ProjectForFarmers.Domain\ProjectForFarmers.Domain.csproj" />
   </ItemGroup>
