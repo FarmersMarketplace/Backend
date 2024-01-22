@@ -28,7 +28,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Agroforum.Application\ProjectForFarmers.Application.csproj" />
     <ProjectReference Include="..\ProjectForFarmers.Application\ProjectForFarmers.Application.csproj" />
     <ProjectReference Include="..\ProjectForFarmers.Persistence\ProjectForFarmers.Persistence.csproj" />
   </ItemGroup>
