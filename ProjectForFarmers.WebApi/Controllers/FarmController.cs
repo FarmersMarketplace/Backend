@@ -35,7 +35,8 @@ namespace ProjectForFarmers.WebApi.Controllers
 
         [HttpPost]
         [Authorize(Roles = "FarmOwner")]
-        public async Task<IActionResult> Create([FromBody] CreateFarmDto createFarmDto)
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> Create([FromForm] CreateFarmDto createFarmDto)
         {
             createFarmDto.OwnerId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
             await FarmService.Create(createFarmDto);

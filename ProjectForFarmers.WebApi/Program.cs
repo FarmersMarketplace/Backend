@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Models;
 using ProjectForFarmers.Persistence;
 using ProjectForFarmers.Persistence.DbContexts;
+using ProjectForFarmers.Application.Services;
 
 namespace ProjectForFarmers.WebApi
 {
@@ -22,8 +23,7 @@ namespace ProjectForFarmers.WebApi
 
             var app = builder.Build();
             ConfigureApp(app);
-
-
+            var chel = Directory.Exists(ImageUtility.FarmsImagesDirectory);
             app.MapGet("/", () => "Hello World!");
 
             app.Run();
@@ -32,11 +32,6 @@ namespace ProjectForFarmers.WebApi
 
         private static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
         {
-            //var dbHost = Environment.GetEnvironmentVariable("DB_HOST");
-            //var dbName = Environment.GetEnvironmentVariable("DB_NAME");
-            //var userName = Environment.GetEnvironmentVariable("DB_USER");
-            //var dbPassword = Environment.GetEnvironmentVariable("DB_PASSWORD");
-            //string connectionString = $"Host={dbHost};Database={dbName};Username={userName};Password={dbPassword};";
             string connectionString = configuration.GetConnectionString("RemoteConnection");
             services.AddPersistence(connectionString);
             

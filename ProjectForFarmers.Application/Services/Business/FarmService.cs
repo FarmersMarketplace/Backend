@@ -7,6 +7,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using SixLabors.ImageSharp.Formats.Jpeg;
 using Image = SixLabors.ImageSharp.Image;
+using Microsoft.AspNetCore.Http;
+using System.Security.AccessControl;
 
 namespace ProjectForFarmers.Application.Services.Business
 {
@@ -23,7 +25,7 @@ namespace ProjectForFarmers.Application.Services.Business
 
         public async Task Create(CreateFarmDto createFarmDto)
         {
-            throw new Exception("Solve images problem!");
+            //throw new Exception("Solve images problem!");
             var address = new Address
             {
                 Id = Guid.NewGuid(),
@@ -31,10 +33,11 @@ namespace ProjectForFarmers.Application.Services.Business
                 Settlement = createFarmDto.Settlement,
                 Street = createFarmDto.Street,
                 HouseNumber = createFarmDto.HouseNumber,
-                PostalCode = createFarmDto.PostalCode
+                PostalCode = createFarmDto.PostalCode,
+                Note = createFarmDto.Note
             };
 
-            //var imagesPaths = await HandleFarmImages();
+            var imagesPaths = await HandleFarmImages(createFarmDto.Images);
 
             var farm = new Farm
             {
@@ -53,28 +56,24 @@ namespace ProjectForFarmers.Application.Services.Business
             await DbContext.SaveChangesAsync();
         }
 
-        public async Task<List<string>> HandleFarmImages(ICollection<byte[]>? images)
+        public async Task<List<string>> HandleFarmImages(List<IFormFile> images)
         {
             var imagePaths = new List<string>();
 
-            foreach (var imageBytes in images)
+            foreach (var image in images)
             {
-                var imageName = Guid.NewGuid().ToString() + ".jpg";
-                var imagePath = Path.Combine(Configuration["Environment:ImagesPath"], imageName);
-
-                using (var imageStream = new MemoryStream(imageBytes))
+                if (image.Length > 0)
                 {
-                    using (var image = Image.Load(imageStream))
-                    {
-                        using (var outputStream = new MemoryStream())
-                        {
-                            image.Save(outputStream, new JpegEncoder());
-                            await File.WriteAllBytesAsync(imagePath, outputStream.ToArray());
-                        }
-                    }
-                }
+                    var fileName = Guid.NewGuid().ToString("N");
+                    var filePath = Directory.GetCurrentDirectory();
 
-                imagePaths.Add(imagePath);
+                    using (var stream = new FileStream(fileName, FileMode.Create))
+                    {
+                        await image.CopyToAsync(stream);
+                    }
+
+                    imagePaths.Add(fileName);
+                }
             }
 
             return imagePaths;

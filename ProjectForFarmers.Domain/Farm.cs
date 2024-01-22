@@ -13,6 +13,7 @@ namespace ProjectForFarmers.Domain
         public string Name { get; set; }
         public string Description { get; set; }
         public string ContactEmail { get; set; }
+        public string ContactPhone { get; set; }
         public string? WebsiteUrl { get; set; }
         public bool IsVisibleOnMap { get; set; }
         public List<string> ImagesPaths { get; set; }
