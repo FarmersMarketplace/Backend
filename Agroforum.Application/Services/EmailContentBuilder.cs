@@ -27,7 +27,7 @@ namespace Agroforum.Application.Services
       <p>Dear {name} {surname},</p>
       <p>We have received a request to reset your password for your account on our website.</p>
       <p>Please confirm the password reset by clicking the link below:</p>
-      <p><a href=""http://localhost:5173/#/ResetPassword/{token}"">Reset Password</a></p>
+      <p><a href=""http://localhost:8080/resetpassword/{token}"">Reset Password</a></p>
       <p>If you did not request a password reset, please ignore this email.</p>
       <p>For security reasons, the link will expire in [insert time here].</p>
       <p>If you have any questions or need further assistance, feel free to contact our support team at <a
@@ -63,7 +63,7 @@ namespace Agroforum.Application.Services
 
       </p>
       <p>Please confirm your registration by clicking the link below:</p>
-      <p><a href=""http://localhost:8080/#/ConfirmEmail/{token}"">Confirm Registration</a></p>
+      <p><a href=""http://localhost:8080/confirmemail/{token}"">Confirm Registration</a></p>
       <p>If you did not register on our [website/service], please ignore this email.</p>
       <p>Thank you for choosing us! If you have any questions or issues, feel free to contact our support team at <a
             href=""mailto:[serviceEmail]"">[serviceEmail]</a>.</p>
