@@ -17,6 +17,12 @@ namespace ProjectForFarmers.Domain
         public string? WebsiteUrl { get; set; }
         public List<string> ImagesNames { get; set; }
         public Guid OwnerId { get; set; }
+        public virtual Account Owner { get; set; }
         public Guid AddressId { get; set; }
+        public virtual Address Address { get; set; }
+        public Guid ScheduleId { get; set; }
+        public virtual Schedule Schedule { get; set; }
+        
+
     }
 }
