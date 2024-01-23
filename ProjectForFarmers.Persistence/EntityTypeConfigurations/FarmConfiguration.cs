@@ -16,12 +16,27 @@ namespace ProjectForFarmers.Persistence.EntityTypeConfigurations
             builder.ToTable("Farms");
 
             builder.HasKey(farm => farm.Id);
-            builder.Property(farm => farm.Name).IsRequired();
+            builder.Property(farm => farm.Name).HasMaxLength(50).IsRequired();
             builder.Property(farm => farm.AddressId).IsRequired();
+            builder.Property(farm => farm.OwnerId).IsRequired();
+            builder.Property(farm => farm.ScheduleId).IsRequired();
 
-            builder.HasOne<Address>()
+            builder.HasOne(f => f.Address)
                 .WithOne()
-                .HasForeignKey<Farm>(f => f.AddressId);
+                .HasForeignKey<Farm>(f => f.AddressId)
+                .IsRequired();
+
+            builder.HasOne(f => f.Owner)
+                .WithOne()
+                .HasForeignKey<Farm>(f => f.OwnerId)
+                .IsRequired();
+
+            builder.HasOne(f => f.Schedule)
+                .WithOne()
+                .HasForeignKey<Farm>(f => f.ScheduleId)
+                .IsRequired();
+
+            builder.HasIndex(farm => farm.Id).IsUnique();
         }
     }
 }
