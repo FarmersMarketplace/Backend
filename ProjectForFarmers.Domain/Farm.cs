@@ -15,8 +15,7 @@ namespace ProjectForFarmers.Domain
         public string ContactEmail { get; set; }
         public string ContactPhone { get; set; }
         public string? WebsiteUrl { get; set; }
-        public bool IsVisibleOnMap { get; set; }
-        public List<string> ImagesPaths { get; set; }
+        public List<string> ImagesNames { get; set; }
         public Guid OwnerId { get; set; }
         public Guid AddressId { get; set; }
     }

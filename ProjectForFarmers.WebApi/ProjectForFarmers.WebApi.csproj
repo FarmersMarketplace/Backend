@@ -32,4 +32,8 @@
     <ProjectReference Include="..\ProjectForFarmers.Persistence\ProjectForFarmers.Persistence.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\images\farms\" />
+  </ItemGroup>
+
 </Project>

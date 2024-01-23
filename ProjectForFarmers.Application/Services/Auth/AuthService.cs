@@ -14,8 +14,8 @@ namespace ProjectForFarmers.Application.Services.Auth
     public class AuthService : IAuthService
     {
         private readonly IApplicationDbContext DbContext;
-        private EmailService EmailService { get; set; }
-        private JwtService JwtService { get; set; }
+        private readonly EmailService EmailService;
+        private readonly JwtService JwtService;
 
         public AuthService(IApplicationDbContext dbContext, IConfiguration configuration)
         {
