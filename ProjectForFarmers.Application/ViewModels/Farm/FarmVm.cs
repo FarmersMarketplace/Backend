@@ -15,5 +15,7 @@ namespace ProjectForFarmers.Application.ViewModels.Farm
         public string ContactEmail { get; set; }
         public string OwnerName { get; set; }
         public Address Address { get; set; }
+        public string? WebsiteUrl { get; set; }
+        public List<string> ImagesPaths { get; set; }
     }
 }
