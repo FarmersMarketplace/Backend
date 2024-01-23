@@ -23,21 +23,18 @@ namespace ProjectForFarmers.WebApi
 
             var app = builder.Build();
             ConfigureApp(app);
-            var chel = Directory.Exists(ImageUtility.FarmsImagesDirectory);
-            app.MapGet("/", () => "Hello World!");
 
             app.Run();
-
         }
 
         private static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
         {
             string connectionString = configuration.GetConnectionString("RemoteConnection");
+
             services.AddPersistence(connectionString);
-            
-            Log.Logger = new LoggerConfiguration()
-                .ReadFrom.Configuration(configuration)
-                .CreateLogger();
+            Log.Logger = new LoggerConfiguration().WriteTo.PostgreSQL(connectionString, "Logs", needAutoCreateTable: true)
+               .MinimumLevel.Information().CreateLogger();
+
             Log.Information("The program has started.");
 
             services.AddApplication();
@@ -91,7 +88,6 @@ namespace ProjectForFarmers.WebApi
             });
 
         }
-
         private static void ConfigureApp(WebApplication app)
         {
             if (app.Environment.IsDevelopment()) app.UseDeveloperExceptionPage();
@@ -105,17 +101,11 @@ namespace ProjectForFarmers.WebApi
                     context.Database.Migrate();
             }
 
-            AppDomain.CurrentDomain.ProcessExit += (sender, e) =>
-            {
-                Log.Information("Program has exited successfully.");
-                Log.CloseAndFlush();
-            };
-
-
             app.UseMiddleware<ExceptionHandlerMiddleware>();
             app.UseRouting();
             app.UseHttpsRedirection();
-            app.UseCors("AllowAll"); //change in future
+            app.UseStaticFiles();
+            app.UseCors("AllowAll");
             app.UseAuthentication();
             app.UseAuthorization();
             app.UseSwagger();
