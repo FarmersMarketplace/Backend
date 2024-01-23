@@ -14,7 +14,6 @@ namespace ProjectForFarmers.Application.DataTransferObjects.Farm
         public string ContactEmail { get; set; }
         public string WebsiteUrl { get; set; }
         public Guid OwnerId { get; set; }
-        public bool IsVisibleOnMap { get; set; }
         public List<IFormFile> Images { get; set; }
         public string Region { get; set; }
         public string Settlement { get; set; }

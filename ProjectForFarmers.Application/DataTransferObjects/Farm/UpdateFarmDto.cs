@@ -12,10 +12,13 @@ namespace ProjectForFarmers.Application.DataTransferObjects.Farm
         public string Name { get; set; }
         public string Description { get; set; }
         public string ContactEmail { get; set; }
+        public string ContactPhone { get; set; }
         public string Region { get; set; }
         public string Settlement { get; set; }
         public string Street { get; set; }
         public string HouseNumber { get; set; }
         public string PostalCode { get; set; }
+        public string? WebsiteUrl { get; internal set; }
+        public string Note { get; internal set; }
     }
 }
