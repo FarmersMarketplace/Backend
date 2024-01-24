@@ -3,14 +3,14 @@ using System.Net;
 using ProjectForFarmers.Application.DataTransferObjects.Auth;
 using Microsoft.Extensions.Configuration;
 
-namespace ProjectForFarmers.Application.Services
+namespace ProjectForFarmers.Application.Helpers
 {
-    public class EmailService
+    public class EmailHelper
     {
         private SmtpClient SmtpClient { get; set; }
         private MailAddress FromAddress { get; set; }
 
-        public EmailService(IConfiguration configuration)
+        public EmailHelper(IConfiguration configuration)
         {
             FromAddress = new MailAddress(configuration["Email:Login"], "[ServiceName]");
             SmtpClient = new SmtpClient();

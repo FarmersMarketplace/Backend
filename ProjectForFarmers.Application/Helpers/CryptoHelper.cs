@@ -5,9 +5,9 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ProjectForFarmers.Application.Services
+namespace ProjectForFarmers.Application.Helpers
 {
-    public static class CryptoService
+    public static class CryptoHelper
     {
         public static string ComputeSha256Hash(string rawData)
         {

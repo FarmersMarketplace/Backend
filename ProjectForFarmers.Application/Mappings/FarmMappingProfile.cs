@@ -75,7 +75,7 @@ namespace ProjectForFarmers.Application.Mappings
         private void MapUpdateFarmDtoToFarm()
         {
             CreateMap<UpdateFarmDto, Farm>()
-                .ForMember(farm => farm.Id, opt => opt.MapFrom(dto => Guid.NewGuid()))
+                .ForMember(farm => farm.Id, opt => opt.MapFrom(dto => dto.FarmId))
                 .ForMember(farm => farm.Name, opt => opt.MapFrom(dto => dto.Name))
                 .ForMember(farm => farm.Description, opt => opt.MapFrom(dto => dto.Description))
                 .ForMember(farm => farm.ContactEmail, opt => opt.MapFrom(dto => dto.ContactEmail))

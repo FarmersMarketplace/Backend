@@ -9,6 +9,7 @@ using SixLabors.ImageSharp.Formats.Jpeg;
 using Image = SixLabors.ImageSharp.Image;
 using Microsoft.AspNetCore.Http;
 using System.Security.AccessControl;
+using ProjectForFarmers.Application.Helpers;
 
 namespace ProjectForFarmers.Application.Services.Business
 {
@@ -17,14 +18,14 @@ namespace ProjectForFarmers.Application.Services.Business
         private readonly IApplicationDbContext DbContext;
         private IConfiguration Configuration { get; set; }
         private readonly string FarmsImageFolder;
-        private readonly ImageService ImageService;
+        private readonly ImageHelper ImageService;
 
         public FarmService(IApplicationDbContext dbContext, IConfiguration configuration)
         {
             DbContext = dbContext;
             Configuration = configuration;
             FarmsImageFolder = Configuration["Images:Farms"];
-            ImageService = new ImageService();
+            ImageService = new ImageHelper();
 
         }
 

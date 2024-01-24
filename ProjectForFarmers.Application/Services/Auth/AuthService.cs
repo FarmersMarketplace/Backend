@@ -8,19 +8,20 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System.ComponentModel.DataAnnotations;
 using static Google.Apis.Auth.GoogleJsonWebSignature;
+using ProjectForFarmers.Application.Helpers;
 
 namespace ProjectForFarmers.Application.Services.Auth
 {
     public class AuthService : IAuthService
     {
         private readonly IApplicationDbContext DbContext;
-        private readonly EmailService EmailService;
+        private readonly EmailHelper EmailService;
         private readonly JwtService JwtService;
 
         public AuthService(IApplicationDbContext dbContext, IConfiguration configuration)
         {
             DbContext = dbContext;
-            EmailService = new EmailService(configuration);
+            EmailService = new EmailHelper(configuration);
             JwtService = new JwtService(configuration);
         }
 
@@ -52,7 +53,7 @@ namespace ProjectForFarmers.Application.Services.Auth
         {
             var account = DbContext.Accounts.FirstOrDefault(a => a.Email ==  loginDto.Email);
             if (account == null) throw new NotFoundException($"Account with {loginDto.Email} email is not found.");
-            else if(CryptoService.ComputeSha256Hash(loginDto.Password) != account.Password) throw new UnauthorizedAccessException("Invalid password.");
+            else if(CryptoHelper.ComputeSha256Hash(loginDto.Password) != account.Password) throw new UnauthorizedAccessException("Invalid password.");
 
             var request = await JwtService.Authenticate(account);
 
@@ -70,7 +71,7 @@ namespace ProjectForFarmers.Application.Services.Auth
                 Id = id,
                 Name = accountDto.Name,
                 Surname = accountDto.Surname,
-                Password = CryptoService.ComputeSha256Hash(accountDto.Password),
+                Password = CryptoHelper.ComputeSha256Hash(accountDto.Password),
                 Roles = new List<Role>()
             };
             account.Roles.Add(accountDto.Role);
@@ -84,7 +85,7 @@ namespace ProjectForFarmers.Application.Services.Auth
             if (account == null) throw new NotFoundException("Account not found or email does not match the provided account.");
             else if(resetPasswordDto.Password != resetPasswordDto.ConfirmPassword) throw new UnauthorizedAccessException("Password and confirm password do not match.");
 
-            account.Password = CryptoService.ComputeSha256Hash(resetPasswordDto.Password);
+            account.Password = CryptoHelper.ComputeSha256Hash(resetPasswordDto.Password);
             await DbContext.SaveChangesAsync();
         }
 

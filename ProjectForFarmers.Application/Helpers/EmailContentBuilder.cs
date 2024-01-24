@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ProjectForFarmers.Application.Services
+namespace ProjectForFarmers.Application.Helpers
 {
     public static class EmailContentBuilder
     {
