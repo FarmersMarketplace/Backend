@@ -15,7 +15,7 @@ namespace ProjectForFarmers.Application.Mappings
             MapRegisterDtoToAccount();
         }
 
-        public void MapRegisterDtoToAccount()
+        private void MapRegisterDtoToAccount()
         {
             CreateMap<RegisterDto, Domain.Account>()
                 .ForMember(account => account.Id, opt => opt.MapFrom(dto => Guid.NewGuid()))

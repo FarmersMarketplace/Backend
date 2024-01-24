@@ -12,6 +12,7 @@ namespace ProjectForFarmers.Application.DataTransferObjects.Farm
         public string Name { get; set; }
         public string Description { get; set; }
         public string ContactEmail { get; set; }
+        public string ContactPhone { get; set; }
         public string WebsiteUrl { get; set; }
         public Guid OwnerId { get; set; }
         public List<IFormFile> Images { get; set; }
