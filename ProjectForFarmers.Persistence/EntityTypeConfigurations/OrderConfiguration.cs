@@ -1,11 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore;
 using ProjectForFarmers.Domain;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ProjectForFarmers.Persistence.EntityTypeConfigurations
 {
@@ -37,8 +32,7 @@ namespace ProjectForFarmers.Persistence.EntityTypeConfigurations
             builder.HasOne(order => order.Farm)
                 .WithMany()
                 .HasForeignKey(order => order.FarmId);
-
-
+            
             builder.HasIndex(order => order.Id).IsUnique();
         }
     }

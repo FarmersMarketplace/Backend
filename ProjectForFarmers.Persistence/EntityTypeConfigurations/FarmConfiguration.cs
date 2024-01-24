@@ -20,6 +20,7 @@ namespace ProjectForFarmers.Persistence.EntityTypeConfigurations
             builder.Property(farm => farm.AddressId).IsRequired();
             builder.Property(farm => farm.OwnerId).IsRequired();
             builder.Property(farm => farm.ScheduleId).IsRequired();
+            builder.Property(farm => farm.CreationDate).IsRequired();
 
             builder.HasOne(f => f.Address)
                 .WithOne()
