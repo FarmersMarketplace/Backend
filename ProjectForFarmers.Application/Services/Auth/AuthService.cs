@@ -9,19 +9,17 @@ using Microsoft.Extensions.Configuration;
 using System.ComponentModel.DataAnnotations;
 using static Google.Apis.Auth.GoogleJsonWebSignature;
 using ProjectForFarmers.Application.Helpers;
+using AutoMapper;
 
 namespace ProjectForFarmers.Application.Services.Auth
 {
-    public class AuthService : IAuthService
+    public class AuthService : Service, IAuthService
     {
-        private readonly IApplicationDbContext DbContext;
         private readonly EmailHelper EmailService;
         private readonly JwtService JwtService;
 
-        public AuthService(IApplicationDbContext dbContext, IConfiguration configuration)
+        public AuthService(IMapper mapper, IApplicationDbContext dbContext, IConfiguration configuration) : base(mapper, dbContext, configuration)
         {
-            DbContext = dbContext;
-            EmailService = new EmailHelper(configuration);
             JwtService = new JwtService(configuration);
         }
 
@@ -45,7 +43,6 @@ namespace ProjectForFarmers.Application.Services.Auth
             if (account == null) throw new NotFoundException($"Account with Id {accountId} not found.");
             
             account.Email = email;
-            account.Roles.Add(Role.Customer);
             await DbContext.SaveChangesAsync();
         }
 
@@ -72,9 +69,8 @@ namespace ProjectForFarmers.Application.Services.Auth
                 Name = accountDto.Name,
                 Surname = accountDto.Surname,
                 Password = CryptoHelper.ComputeSha256Hash(accountDto.Password),
-                Roles = new List<Role>()
+                Role = accountDto.Role
             };
-            account.Roles.Add(accountDto.Role);
 
             await DbContext.Accounts.AddAsync(account);
         }
@@ -104,13 +100,14 @@ namespace ProjectForFarmers.Application.Services.Auth
             var account = await DbContext.Accounts.FirstOrDefaultAsync(a => a.Email == payload.Email);
             if (account == null) 
             {
+                throw new Exception("Set role!");
                 account = new Account 
                 {
                     Id = Guid.NewGuid(),
                     Name = payload.GivenName,
                     Surname = payload.FamilyName,
                     Email = payload.Email,
-                    Roles = new List<Role> { Role.Customer}
+                    //Role = Role.Customer
                 };
                 DbContext.Accounts.Add(account);
                 await DbContext.SaveChangesAsync();

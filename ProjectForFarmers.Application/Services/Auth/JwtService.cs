@@ -9,6 +9,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using System.Data;
 
 namespace ProjectForFarmers.Application.Services.Auth
 {
@@ -28,13 +29,9 @@ namespace ProjectForFarmers.Application.Services.Auth
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, account.Id.ToString()),
+                new Claim(ClaimTypes.Role, account.Role.ToString())
             };
 
-            if (account.Roles != null && account.Roles.Any())
-            {
-                foreach (var role in account.Roles)
-                    claims.Add(new Claim(ClaimTypes.Role, role.ToString()));
-            }
             var notBefore = DateTime.UtcNow;
             var expires = notBefore.AddHours(int.Parse(Configuration["Auth:TokenLifetime"]));
             var tokenDescriptor = new SecurityTokenDescriptor

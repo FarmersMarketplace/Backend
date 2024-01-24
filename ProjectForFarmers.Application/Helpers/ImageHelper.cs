@@ -11,7 +11,6 @@ namespace ProjectForFarmers.Application.Helpers
 {
     public class ImageHelper
     {
-        private readonly IConfiguration Configuration;
         private readonly string[] AllowedExtensions;
         private readonly string[] AllowedMimeTypes;
 
