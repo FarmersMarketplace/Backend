@@ -19,6 +19,7 @@ namespace ProjectForFarmers.Persistence.EntityTypeConfigurations
                 .UseIdentityColumn()
                 .HasComputedColumnSql("RIGHT('0000000' + CAST(CONVERT(NVARCHAR(7), [Number]) AS NVARCHAR(7)), 7)");
 
+            builder.Property(account => account.CreationDate).IsRequired();
             builder.Property(account => account.CustomerName).IsRequired();
             builder.Property(account => account.CustomerPhone).IsRequired();
             builder.Property(account => account.CustomerEmail).IsRequired();

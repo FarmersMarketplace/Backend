@@ -10,6 +10,7 @@ namespace ProjectForFarmers.Domain
     {
         public Guid Id { get; set; }
         public string Number { get; set; }
+        public DateTime CreationDate { get; set; }
         public string CustomerName { get; set; }
         public string CustomerPhone { get; set; }
         public string CustomerEmail { get; set; }

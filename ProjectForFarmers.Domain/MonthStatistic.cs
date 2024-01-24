@@ -23,6 +23,8 @@ namespace ProjectForFarmers.Domain
         public Guid PreviousOrdersStatisticId { get; set; }
         public OrderGroupStatistic TotalActivity { get; set; }
         public Guid TotalActivityStatisticId { get; set; }
+        public decimal TotalRevenue { get; set; }
+        public float TotalRevenuePercentage { get; set; }
     }
 
 }
