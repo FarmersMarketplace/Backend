@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Sockets;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ProjectForFarmers.Domain
+﻿namespace ProjectForFarmers.Domain
 {
     public class Farm
     {
@@ -16,13 +9,12 @@ namespace ProjectForFarmers.Domain
         public string ContactPhone { get; set; }
         public string? WebsiteUrl { get; set; }
         public List<string> ImagesNames { get; set; }
+        public DateTime CreationDate { get; set; }
         public Guid OwnerId { get; set; }
         public virtual Account Owner { get; set; }
         public Guid AddressId { get; set; }
         public virtual Address Address { get; set; }
         public Guid ScheduleId { get; set; }
         public virtual Schedule Schedule { get; set; }
-        
-
     }
 }

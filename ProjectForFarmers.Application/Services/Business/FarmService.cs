@@ -47,7 +47,10 @@ namespace ProjectForFarmers.Application.Services.Business
             var farm = await DbContext.Farms.FirstOrDefaultAsync(f => f.Id == updateFarmDto.FarmId);
             if (farm == null) throw new NotFoundException($"Farm with Id {updateFarmDto.FarmId} does not exist.");
 
+            var farmCreationDate = farm.CreationDate;
             farm = Mapper.Map<Farm>(updateFarmDto);
+            farm.CreationDate = farmCreationDate;
+
             await DbContext.SaveChangesAsync();
         }
 

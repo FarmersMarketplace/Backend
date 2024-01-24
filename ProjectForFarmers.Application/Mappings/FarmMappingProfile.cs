@@ -66,6 +66,7 @@ namespace ProjectForFarmers.Application.Mappings
                 .ForMember(farm => farm.Description, opt => opt.MapFrom(dto => dto.Description))
                 .ForMember(farm => farm.ContactEmail, opt => opt.MapFrom(dto => dto.ContactEmail))
                 .ForMember(farm => farm.ContactPhone, opt => opt.MapFrom(dto => dto.ContactPhone))
+                .ForMember(farm => farm.CreationDate, opt => opt.MapFrom(dto => DateTime.UtcNow))
                 .ForMember(farm => farm.OwnerId, opt => opt.MapFrom(dto => dto.OwnerId))
                 .ForMember(farm => farm.WebsiteUrl, opt => opt.MapFrom(dto => dto.WebsiteUrl))
                 .ForMember(farm => farm.Address, opt => opt.MapFrom(dto => dto.Address))
