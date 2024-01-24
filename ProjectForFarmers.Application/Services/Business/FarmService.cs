@@ -10,58 +10,25 @@ using Image = SixLabors.ImageSharp.Image;
 using Microsoft.AspNetCore.Http;
 using System.Security.AccessControl;
 using ProjectForFarmers.Application.Helpers;
+using AutoMapper;
 
 namespace ProjectForFarmers.Application.Services.Business
 {
-    public class FarmService : IFarmService
+    public class FarmService : Service, IFarmService
     {
-        private readonly IApplicationDbContext DbContext;
-        private IConfiguration Configuration { get; set; }
         private readonly string FarmsImageFolder;
-        private readonly ImageHelper ImageService;
+        private readonly ImageHelper ImageHelper;
 
-        public FarmService(IApplicationDbContext dbContext, IConfiguration configuration)
+        public FarmService(IMapper mapper, IApplicationDbContext dbContext, IConfiguration configuration) : base(mapper, dbContext, configuration)
         {
-            DbContext = dbContext;
-            Configuration = configuration;
             FarmsImageFolder = Configuration["Images:Farms"];
-            ImageService = new ImageHelper();
-
+            ImageHelper = new ImageHelper();
         }
 
         public async Task Create(CreateFarmDto createFarmDto)
         {
-            var address = new Address
-            {
-                Id = Guid.NewGuid(),
-                Region = createFarmDto.Region,
-                Settlement = createFarmDto.Settlement,
-                Street = createFarmDto.Street,
-                HouseNumber = createFarmDto.HouseNumber,
-                PostalCode = createFarmDto.PostalCode,
-                Note = createFarmDto.Note
-            };
+            var farm = Mapper.Map<Farm>(createFarmDto);
 
-            var schedule = new Schedule
-            {
-                Id = Guid.NewGuid(),
-                
-            };
-
-            var imagesPaths = await ImageService.SaveImages(createFarmDto.Images, FarmsImageFolder);
-
-            var farm = new Farm
-            {
-                Id = Guid.NewGuid(),
-                Name = createFarmDto.Name,
-                Description = createFarmDto.Description,
-                ContactEmail = createFarmDto.ContactEmail,
-                ImagesNames = imagesPaths,
-                OwnerId = createFarmDto.OwnerId,
-                AddressId = address.Id,
-            };
-
-            await DbContext.Addresses.AddAsync(address);
             await DbContext.Farms.AddAsync(farm);
             await DbContext.SaveChangesAsync();
         }
@@ -71,7 +38,7 @@ namespace ProjectForFarmers.Application.Services.Business
             var farm = await DbContext.Farms.FirstOrDefaultAsync(f => f.Id == farmId && f.OwnerId == ownerId);
             if (farm == null) throw new NotFoundException($"Farm with Id {farmId} does not exist.");
             DbContext.Farms.Remove(farm);
-            await ImageService.DeleteImages(farm.ImagesNames, FarmsImageFolder);
+            await ImageHelper.DeleteImages(farm.ImagesNames, FarmsImageFolder);
             await DbContext.SaveChangesAsync();
         }
 
@@ -80,19 +47,7 @@ namespace ProjectForFarmers.Application.Services.Business
             var farm = await DbContext.Farms.FirstOrDefaultAsync(f => f.Id == updateFarmDto.FarmId);
             if (farm == null) throw new NotFoundException($"Farm with Id {updateFarmDto.FarmId} does not exist.");
 
-            farm.Name = updateFarmDto.Name;
-            farm.Description = updateFarmDto.Description;
-            farm.ContactEmail = updateFarmDto.ContactEmail;
-            farm.ContactPhone = updateFarmDto.ContactPhone;
-            farm.WebsiteUrl = updateFarmDto.WebsiteUrl;
-
-            farm.Address.Region = updateFarmDto.Region;
-            farm.Address.Settlement = updateFarmDto.Settlement;
-            farm.Address.Street = updateFarmDto.Street;
-            farm.Address.HouseNumber = updateFarmDto.HouseNumber;
-            farm.Address.PostalCode = updateFarmDto.PostalCode;
-            farm.Address.Note = updateFarmDto.Note;
-
+            farm = Mapper.Map<Farm>(updateFarmDto);
             await DbContext.SaveChangesAsync();
         }
 
@@ -100,17 +55,6 @@ namespace ProjectForFarmers.Application.Services.Business
         {
             var farm = await DbContext.Farms.FirstOrDefaultAsync(f => f.Id == farmId);
             if (farm == null) throw new NotFoundException($"Farm with Id {farmId} does not exist.");
-
-            var owner = await DbContext.Accounts.FirstOrDefaultAsync(a => a.Id == farm.OwnerId);
-            if(owner == null) throw new NotFoundException($"Farm with Id {farmId} does not have owner.");
-
-            var address = await DbContext.Addresses.FirstOrDefaultAsync(f => f.Id == farmId);
-            if (address == null)
-            {
-                address = new Address() { Id = Guid.NewGuid() };
-                farm.AddressId = address.Id;
-                DbContext.Addresses.Add(address);
-            }
 
             var imagesPaths = farm.ImagesNames.Select(i => Path.Combine(FarmsImageFolder.Replace("wwwroot/", ""), i)).ToList();
 
@@ -120,8 +64,8 @@ namespace ProjectForFarmers.Application.Services.Business
                 Name = farm.Name,
                 Description = farm.Description,
                 ContactEmail = farm.ContactEmail,
-                OwnerName = owner.Name + " " + owner.Surname,
-                Address = address,
+                OwnerName = farm.Owner.Name + " " + farm.Owner.Surname,
+                Address = farm.Address,
                 WebsiteUrl = farm.WebsiteUrl,
                 ImagesPaths = imagesPaths
             };
@@ -147,8 +91,8 @@ namespace ProjectForFarmers.Application.Services.Business
             var farm = await DbContext.Farms.FirstOrDefaultAsync(f => f.Id == updateFarmImagesDto.FarmId);
             if(farm == null) throw new NotFoundException($"Farm with Id {updateFarmImagesDto.FarmId} does not exist.");
 
-            await ImageService.DeleteImages(farm.ImagesNames, FarmsImageFolder);
-            var imagesPaths = await ImageService.SaveImages(updateFarmImagesDto.Images, FarmsImageFolder);
+            await ImageHelper.DeleteImages(farm.ImagesNames, FarmsImageFolder);
+            var imagesPaths = await ImageHelper.SaveImages(updateFarmImagesDto.Images, FarmsImageFolder);
 
             farm.ImagesNames = imagesPaths;
             await DbContext.SaveChangesAsync();
