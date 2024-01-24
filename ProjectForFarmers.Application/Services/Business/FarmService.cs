@@ -41,6 +41,12 @@ namespace ProjectForFarmers.Application.Services.Business
                 Note = createFarmDto.Note
             };
 
+            var schedule = new Schedule
+            {
+                Id = Guid.NewGuid(),
+                
+            };
+
             var imagesPaths = await ImageService.SaveImages(createFarmDto.Images, FarmsImageFolder);
 
             var farm = new Farm
@@ -73,26 +79,18 @@ namespace ProjectForFarmers.Application.Services.Business
             var farm = await DbContext.Farms.FirstOrDefaultAsync(f => f.Id == updateFarmDto.FarmId);
             if (farm == null) throw new NotFoundException($"Farm with Id {updateFarmDto.FarmId} does not exist.");
 
-            var address = await DbContext.Addresses.FirstOrDefaultAsync(f => f.Id == updateFarmDto.FarmId);
-            if (address == null)
-            {
-                address = new Address() { Id = Guid.NewGuid() };
-                farm.AddressId = address.Id;
-                DbContext.Addresses.Add(address);
-            }
-
             farm.Name = updateFarmDto.Name;
             farm.Description = updateFarmDto.Description;
             farm.ContactEmail = updateFarmDto.ContactEmail;
             farm.ContactPhone = updateFarmDto.ContactPhone;
             farm.WebsiteUrl = updateFarmDto.WebsiteUrl;
 
-            address.Region = updateFarmDto.Region;
-            address.Settlement = updateFarmDto.Settlement;
-            address.Street = updateFarmDto.Street;
-            address.HouseNumber = updateFarmDto.HouseNumber;
-            address.PostalCode = updateFarmDto.PostalCode;
-            address.Note = updateFarmDto.Note;
+            farm.Address.Region = updateFarmDto.Region;
+            farm.Address.Settlement = updateFarmDto.Settlement;
+            farm.Address.Street = updateFarmDto.Street;
+            farm.Address.HouseNumber = updateFarmDto.HouseNumber;
+            farm.Address.PostalCode = updateFarmDto.PostalCode;
+            farm.Address.Note = updateFarmDto.Note;
 
             await DbContext.SaveChangesAsync();
         }

@@ -15,8 +15,7 @@ namespace ProjectForFarmers.Domain
         public DayOfWeek Thursday { get; set; }
         public DayOfWeek Friday { get; set; }
         public DayOfWeek Saturday { get; set; }
-        public DayOfWeek Sunday { get; private set; }
-
+        public DayOfWeek Sunday { get; set; }
         public Guid MondayId { get; set; }
         public Guid TuesdayId { get; set; }
         public Guid WednesdayId { get; set; }
