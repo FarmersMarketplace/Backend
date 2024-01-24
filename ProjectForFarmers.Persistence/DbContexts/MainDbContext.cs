@@ -11,7 +11,7 @@ namespace ProjectForFarmers.Persistence.DbContexts
         public DbSet<Account> Accounts { get; set; }
         public DbSet<Address> Addresses { get; set; }
         public DbSet<Farm> Farms { get; set; }
-        public DbSet<EmployeePermissions> EmployeesPermissions { get; set; }
+        public DbSet<Order> Orders { get; set; }
 
         public MainDbContext(DbContextOptions<MainDbContext> options) : base(options)
         {
@@ -22,7 +22,6 @@ namespace ProjectForFarmers.Persistence.DbContexts
             modelBuilder.ApplyConfiguration(new AccountConfiguration());
             modelBuilder.ApplyConfiguration(new AddressConfiguration());
             modelBuilder.ApplyConfiguration(new FarmConfiguration());
-            modelBuilder.ApplyConfiguration(new EmployeePermissionsConfigurations());
 
             base.OnModelCreating(modelBuilder);
         }

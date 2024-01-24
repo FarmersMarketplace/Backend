@@ -15,7 +15,10 @@ namespace ProjectForFarmers.Domain
         public string CustomerEmail { get; set; }
         public decimal PaymentTotal { get; set; }
         public PaymentType PaymentType { get; set; }
-
+        public virtual Farm Farm { get; set; }
+        public Guid FarmId { get; set; }
+        public virtual Account Customer { get; set; }
+        public Guid CustomerId { get; set; }
     }
 
 }
