@@ -10,11 +10,11 @@ namespace ProjectForFarmers.Application.ViewModels.Farm
     {
         public Guid Id { get; set; }
         public string Name { get; set; }
+        public string? AvatarName { get; set; }
 
-        public FarmLookupVm(Guid id, string name)
+        public FarmLookupVm()
         {
-            Id = id;
-            Name = name;
+            
         }
     }
 }
