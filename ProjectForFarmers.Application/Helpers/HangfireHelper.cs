@@ -1,0 +1,60 @@
+﻿using Hangfire;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using ProjectForFarmers.Application.Interfaces;
+using ProjectForFarmers.Application.Services.Business;
+using Serilog;
+
+
+namespace ProjectForFarmers.Application.Helpers
+{
+    public static class HangfireHelper
+    {
+        public static DateTimeOffset LastDayOfCurrentMonth => new DateTimeOffset(DateTimeOffset.UtcNow.Year,
+                DateTimeOffset.UtcNow.Month,
+                1, 0, 0, 0,
+                DateTimeOffset.UtcNow.Offset)
+                    .AddMonths(1)
+                    .AddDays(-1)
+                    .AddSeconds(-1);
+        public static IApplicationDbContext DbContext { get; set; }
+        private static StatisticService StatisticService { get; set; }
+
+        static HangfireHelper()
+        {
+        }
+
+        public static async Task UpdateStatistics()
+        {
+            BackgroundJob.Schedule(() => UpdateStatistics(), LastDayOfNextMonth());
+
+            await StatisticService.UpdateAllStatistics(LastDayOfCurrentMonth);
+        }
+
+        public static DateTimeOffset LastDayOfNextMonth()
+        {
+            return LastDayOfCurrentMonth.AddMonths(1);
+        }
+
+        public static void RegisterTasks(IServiceProvider services)
+        {
+            var scope = services.CreateScope();
+            var serviceProvider = scope.ServiceProvider;
+
+            DbContext = serviceProvider.GetRequiredService<IApplicationDbContext>();
+
+            StatisticService = new StatisticService(DbContext);
+
+            BackgroundJob.Schedule(() => UpdateStatistics(), LastDayOfCurrentMonth);
+            BackgroundJob.Schedule(() => RemoveOldLogs(), TimeSpan.FromDays(30 * 4));
+        }
+
+        public static async Task RemoveOldLogs()
+        {
+            BackgroundJob.Schedule(() => RemoveOldLogs(), TimeSpan.FromDays(30 * 2));
+
+
+        }
+    }
+
+}

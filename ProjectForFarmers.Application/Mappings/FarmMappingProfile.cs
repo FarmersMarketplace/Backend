@@ -1,5 +1,8 @@
 ﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Microsoft.Extensions.Configuration;
 using ProjectForFarmers.Application.DataTransferObjects.Farm;
+using ProjectForFarmers.Application.ViewModels.Farm;
 using ProjectForFarmers.Domain;
 using System;
 using System.CodeDom;
@@ -13,18 +16,23 @@ namespace ProjectForFarmers.Application.Mappings
 {
     public class FarmMappingProfile : Profile
     {
-        public FarmMappingProfile()
+        private readonly IConfiguration Configuration;
+
+        public FarmMappingProfile(IConfiguration configuration)
         {
+            Configuration = configuration;
+
             MapAddressDtoToAddress();
             MapDayOfWeekDtoToDayOfWeek();
             MapScheduleDtoToSchedule();
             MapCreateFarmDtoToFarm();
             MapUpdateFarmDtoToFarm();
+            MapFarmToFarmLookupVm();
         }
 
         private void MapAddressDtoToAddress()
         {
-            CreateMap<AddressDto, Address>()
+            CreateMap<AddressDto, Domain.Address>()
                 .ForMember(address => address.Id, opt => opt.MapFrom(dto => Guid.NewGuid()))
                 .ForMember(address => address.Region, opt => opt.MapFrom(dto => dto.Region))
                 .ForMember(address => address.District, opt => opt.MapFrom(dto => dto.District))
@@ -84,6 +92,15 @@ namespace ProjectForFarmers.Application.Mappings
                 .ForMember(farm => farm.WebsiteUrl, opt => opt.MapFrom(dto => dto.WebsiteUrl))
                 .ForMember(farm => farm.Address, opt => opt.MapFrom(dto => dto.Address))
                 .ForMember(farm => farm.Schedule, opt => opt.MapFrom(dto => dto.Schedule));
+        }
+
+        private void MapFarmToFarmLookupVm()
+        {
+            CreateMap<Farm, FarmLookupVm>()
+                .ForMember(vm => vm.Id, opt => opt.MapFrom(farm => farm.Id))
+                .ForMember(farm => farm.Name, opt => opt.MapFrom(dto => dto.Name))
+                .ForMember(farm => farm.AvatarName, opt => opt.MapFrom(dto => 
+                (dto.ImagesNames == null || dto.ImagesNames.Count <=0) ? "" : dto.ImagesNames[0]));
         }
     }
 

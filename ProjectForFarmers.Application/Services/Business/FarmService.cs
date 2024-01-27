@@ -5,12 +5,15 @@ using ProjectForFarmers.Application.ViewModels.Farm;
 using ProjectForFarmers.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using SixLabors.ImageSharp.Formats.Jpeg;
-using Image = SixLabors.ImageSharp.Image;
-using Microsoft.AspNetCore.Http;
-using System.Security.AccessControl;
+using Geocoding;
 using ProjectForFarmers.Application.Helpers;
 using AutoMapper;
+using Geocoding;
+using Geocoding.Google;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Address = ProjectForFarmers.Domain.Address;
+using ProjectForFarmers.Application.Mappings;
+using System.Net;
 
 namespace ProjectForFarmers.Application.Services.Business
 {
@@ -28,6 +31,11 @@ namespace ProjectForFarmers.Application.Services.Business
         public async Task Create(CreateFarmDto createFarmDto)
         {
             var farm = Mapper.Map<Farm>(createFarmDto);
+            var address = farm.Address;
+
+            var coords = await GetCoordinates(address);
+            address.Latitude = coords.Latitude;
+            address.Longtitude = coords.Longitude;
 
             await DbContext.Farms.AddAsync(farm);
             await DbContext.SaveChangesAsync();
@@ -42,13 +50,44 @@ namespace ProjectForFarmers.Application.Services.Business
             await DbContext.SaveChangesAsync();
         }
 
+        private async Task<Location> GetCoordinates(Address address)
+        {
+            IGeocoder geocoder = new GoogleGeocoder() { ApiKey = Configuration["Geocoding:Apikey"] };
+            var request = await geocoder.GeocodeAsync($"{address.Region} oblast, {address.District} district, {address.Settlement} street {address.Street}, {address.HouseNumber}, Ukraine");
+            var coords = request.FirstOrDefault().Coordinates;
+            return coords;
+        }
+
+        private async Task<Location> GetCoordinates(AddressDto dto)
+        {
+            IGeocoder geocoder = new GoogleGeocoder() { ApiKey = Configuration["Geocoding:Apikey"] };
+            var request = await geocoder.GeocodeAsync($"{dto.Region} oblast, {dto.District} district, {dto.Settlement} street {dto.Street}, {dto.HouseNumber}, Ukraine");
+            var coords = request.FirstOrDefault().Coordinates;
+            return coords;
+        }
+
         public async Task Update(UpdateFarmDto updateFarmDto)
         {
             var farm = await DbContext.Farms.FirstOrDefaultAsync(f => f.Id == updateFarmDto.FarmId);
             if (farm == null) throw new NotFoundException($"Farm with Id {updateFarmDto.FarmId} does not exist.");
 
+            var farmAddress = farm.Address;
+            var addressDto = updateFarmDto.Address;
             var farmCreationDate = farm.CreationDate;
+
             farm = Mapper.Map<Farm>(updateFarmDto);
+
+            if(farmAddress.Region != addressDto.Region
+                || farmAddress.District != addressDto.District
+                || farmAddress.Settlement != addressDto.Settlement
+                || farmAddress.Street != addressDto.Street
+                || farmAddress.HouseNumber != addressDto.HouseNumber)
+            {
+                var coords = await GetCoordinates(addressDto);
+                farm.Address.Latitude = coords.Latitude;
+                farm.Address.Longtitude = coords.Longitude;
+            }
+
             farm.CreationDate = farmCreationDate;
 
             await DbContext.SaveChangesAsync();
@@ -70,7 +109,7 @@ namespace ProjectForFarmers.Application.Services.Business
                 OwnerName = farm.Owner.Name + " " + farm.Owner.Surname,
                 Address = farm.Address,
                 WebsiteUrl = farm.WebsiteUrl,
-                ImagesPaths = imagesPaths
+                ImagesNames = imagesPaths
             };
 
             return request;
@@ -82,7 +121,7 @@ namespace ProjectForFarmers.Application.Services.Business
             var response = new FarmListVm();
             foreach ( var f in farms )
             {
-                var vm = new FarmLookupVm(f.Id, f.Name);
+                var vm = Mapper.Map<FarmLookupVm>(f);
                 response.Farms.Add(vm);
             }
 

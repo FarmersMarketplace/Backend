@@ -16,5 +16,6 @@
         public virtual Address Address { get; set; }
         public Guid ScheduleId { get; set; }
         public virtual Schedule Schedule { get; set; }
+        public virtual List<MonthStatistic> Dashboard {  get; set; }
     }
 }

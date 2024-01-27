@@ -2,6 +2,7 @@
 using ProjectForFarmers.Domain;
 using ProjectForFarmers.Persistence.EntityTypeConfigurations;
 using Microsoft.EntityFrameworkCore;
+using DayOfWeek = ProjectForFarmers.Domain.DayOfWeek;
 
 
 namespace ProjectForFarmers.Persistence.DbContexts
@@ -12,6 +13,10 @@ namespace ProjectForFarmers.Persistence.DbContexts
         public DbSet<Address> Addresses { get; set; }
         public DbSet<Farm> Farms { get; set; }
         public DbSet<Order> Orders { get; set; }
+        public DbSet<DayOfWeek> DaysOfWeek { get; set; }
+        public DbSet<Schedule> Schedules { get; set; }
+        public DbSet<MonthStatistic> MonthesStatistics { get; set; }
+
 
         public MainDbContext(DbContextOptions<MainDbContext> options) : base(options)
         {
@@ -21,8 +26,11 @@ namespace ProjectForFarmers.Persistence.DbContexts
         {
             modelBuilder.ApplyConfiguration(new AccountConfiguration());
             modelBuilder.ApplyConfiguration(new AddressConfiguration());
+            modelBuilder.ApplyConfiguration(new DayOfWeekConfiguration());
+            modelBuilder.ApplyConfiguration(new ScheduleConfiguration());
             modelBuilder.ApplyConfiguration(new FarmConfiguration());
             modelBuilder.ApplyConfiguration(new OrderConfiguration());
+            modelBuilder.ApplyConfiguration(new MonthStatisticConfiguration());
 
             base.OnModelCreating(modelBuilder);
         }
