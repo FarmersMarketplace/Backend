@@ -16,8 +16,7 @@ namespace ProjectForFarmers.Persistence.EntityTypeConfigurations
                 .IsRequired()
                 .HasMaxLength(7)
                 .ValueGeneratedOnAdd()
-                .UseIdentityColumn()
-                .HasComputedColumnSql("RIGHT('0000000' + CAST(CONVERT(NVARCHAR(7), [Number]) AS NVARCHAR(7)), 7)");
+                .UseSerialColumn();
 
             builder.Property(account => account.CreationDate).IsRequired();
             builder.Property(account => account.CustomerName).IsRequired();
@@ -29,10 +28,6 @@ namespace ProjectForFarmers.Persistence.EntityTypeConfigurations
             builder.HasOne(order => order.Customer)
                 .WithMany()
                 .HasForeignKey(order => order.CustomerId);
-
-            builder.HasOne(order => order.Farm)
-                .WithMany()
-                .HasForeignKey(order => order.FarmId);
             
             builder.HasIndex(order => order.Id).IsUnique();
         }

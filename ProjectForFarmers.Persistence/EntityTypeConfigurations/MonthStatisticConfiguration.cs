@@ -20,6 +20,8 @@ namespace ProjectForFarmers.Persistence.EntityTypeConfigurations
             builder.Property(statistic => statistic.EndDate).IsRequired();
             builder.Property(statistic => statistic.TotalRevenue).IsRequired();
             builder.Property(statistic => statistic.TotalRevenuePercentage).IsRequired();
+            builder.Property(statistic => statistic.Producer).IsRequired();
+            builder.Property(statistic => statistic.ProducerId).IsRequired();
 
             builder.HasOne<OrderGroupStatistic>()
                 .WithOne()
@@ -36,10 +38,6 @@ namespace ProjectForFarmers.Persistence.EntityTypeConfigurations
             builder.HasOne<OrderGroupStatistic>()
                 .WithOne()
                 .HasForeignKey<MonthStatistic>(f => f.NewOrdersStatisticId);
-
-            builder.HasOne<OrderGroupStatistic>()
-                .WithOne()
-                .HasForeignKey<MonthStatistic>(f => f.PreviousOrdersStatisticId);
 
             builder.HasOne<OrderGroupStatistic>()
                 .WithOne()
