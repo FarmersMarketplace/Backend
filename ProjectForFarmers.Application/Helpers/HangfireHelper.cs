@@ -4,7 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using ProjectForFarmers.Application.Interfaces;
 using ProjectForFarmers.Application.Services.Business;
 using Serilog;
-
+using Microsoft.EntityFrameworkCore;
 
 namespace ProjectForFarmers.Application.Helpers
 {
@@ -53,7 +53,7 @@ namespace ProjectForFarmers.Application.Helpers
         {
             BackgroundJob.Schedule(() => RemoveOldLogs(), TimeSpan.FromDays(30 * 2));
 
-
+            //DbContext.Database.c
         }
     }
 

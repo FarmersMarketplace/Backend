@@ -24,7 +24,10 @@ namespace ProjectForFarmers.Domain
         public OrderGroupStatistic TotalActivity { get; set; }
         public Guid TotalActivityStatisticId { get; set; }
         public decimal TotalRevenue { get; set; }
-        public float TotalRevenuePercentage { get; set; }
+        public float TotalRevenueChangePercentage { get; set; }
+        public Guid? CustomerWithHighestPaymentId { get; set; }
+        public decimal HighestCustomerPayment { get; set; }
+        public float HighestCustomerPaymentPercentage { get; set; }
     }
 
 }

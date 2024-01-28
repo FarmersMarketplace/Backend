@@ -11,7 +11,7 @@ namespace ProjectForFarmers.Application.Services.Business
 {
     public interface IOrderService
     {
-        public Task<DashboardVm> Dashboard(DashboardDto dto);
+        public Task<LoadDashboardVm> LoadDashboard(LoadDashboardDto dto);
     }
 
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ProjectForFarmers.Domain;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,11 +7,10 @@ using System.Threading.Tasks;
 
 namespace ProjectForFarmers.Application.DataTransferObjects.Order
 {
-    public class DashboardDto
+    public class LoadDashboardDto
     {
-        public Guid Id { get; set; }
-        public DateTime StartDate { get; set; }
-        public DateTime EndDate { get; set; }
+        public Guid ProducerId { get; set; }
+        public Producer Producer { get; set; }
     }
 
 }

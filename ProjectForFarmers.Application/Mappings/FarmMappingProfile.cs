@@ -16,12 +16,8 @@ namespace ProjectForFarmers.Application.Mappings
 {
     public class FarmMappingProfile : Profile
     {
-        private readonly IConfiguration Configuration;
-
-        public FarmMappingProfile(IConfiguration configuration)
+        public FarmMappingProfile()
         {
-            Configuration = configuration;
-
             MapAddressDtoToAddress();
             MapDayOfWeekDtoToDayOfWeek();
             MapScheduleDtoToSchedule();
@@ -32,7 +28,7 @@ namespace ProjectForFarmers.Application.Mappings
 
         private void MapAddressDtoToAddress()
         {
-            CreateMap<AddressDto, Domain.Address>()
+            CreateMap<AddressDto, Address>()
                 .ForMember(address => address.Id, opt => opt.MapFrom(dto => Guid.NewGuid()))
                 .ForMember(address => address.Region, opt => opt.MapFrom(dto => dto.Region))
                 .ForMember(address => address.District, opt => opt.MapFrom(dto => dto.District))
@@ -100,7 +96,7 @@ namespace ProjectForFarmers.Application.Mappings
                 .ForMember(vm => vm.Id, opt => opt.MapFrom(farm => farm.Id))
                 .ForMember(farm => farm.Name, opt => opt.MapFrom(dto => dto.Name))
                 .ForMember(farm => farm.AvatarName, opt => opt.MapFrom(dto => 
-                (dto.ImagesNames == null || dto.ImagesNames.Count <=0) ? "" : dto.ImagesNames[0]));
+                (dto.ImagesNames == null || dto.ImagesNames.Count <= 0) ? "" : dto.ImagesNames[0]));
         }
     }
 

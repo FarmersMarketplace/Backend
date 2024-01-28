@@ -19,7 +19,7 @@ namespace ProjectForFarmers.Persistence.EntityTypeConfigurations
             builder.Property(statistic => statistic.StartDate).IsRequired();
             builder.Property(statistic => statistic.EndDate).IsRequired();
             builder.Property(statistic => statistic.TotalRevenue).IsRequired();
-            builder.Property(statistic => statistic.TotalRevenuePercentage).IsRequired();
+            builder.Property(statistic => statistic.TotalRevenueChangePercentage).IsRequired();
             builder.Property(statistic => statistic.Producer).IsRequired();
             builder.Property(statistic => statistic.ProducerId).IsRequired();
 

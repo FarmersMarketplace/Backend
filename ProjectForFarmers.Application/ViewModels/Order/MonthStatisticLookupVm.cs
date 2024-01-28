@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ProjectForFarmers.Application.DataTransferObjects.Order
+namespace ProjectForFarmers.Application.ViewModels.Order
 {
-    public class DashboardDto
+    public class MonthStatisticLookupVm
     {
         public Guid Id { get; set; }
         public DateTime StartDate { get; set; }

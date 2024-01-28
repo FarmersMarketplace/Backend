@@ -9,8 +9,6 @@ using System.Reflection;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Models;
 using ProjectForFarmers.Persistence;
-using ProjectForFarmers.Persistence.DbContexts;
-using ProjectForFarmers.Application.Mappings;
 using Hangfire;
 using Hangfire.PostgreSql;
 using ProjectForFarmers.Application.Helpers;
@@ -96,6 +94,7 @@ namespace ProjectForFarmers.WebApi
             });
 
         }
+
         private static void ConfigureApp(WebApplication app)
         {
             if (app.Environment.IsDevelopment()) app.UseDeveloperExceptionPage();
