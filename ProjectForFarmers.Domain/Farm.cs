@@ -7,11 +7,11 @@
         public string Description { get; set; }
         public string ContactEmail { get; set; }
         public string ContactPhone { get; set; }
-        public string? WebsiteUrl { get; set; }
+        public string? SocialPageUrl { get; set; }
         public List<string> ImagesNames { get; set; }
         public DateTime CreationDate { get; set; }
-        public Guid OwnerId { get; set; }
-        public virtual Account Owner { get; set; }
+        public virtual Guid OwnerId { get; set; }
+        public Account Owner { get; set; }
         public Guid AddressId { get; set; }
         public virtual Address Address { get; set; }
         public Guid ScheduleId { get; set; }

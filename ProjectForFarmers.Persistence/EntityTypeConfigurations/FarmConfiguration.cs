@@ -28,8 +28,8 @@ namespace ProjectForFarmers.Persistence.EntityTypeConfigurations
                 .IsRequired();
 
             builder.HasOne(f => f.Owner)
-                .WithOne()
-                .HasForeignKey<Farm>(f => f.OwnerId)
+                .WithMany()
+                .HasForeignKey(f => f.OwnerId)
                 .IsRequired();
 
             builder.HasOne(f => f.Schedule)
