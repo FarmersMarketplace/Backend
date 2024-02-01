@@ -38,12 +38,13 @@ namespace ProjectForFarmers.Application.Services.Business
         {
             DateTimeOffset firstDayOfCurrentMonth = new DateTimeOffset(lastDateOfMonth.Year, lastDateOfMonth.Month, 1, 0, 0, 0, lastDateOfMonth.Offset);
             DateTimeOffset lastDayOfPreviousMonth = firstDayOfCurrentMonth.AddDays(-1);
+            DateTimeOffset firstDayOfPreviousMonth = firstDayOfCurrentMonth.AddMonths(-1);
 
             var previousStatistic = await GetPreviousStatistic(producerId, producer, lastDayOfPreviousMonth);
 
             if (previousStatistic == null)
             {
-                var existsOrdersForPreviousMonth = await ExistsOrdersForPeriodOfTime(previousStatistic.ProducerId, previousStatistic.StartDate, previousStatistic.EndDate);
+                var existsOrdersForPreviousMonth = await ExistsOrdersForPeriodOfTime(producerId, firstDayOfPreviousMonth, lastDayOfPreviousMonth);
 
                 if (existsOrdersForPreviousMonth)
                 {
@@ -77,43 +78,43 @@ namespace ProjectForFarmers.Application.Services.Business
             {
                 Id = Guid.NewGuid(),
                 Count = (uint)bookedOrders.Length,
-                PercentageChange = await CalculatePercentageChanges(bookedOrders.Length, previousStatistic.BookedOrders.Count)
+                PercentageChange = await CalculatePercentageChanges(bookedOrders.Length, previousStatistic.BookedOrdersStatistic.Count)
             };
 
             var completedOrdersStat = new OrderGroupStatistic
             {
                 Id = Guid.NewGuid(),
                 Count = (uint)bookedOrders.Length,
-                PercentageChange = await CalculatePercentageChanges(completedOrders.Length, previousStatistic.CompletedOrders.Count)
+                PercentageChange = await CalculatePercentageChanges(completedOrders.Length, previousStatistic.CompletedOrdersStatistic.Count)
             };
 
             var processingOrdersStat = new OrderGroupStatistic
             {
                 Id = Guid.NewGuid(),
                 Count = (uint)processingOrders.Length,
-                PercentageChange = await CalculatePercentageChanges(processingOrders.Length, previousStatistic.ProcessingOrders.Count)
+                PercentageChange = await CalculatePercentageChanges(processingOrders.Length, previousStatistic.ProcessingOrdersStatistic.Count)
             };
 
             var newOrdersStat = new OrderGroupStatistic
             {
                 Id = Guid.NewGuid(),
                 Count = (uint)newOrders.Length,
-                PercentageChange = await CalculatePercentageChanges(newOrders.Length, previousStatistic.NewOrders.Count)
+                PercentageChange = await CalculatePercentageChanges(newOrders.Length, previousStatistic.NewOrdersStatistic.Count)
             };
 
             var totalActivityOrdersOrdersStat = new OrderGroupStatistic
             {
                 Id = Guid.NewGuid(),
                 Count = (uint)totalActivityOrders.Length,
-                PercentageChange = await CalculatePercentageChanges(totalActivityOrders.Length, previousStatistic.TotalActivity.Count)
+                PercentageChange = await CalculatePercentageChanges(totalActivityOrders.Length, previousStatistic.TotalActivityStatistic.Count)
             };
 
-            var totalRevenu = orders.Sum(order => order.PaymentTotal);
+            var totalRevenu = orders.Sum(order => order.TotalPayment);
 
             var customerWithHighestPayment = (
                 from order in orders
                 group order by order.CustomerId into customerGroup
-                let totalPayment = customerGroup.Sum(order => order.PaymentTotal)
+                let totalPayment = customerGroup.Sum(order => order.TotalPayment)
                 orderby totalPayment descending
                 select new
                 {
@@ -128,29 +129,40 @@ namespace ProjectForFarmers.Application.Services.Business
             {
                 Id = Guid.NewGuid(),
                 ProducerId = producerId,
-                Producer = Producer.Seller,
-                StartDate = new DateTime(lastDateOfMonth.Year, lastDateOfMonth.Month, lastDateOfMonth.Day, 0, 0, 0),
-                EndDate = new DateTime(lastDateOfMonth.Year, lastDateOfMonth.Month, lastDateOfMonth.Day, 23, 59, 59),
-                BookedOrders = bookedOrdersStat,
-                CompletedOrders = completedOrdersStat,
-                ProcessingOrders = processingOrdersStat,
-                NewOrders = newOrdersStat,
-                TotalActivity = totalActivityOrdersOrdersStat,
+                Producer = producer,
+                StartDate = new DateTime(lastDateOfMonth.Year, lastDateOfMonth.Month, 1, 0, 0, 0, DateTimeKind.Utc),
+                EndDate = new DateTime(lastDateOfMonth.Year, lastDateOfMonth.Month, lastDateOfMonth.Day, 23, 59, 59, DateTimeKind.Utc),
+                BookedOrdersStatistic = bookedOrdersStat,
+                CompletedOrdersStatistic = completedOrdersStat,
+                ProcessingOrdersStatistic = processingOrdersStat,
+                NewOrdersStatistic = newOrdersStat,
+                TotalActivityStatistic = totalActivityOrdersOrdersStat,
+                BookedOrdersStatisticId = bookedOrdersStat.Id,
+                CompletedOrdersStatisticId = completedOrdersStat.Id,
+                ProcessingOrdersStatisticId = processingOrdersStat.Id,
+                NewOrdersStatisticId = newOrdersStat.Id,
+                TotalActivityStatisticId = totalActivityOrdersOrdersStat.Id,
                 TotalRevenue = totalRevenu,
                 TotalRevenueChangePercentage = await CalculatePercentageChanges(totalRevenu, previousStatistic.TotalRevenue),
                 CustomerWithHighestPaymentId = customerId,
                 HighestCustomerPayment = sum,
-                HighestCustomerPaymentPercentage = await CalculatePercentageChanges(sum, totalRevenu)
+                HighestCustomerPaymentPercentage = await CalculatePaymentPercentageChanges(sum, totalRevenu)
             };
 
             return result;
+        }
+
+        private async Task<float> CalculatePaymentPercentageChanges(decimal sum, decimal totalRevenu)
+        {
+            return (float)((sum*100)/totalRevenu);
         }
 
         private async Task<MonthStatistic> CalculateMonthStatisticForFirstMonth(Guid producerId, Producer producer, DateTimeOffset lastDateOfMonth)
         {
             var orders = DbContext.Orders.Where(o => o.Producer == producer
                 && o.ProducerId == producerId
-                && o.CreationDate.Month == lastDateOfMonth.Month).ToArray();
+                && o.CreationDate.Month == lastDateOfMonth.Month
+                && o.CreationDate.Year == lastDateOfMonth.Year).ToArray();
 
             var bookedOrders = orders.Where(o => o.Status != OrderStatus.Completed).ToArray();
             var completedOrders = orders.Where(o => o.Status == OrderStatus.Completed).ToArray();
@@ -193,12 +205,12 @@ namespace ProjectForFarmers.Application.Services.Business
                 PercentageChange = totalActivityOrders.Length > 0 ? 100 : 0
             };
 
-            var totalRevenu = orders.Sum(order => order.PaymentTotal);
+            var totalRevenu = orders.Sum(order => order.TotalPayment);
 
             var customerWithHighestPayment = (
                 from order in orders
                 group order by order.CustomerId into customerGroup
-                let totalPayment = customerGroup.Sum(order => order.PaymentTotal)
+                let totalPayment = customerGroup.Sum(order => order.TotalPayment)
                 orderby totalPayment descending
                 select new
                 {
@@ -213,19 +225,24 @@ namespace ProjectForFarmers.Application.Services.Business
             {
                 Id = Guid.NewGuid(),
                 ProducerId = producerId,
-                Producer = Producer.Seller,
-                StartDate = new DateTime(lastDateOfMonth.Year, lastDateOfMonth.Month, lastDateOfMonth.Day, 0, 0, 0),
-                EndDate = new DateTime(lastDateOfMonth.Year, lastDateOfMonth.Month, lastDateOfMonth.Day, 23, 59, 59),
-                BookedOrders = bookedOrdersStat,
-                CompletedOrders = completedOrdersStat,
-                ProcessingOrders = processingOrdersStat,
-                NewOrders = newOrdersStat,
-                TotalActivity = totalActivityOrdersOrdersStat,
+                Producer = producer,
+                StartDate = new DateTime(lastDateOfMonth.Year, lastDateOfMonth.Month, 1, 0, 0, 0, DateTimeKind.Utc),
+                EndDate = new DateTime(lastDateOfMonth.Year, lastDateOfMonth.Month, lastDateOfMonth.Day, 23, 59, 59, DateTimeKind.Utc),
+                BookedOrdersStatistic = bookedOrdersStat,
+                CompletedOrdersStatistic = completedOrdersStat,
+                ProcessingOrdersStatistic = processingOrdersStat,
+                NewOrdersStatistic = newOrdersStat,
+                TotalActivityStatistic = totalActivityOrdersOrdersStat,
+                BookedOrdersStatisticId = bookedOrdersStat.Id,
+                CompletedOrdersStatisticId = completedOrdersStat.Id,
+                ProcessingOrdersStatisticId = processingOrdersStat.Id,
+                NewOrdersStatisticId = newOrdersStat.Id,
+                TotalActivityStatisticId = totalActivityOrdersOrdersStat.Id,
                 TotalRevenue = totalRevenu,
                 TotalRevenueChangePercentage = 100,
                 CustomerWithHighestPaymentId = customerId,
                 HighestCustomerPayment = sum,
-                HighestCustomerPaymentPercentage = await CalculatePercentageChanges(sum, totalRevenu)
+                HighestCustomerPaymentPercentage = await CalculatePaymentPercentageChanges(sum, totalRevenu)
             };
 
             return result;
@@ -233,26 +250,39 @@ namespace ProjectForFarmers.Application.Services.Business
 
         private async Task<MonthStatistic> GetPreviousStatistic(Guid producerId, Producer producer, DateTimeOffset lastDayOfPreviousMonth)
         {
-            var previousStatistic = await DbContext.MonthesStatistics.FirstOrDefaultAsync(m => m.Producer == producer
-                && m.ProducerId == producerId
-                && m.StartDate.Year == lastDayOfPreviousMonth.Year
-                && m.StartDate.Month == lastDayOfPreviousMonth.Month
-                && m.StartDate.Day == 1
-                && m.EndDate.Year == lastDayOfPreviousMonth.Year
-                && m.EndDate.Month == lastDayOfPreviousMonth.Month
-                && m.EndDate.Day == lastDayOfPreviousMonth.Day);
+            var previousStatistic = await DbContext.MonthesStatistics
+                .Include(m => m.BookedOrdersStatistic)
+                .Include(m => m.CompletedOrdersStatistic)
+                .Include(m => m.ProcessingOrdersStatistic)
+                .Include(m => m.NewOrdersStatistic)
+                .Include(m => m.TotalActivityStatistic)
+                .FirstOrDefaultAsync(m => m.Producer == producer
+                    && m.ProducerId == producerId
+                    && m.StartDate.Year == lastDayOfPreviousMonth.Year
+                    && m.StartDate.Month == lastDayOfPreviousMonth.Month
+                    && m.StartDate.Day == 1
+                    && m.EndDate.Year == lastDayOfPreviousMonth.Year
+                    && m.EndDate.Month == lastDayOfPreviousMonth.Month
+                    && m.EndDate.Day == lastDayOfPreviousMonth.Day);
 
             return previousStatistic;
         }
 
         private async Task<float> CalculatePercentageChanges(decimal currentCount, decimal previousCount)
         {
-            float curPercent = (float)(currentCount * 100 / previousCount);
+            if(previousCount > 0)
+            {
+                float curPercent = (float)(currentCount * 100 / previousCount);
 
-            return curPercent - 100f;
+                return curPercent - 100f;
+            }
+            else
+            {
+                return 100;
+            }
         }
 
-        private async Task<bool> ExistsOrdersForPeriodOfTime(Guid producerId, DateTime startDate, DateTime endDate)
+        private async Task<bool> ExistsOrdersForPeriodOfTime(Guid producerId, DateTimeOffset startDate, DateTimeOffset endDate)
         {
             var existsOrdersForPreviousMonth = DbContext.Orders.Any(o => o.CreationDate.Year >= startDate.Year 
                 && o.ProducerId == producerId
