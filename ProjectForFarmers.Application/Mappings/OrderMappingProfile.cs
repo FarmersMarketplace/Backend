@@ -17,6 +17,7 @@ namespace ProjectForFarmers.Application.Mappings
             MapOrderGroupStatisticToOrderGroupStatisticVm();
             MapMonthStatisticToDashboardVm();
             MapOrderToOrderLookupVm();
+            MapOrderToOrderVm();
         }
 
         private void MapMonthStatisticToDashboardVm()
@@ -47,12 +48,32 @@ namespace ProjectForFarmers.Application.Mappings
                 .ForMember(vm => vm.Id, opt => opt.MapFrom(order => order.Id))
                 .ForMember(vm => vm.Number, opt => opt.MapFrom(order => order.Number.ToString("D7")))
                 .ForMember(vm => vm.CreationDate, opt => opt.MapFrom(order => order.CreationDate))
-                .ForMember(vm => vm.CustomerName, opt => opt.MapFrom(order => order.CustomerName))
-                .ForMember(vm => vm.CustomerPhone, opt => opt.MapFrom(order => order.CustomerPhone))
-                .ForMember(vm => vm.CustomerEmail, opt => opt.MapFrom(order => order.CustomerEmail))
+                .ForMember(vm => vm.CustomerName, opt => opt.MapFrom(order => order.Customer.Name + " " + order.Customer.Surname))
+                .ForMember(vm => vm.CustomerPhone, opt => opt.MapFrom(order => order.Customer.Phone))
+                .ForMember(vm => vm.CustomerEmail, opt => opt.MapFrom(order => order.Customer.Email))
                 .ForMember(vm => vm.TotalPayment, opt => opt.MapFrom(order => order.TotalPayment))
                 .ForMember(vm => vm.PaymentType, opt => opt.MapFrom(order => order.TotalPayment))
                 .ForMember(vm => vm.Status, opt => opt.MapFrom(order => order.Status));
+        }
+
+        private void MapOrderToOrderVm()
+        {
+            CreateMap<Order, OrderVm>()
+                .ForMember(vm => vm.Id, opt => opt.MapFrom(order => order.Id))
+                .ForMember(vm => vm.Number, opt => opt.MapFrom(order => order.Number.ToString("D7")))
+                .ForMember(vm => vm.CreationDate, opt => opt.MapFrom(order => order.CreationDate))
+                .ForMember(vm => vm.ReceiveDate, opt => opt.MapFrom(order => order.ReceiveDate))
+                .ForMember(vm => vm.TotalPayment, opt => opt.MapFrom(order => order.TotalPayment))
+                .ForMember(vm => vm.PaymentType, opt => opt.MapFrom(order => order.PaymentType))
+                .ForMember(vm => vm.PaymentStatus, opt => opt.MapFrom(order => order.PaymentStatus))
+                .ForMember(vm => vm.ReceivingType, opt => opt.MapFrom(order => order.ReceivingType))
+                .ForMember(vm => vm.SupplyPoint, opt => opt.MapFrom(order => order.SupplyPoint))
+                .ForMember(vm => vm.DeliveryPoint, opt => opt.MapFrom(order => order.DeliveryPoint))
+                .ForMember(vm => vm.Status, opt => opt.MapFrom(order => order.Status))
+                .ForMember(vm => vm.CustomerId, opt => opt.MapFrom(order => order.CustomerId))
+                .ForMember(vm => vm.CustomerName, opt => opt.MapFrom(order => order.Customer.Name + " " + order.Customer.Surname))
+                .ForMember(vm => vm.CustomerPhone, opt => opt.MapFrom(order => order.Customer.Phone))
+                .ForMember(vm => vm.Items, opt => opt.MapFrom(order => new List<OrderItemVm>()));
         }
     }
 
