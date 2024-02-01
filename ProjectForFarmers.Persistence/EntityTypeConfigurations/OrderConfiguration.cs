@@ -19,11 +19,23 @@ namespace ProjectForFarmers.Persistence.EntityTypeConfigurations
                 .UseSerialColumn();
 
             builder.Property(account => account.CreationDate).IsRequired();
-            builder.Property(account => account.CustomerName).IsRequired();
-            builder.Property(account => account.CustomerPhone).IsRequired();
-            builder.Property(account => account.CustomerEmail).IsRequired();
+            builder.Property(account => account.ReceiveDate).IsRequired();
             builder.Property(account => account.TotalPayment).IsRequired();
             builder.Property(account => account.PaymentType).IsRequired();
+            builder.Property(account => account.PaymentStatus).IsRequired();
+            builder.Property(account => account.ReceivingType).IsRequired();
+
+            builder.HasOne(order => order.Customer)
+                .WithMany() 
+                .HasForeignKey(order => order.CustomerId);
+
+            builder.HasOne(order => order.SupplyPoint)
+                .WithMany()
+                .HasForeignKey(order => order.SupplyPointId);
+
+            builder.HasOne(order => order.DeliveryPoint)
+                .WithMany()
+                .HasForeignKey(order => order.DeliveryPointId);
 
             builder.HasOne(order => order.Customer)
                 .WithMany()
