@@ -9,12 +9,13 @@ namespace ProjectForFarmers.Domain
     public class DayOfWeek
     {
         public Guid Id { get; set; }
-        private string startHour;
-        private string startMinute;
-        private string endHour;
-        private string endMinute;
+        public bool IsOpened { get; set; }
+        private byte? startHour;
+        private byte? startMinute;
+        private byte? endHour;
+        private byte? endMinute;
 
-        public string StartHour
+        public byte? StartHour
         {
             get { return startHour; }
             set
@@ -26,7 +27,7 @@ namespace ProjectForFarmers.Domain
             }
         }
 
-        public string StartMinute
+        public byte? StartMinute
         {
             get { return startMinute; }
             set
@@ -38,7 +39,7 @@ namespace ProjectForFarmers.Domain
             }
         }
 
-        public string EndHour
+        public byte? EndHour
         {
             get { return endHour; }
             set
@@ -50,7 +51,7 @@ namespace ProjectForFarmers.Domain
             }
         }
 
-        public string EndMinute
+        public byte? EndMinute
         {
             get { return endMinute; }
             set
@@ -64,19 +65,25 @@ namespace ProjectForFarmers.Domain
 
         public DayOfWeek()
         {
-            StartHour = "00";
-            StartMinute = "00";
-            EndHour = "00";
-            EndMinute = "00";
+            IsOpened = false;
+            StartHour = null;
+            StartMinute = null;
+            EndHour = null;
+            EndMinute = null;
         }
 
-        public DayOfWeek(string startHour, string startMinute, string endHour, string endMinute)
+        public DayOfWeek(bool isOpened, byte? startHour, byte? startMinute, byte? endHour, byte? endMinute)
         {
-            var startTimeInMinutes = int.Parse(startHour) * 60 + int.Parse(startMinute);
-            var endTimeInMinutes = int.Parse(endHour) * 60 + int.Parse(endMinute);
+            IsOpened = isOpened;
 
-            if (endTimeInMinutes <= startTimeInMinutes)
-                throw new ArgumentException("End time must be greater than start time.");
+            if (startHour != null && startMinute != null && endHour != null && endMinute != null) 
+            {
+                int startTimeInMinutes = (int)(startHour * 60 + startMinute);
+                int endTimeInMinutes = (int)(endHour * 60 + endMinute);
+
+                if (endTimeInMinutes <= startTimeInMinutes)
+                    throw new ArgumentException("End time must be greater than start time.");
+            }
 
             StartHour = startHour;
             StartMinute = startMinute;
@@ -84,16 +91,14 @@ namespace ProjectForFarmers.Domain
             EndMinute = endMinute;
         }
 
-        private bool IsValidHour(string hour)
+        private bool IsValidHour(byte? hour)
         {
-            int hourValue;
-            return int.TryParse(hour, out hourValue) && hourValue >= 0 && hourValue < 24;
+            return hour == null || (hour >= 0 && hour < 24);
         }
 
-        private bool IsValidMinute(string minute)
+        private bool IsValidMinute(byte? minute)
         {
-            int minuteValue;
-            return int.TryParse(minute, out minuteValue) && minuteValue >= 0 && minuteValue < 60;
+            return (minute == null) || (minute >= 0 && minute < 60);
         }
     }
 
