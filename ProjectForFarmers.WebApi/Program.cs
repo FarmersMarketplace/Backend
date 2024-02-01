@@ -123,8 +123,6 @@ namespace ProjectForFarmers.WebApi
             app.UseAuthentication();
             app.UseAuthorization();
 
-            
-
             app.UseSwagger();
             app.UseSwaggerUI(options =>
             {
