@@ -16,6 +16,7 @@ namespace ProjectForFarmers.Persistence.DbContexts
         public DbSet<DayOfWeek> DaysOfWeek { get; set; }
         public DbSet<Schedule> Schedules { get; set; }
         public DbSet<MonthStatistic> MonthesStatistics { get; set; }
+        public DbSet<OrderItem> OrdersItems { get; set; }
 
         public MainDbContext(DbContextOptions<MainDbContext> options) : base(options)
         {
@@ -29,6 +30,7 @@ namespace ProjectForFarmers.Persistence.DbContexts
             modelBuilder.ApplyConfiguration(new ScheduleConfiguration());
             modelBuilder.ApplyConfiguration(new FarmConfiguration());
             modelBuilder.ApplyConfiguration(new OrderConfiguration());
+            modelBuilder.ApplyConfiguration(new OrderItemConfiguration());
             modelBuilder.ApplyConfiguration(new MonthStatisticConfiguration());
 
             base.OnModelCreating(modelBuilder);
