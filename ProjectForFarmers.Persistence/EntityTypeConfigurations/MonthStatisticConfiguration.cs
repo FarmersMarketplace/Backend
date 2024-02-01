@@ -23,23 +23,23 @@ namespace ProjectForFarmers.Persistence.EntityTypeConfigurations
             builder.Property(statistic => statistic.Producer).IsRequired();
             builder.Property(statistic => statistic.ProducerId).IsRequired();
 
-            builder.HasOne<OrderGroupStatistic>()
+            builder.HasOne(f => f.BookedOrdersStatistic)
                 .WithOne()
                 .HasForeignKey<MonthStatistic>(f => f.BookedOrdersStatisticId);
 
-            builder.HasOne<OrderGroupStatistic>()
+            builder.HasOne(f => f.CompletedOrdersStatistic)
                 .WithOne()
-                .HasForeignKey<MonthStatistic>(f => f.CompleteOrdersStatisticId);
+                .HasForeignKey<MonthStatistic>(f => f.CompletedOrdersStatisticId);
 
-            builder.HasOne<OrderGroupStatistic>()
+            builder.HasOne(f => f.ProcessingOrdersStatistic)
                 .WithOne()
                 .HasForeignKey<MonthStatistic>(f => f.ProcessingOrdersStatisticId);
 
-            builder.HasOne<OrderGroupStatistic>()
+            builder.HasOne(f => f.NewOrdersStatistic)
                 .WithOne()
                 .HasForeignKey<MonthStatistic>(f => f.NewOrdersStatisticId);
 
-            builder.HasOne<OrderGroupStatistic>()
+            builder.HasOne(f => f.TotalActivityStatistic)
                 .WithOne()
                 .HasForeignKey<MonthStatistic>(f => f.TotalActivityStatisticId);
 
