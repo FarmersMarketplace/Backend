@@ -75,5 +75,39 @@ namespace ProjectForFarmers.Application.Helpers
 </html>";
         }
 
+        public static string FarmEmailConfirmationMessageBody(string farmName, string farmerName, string farmerSurname, string email, string token)
+        {
+            return $@"
+<!DOCTYPE html>
+<html lang=""en"">
+
+<head>
+   <meta charset=""UTF-8"">
+   <meta http-equiv=""X-UA-Compatible"" content=""IE=edge"">
+   <meta name=""viewport"" content=""width=device-width, initial-scale=1.0"">
+   <title>Farm contact email confirmation</title>
+</head>
+
+<body>
+   <div id=""container"">
+      <h2>Farm Email Confirmation</h2>
+      <p>Dear {farmerName} {farmerSurname},</p>
+      <p>Thank you for registering your farm on our website. We are pleased to welcome you to our community!</p>
+      <p><strong>Name:</strong> {farmName}<br>
+         <strong>Email:</strong> {email}<br>
+
+      </p>
+      <p>Please confirm your contact email by clicking the link below:</p>
+      <p><a href=""http://localhost:8080/confirmfarmemail/{token}"">Confirm email</a></p>
+      <p>Thank you for choosing us! If you have any questions or issues, feel free to contact our support team at <a
+            href=""mailto:[serviceEmail]"">[serviceEmail]</a>.</p>
+      <p>Best regards,<br>
+         Agroforum</p>
+   </div>
+</body>
+
+</html>";
+        }
+
     }
 }

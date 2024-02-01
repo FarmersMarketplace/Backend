@@ -10,17 +10,20 @@ using System.ComponentModel.DataAnnotations;
 using static Google.Apis.Auth.GoogleJsonWebSignature;
 using ProjectForFarmers.Application.Helpers;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
+using ProjectForFarmers.Application.ViewModels;
 
 namespace ProjectForFarmers.Application.Services.Auth
 {
     public class AuthService : Service, IAuthService
     {
-        private readonly EmailHelper EmailService;
+        private readonly EmailHelper EmailHelper;
         private readonly JwtService JwtService;
 
         public AuthService(IMapper mapper, IApplicationDbContext dbContext, IConfiguration configuration) : base(mapper, dbContext, configuration)
         {
             JwtService = new JwtService(configuration);
+            EmailHelper = new EmailHelper(configuration);
         }
 
         public async Task Register(RegisterDto accountDto)
@@ -29,7 +32,7 @@ namespace ProjectForFarmers.Application.Services.Auth
 
             await CreateAccount(id, accountDto);
             string message = EmailContentBuilder.ConfirmationMessageBody(accountDto.Name, accountDto.Surname, accountDto.Email, await JwtService.EmailConfirmationToken(id, accountDto.Email));
-            await EmailService.SendEmail(message, accountDto.Email, "[ServiceName] Registration Confirmation");
+            await EmailHelper.SendEmail(message, accountDto.Email, "[ServiceName] Registration Confirmation");
             await DbContext.SaveChangesAsync();
         }
 
@@ -90,7 +93,17 @@ namespace ProjectForFarmers.Application.Services.Auth
             var account = await DbContext.Accounts.FirstOrDefaultAsync(a => a.Email == forgotPasswordDto.Email);
             if (account == null) throw new NotFoundException($"Account with email {forgotPasswordDto.Email} is not found.");
             string message = EmailContentBuilder.ResetPasswordMessageBody(account.Name, account.Surname, await JwtService.EmailConfirmationToken(account.Id, account.Email));
-            await EmailService.SendEmail(message, forgotPasswordDto.Email, "Password reset request for Agroforum account");
+            await EmailHelper.SendEmail(message, forgotPasswordDto.Email, "Password reset request for Agroforum account");
+        }
+
+        public async Task ConfirmFarmEmail(Guid farmId, string email)
+        {
+            var farm = await DbContext.Farms.FirstOrDefaultAsync(a => a.Id == farmId);
+
+            if (farm == null) throw new NotFoundException($"Farm with Id {farmId} not found.");
+
+            farm.ContactEmail = email;
+            await DbContext.SaveChangesAsync();
         }
 
         public async Task<JwtVm> AuthenticateWithGoogle(AuthenticateWithGoogleDto authenticateWithGoogleDto)

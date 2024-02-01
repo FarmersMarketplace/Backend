@@ -19,11 +19,13 @@ namespace ProjectForFarmers.Application
         {
             services.AddTransient<IAuthService, AuthService>();
             services.AddTransient<IFarmService, FarmService>();
+            services.AddTransient<IOrderService, OrderService>();
 
             services.AddAutoMapper(config =>
             {
                 config.AddProfile(new AuthMappingProfile());
-                config.AddProfile(new FarmMappingProfile(configuration));
+                config.AddProfile(new FarmMappingProfile());
+                config.AddProfile(new OrderMappingProfile());
             });
 
             return services;
