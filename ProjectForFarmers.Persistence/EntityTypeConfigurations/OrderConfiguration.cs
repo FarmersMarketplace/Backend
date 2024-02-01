@@ -22,7 +22,7 @@ namespace ProjectForFarmers.Persistence.EntityTypeConfigurations
             builder.Property(account => account.CustomerName).IsRequired();
             builder.Property(account => account.CustomerPhone).IsRequired();
             builder.Property(account => account.CustomerEmail).IsRequired();
-            builder.Property(account => account.PaymentTotal).IsRequired();
+            builder.Property(account => account.TotalPayment).IsRequired();
             builder.Property(account => account.PaymentType).IsRequired();
 
             builder.HasOne(order => order.Customer)

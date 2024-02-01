@@ -14,7 +14,7 @@ namespace ProjectForFarmers.Domain
         public string CustomerName { get; set; }
         public string CustomerPhone { get; set; }
         public string CustomerEmail { get; set; }
-        public decimal PaymentTotal { get; set; }
+        public decimal TotalPayment { get; set; }
         public PaymentType PaymentType { get; set; }
         public Producer Producer { get; set; }
         public OrderStatus Status { get; set; }

@@ -13,16 +13,16 @@ namespace ProjectForFarmers.Domain
         public Producer Producer { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
-        public OrderGroupStatistic BookedOrders { get; set; }
         public Guid BookedOrdersStatisticId { get; set; }
-        public OrderGroupStatistic CompletedOrders { get; set; }
-        public Guid CompleteOrdersStatisticId { get; set; }
-        public OrderGroupStatistic ProcessingOrders { get; set; }
+        public Guid CompletedOrdersStatisticId { get; set; }
         public Guid ProcessingOrdersStatisticId { get; set; }
-        public OrderGroupStatistic NewOrders { get; set; }
         public Guid NewOrdersStatisticId { get; set; }
-        public OrderGroupStatistic TotalActivity { get; set; }
         public Guid TotalActivityStatisticId { get; set; }
+        public OrderGroupStatistic BookedOrdersStatistic { get; set; }
+        public OrderGroupStatistic CompletedOrdersStatistic { get; set; }
+        public OrderGroupStatistic ProcessingOrdersStatistic { get; set; }
+        public OrderGroupStatistic NewOrdersStatistic { get; set; }
+        public OrderGroupStatistic TotalActivityStatistic { get; set; }
         public decimal TotalRevenue { get; set; }
         public float TotalRevenueChangePercentage { get; set; }
         public Guid? CustomerWithHighestPaymentId { get; set; }
