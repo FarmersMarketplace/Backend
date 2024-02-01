@@ -1,15 +1,7 @@
 ﻿using AutoMapper;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using Microsoft.Extensions.Configuration;
 using ProjectForFarmers.Application.DataTransferObjects.Farm;
 using ProjectForFarmers.Application.ViewModels.Farm;
 using ProjectForFarmers.Domain;
-using System;
-using System.CodeDom;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using DayOfWeek = ProjectForFarmers.Domain.DayOfWeek;
 
 namespace ProjectForFarmers.Application.Mappings
@@ -22,7 +14,6 @@ namespace ProjectForFarmers.Application.Mappings
             MapDayOfWeekDtoToDayOfWeek();
             MapScheduleDtoToSchedule();
             MapCreateFarmDtoToFarm();
-            MapUpdateFarmDtoToFarm();
             MapFarmToFarmLookupVm();
         }
 
@@ -68,25 +59,13 @@ namespace ProjectForFarmers.Application.Mappings
                 .ForMember(farm => farm.Id, opt => opt.MapFrom(dto => Guid.NewGuid()))
                 .ForMember(farm => farm.Name, opt => opt.MapFrom(dto => dto.Name))
                 .ForMember(farm => farm.Description, opt => opt.MapFrom(dto => dto.Description))
-                .ForMember(farm => farm.ContactEmail, opt => opt.MapFrom(dto => dto.ContactEmail))
+                .ForMember(farm => farm.ContactEmail, opt => opt.MapFrom(dto => string.Empty))
                 .ForMember(farm => farm.ContactPhone, opt => opt.MapFrom(dto => dto.ContactPhone))
                 .ForMember(farm => farm.CreationDate, opt => opt.MapFrom(dto => DateTime.UtcNow))
                 .ForMember(farm => farm.OwnerId, opt => opt.MapFrom(dto => dto.OwnerId))
-                .ForMember(farm => farm.WebsiteUrl, opt => opt.MapFrom(dto => dto.WebsiteUrl))
+                .ForMember(farm => farm.SocialPageUrl, opt => opt.MapFrom(dto => dto.SocialPageUrl))
                 .ForMember(farm => farm.Address, opt => opt.MapFrom(dto => dto.Address))
-                .ForMember(farm => farm.Schedule, opt => opt.MapFrom(dto => dto.Schedule));
-        }
-
-        private void MapUpdateFarmDtoToFarm()
-        {
-            CreateMap<UpdateFarmDto, Farm>()
-                .ForMember(farm => farm.Id, opt => opt.MapFrom(dto => dto.FarmId))
-                .ForMember(farm => farm.Name, opt => opt.MapFrom(dto => dto.Name))
-                .ForMember(farm => farm.Description, opt => opt.MapFrom(dto => dto.Description))
-                .ForMember(farm => farm.ContactEmail, opt => opt.MapFrom(dto => dto.ContactEmail))
-                .ForMember(farm => farm.ContactPhone, opt => opt.MapFrom(dto => dto.ContactPhone))
-                .ForMember(farm => farm.WebsiteUrl, opt => opt.MapFrom(dto => dto.WebsiteUrl))
-                .ForMember(farm => farm.Address, opt => opt.MapFrom(dto => dto.Address))
+                .ForMember(farm => farm.ImagesNames, opt => opt.MapFrom(dto => new List<string>()))
                 .ForMember(farm => farm.Schedule, opt => opt.MapFrom(dto => dto.Schedule));
         }
 
