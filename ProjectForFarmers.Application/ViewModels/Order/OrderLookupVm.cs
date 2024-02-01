@@ -10,7 +10,7 @@ namespace ProjectForFarmers.Application.ViewModels.Order
     public class OrderLookupVm
     {
         public Guid Id { get; set; }
-        public uint Number { get; set; }
+        public string Number { get; set; }
         public DateTime CreationDate { get; set; }
         public string CustomerName { get; set; }
         public string CustomerPhone { get; set; }
