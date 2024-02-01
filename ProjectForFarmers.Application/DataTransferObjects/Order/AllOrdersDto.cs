@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ProjectForFarmers.Application.DataTransferObjects.Order
 {
-    public class GetAllOrdersDto
+    public class AllOrdersDto
     {
         public Guid ProducerId { get; set; }
         public Producer Producer { get; set; }

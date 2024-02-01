@@ -12,12 +12,11 @@ namespace ProjectForFarmers.Application.DataTransferObjects.Farm
 {
     public class DayOfWeekDto
     {
-        public string StartHour { get; set; }
-        public string StartMinute { get; set; }
-        public string EndHour { get; set; }
-        public string EndMinute { get; set; }
-
-        
+        public bool IsOpened { get; set; }
+        public byte? StartHour { get; set; }
+        public byte? StartMinute { get; set; }
+        public byte? EndHour { get; set; }
+        public byte? EndMinute { get; set; }
     }
 
 }

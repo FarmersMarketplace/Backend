@@ -13,7 +13,7 @@ namespace ProjectForFarmers.Application.DataTransferObjects.Farm
         public string Description { get; set; }
         public string ContactEmail { get; set; }
         public string ContactPhone { get; set; }
-        public string? WebsiteUrl { get; internal set; }
+        public string? SocialPageUrl { get; internal set; }
         public AddressDto Address { get; set; }
         public ScheduleDto Schedule { get; set; }
     }
