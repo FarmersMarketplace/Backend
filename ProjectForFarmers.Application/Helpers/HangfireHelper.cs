@@ -1,10 +1,8 @@
 ﻿using Hangfire;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using ProjectForFarmers.Application.Interfaces;
 using ProjectForFarmers.Application.Services.Business;
 using Serilog;
-using Microsoft.EntityFrameworkCore;
 
 namespace ProjectForFarmers.Application.Helpers
 {
@@ -15,7 +13,6 @@ namespace ProjectForFarmers.Application.Helpers
                 1, 0, 0, 0,
                 DateTimeOffset.UtcNow.Offset)
                     .AddMonths(1)
-                    .AddDays(-1)
                     .AddSeconds(-1);
         public static IApplicationDbContext DbContext { get; set; }
         private static StatisticService StatisticService { get; set; }
@@ -26,6 +23,7 @@ namespace ProjectForFarmers.Application.Helpers
 
         public static async Task UpdateStatistics()
         {
+            Log.Information("1");
             BackgroundJob.Schedule(() => UpdateStatistics(), LastDayOfNextMonth());
 
             await StatisticService.UpdateAllStatistics(LastDayOfCurrentMonth);
@@ -46,14 +44,7 @@ namespace ProjectForFarmers.Application.Helpers
             StatisticService = new StatisticService(DbContext);
 
             BackgroundJob.Schedule(() => UpdateStatistics(), LastDayOfCurrentMonth);
-            BackgroundJob.Schedule(() => RemoveOldLogs(), TimeSpan.FromDays(30 * 4));
-        }
 
-        public static async Task RemoveOldLogs()
-        {
-            BackgroundJob.Schedule(() => RemoveOldLogs(), TimeSpan.FromDays(30 * 2));
-
-            //DbContext.Database.c
         }
     }
 
