@@ -17,7 +17,6 @@ namespace ProjectForFarmers.Persistence.DbContexts
         public DbSet<Schedule> Schedules { get; set; }
         public DbSet<MonthStatistic> MonthesStatistics { get; set; }
 
-
         public MainDbContext(DbContextOptions<MainDbContext> options) : base(options)
         {
         }

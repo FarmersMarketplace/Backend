@@ -13,15 +13,15 @@ using ProjectForFarmers.Persistence.DbContexts;
 namespace ProjectForFarmers.Persistence.Migrations
 {
     [DbContext(typeof(MainDbContext))]
-    [Migration("20240126102111_InitialMigration")]
-    partial class InitialMigration
+    [Migration("20240131150945_RenameMonthStatisticProperties")]
+    partial class RenameMonthStatisticProperties
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.13")
+                .HasAnnotation("ProductVersion", "7.0.15")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -77,6 +77,12 @@ namespace ProjectForFarmers.Persistence.Migrations
                         .HasMaxLength(10)
                         .HasColumnType("character varying(10)");
 
+                    b.Property<double>("Latitude")
+                        .HasColumnType("double precision");
+
+                    b.Property<double>("Longtitude")
+                        .HasColumnType("double precision");
+
                     b.Property<string>("Note")
                         .IsRequired()
                         .HasColumnType("text");
@@ -115,25 +121,20 @@ namespace ProjectForFarmers.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<string>("EndHour")
-                        .IsRequired()
-                        .HasMaxLength(2)
-                        .HasColumnType("character varying(2)");
+                    b.Property<byte?>("EndHour")
+                        .HasColumnType("smallint");
 
-                    b.Property<string>("EndMinute")
-                        .IsRequired()
-                        .HasMaxLength(2)
-                        .HasColumnType("character varying(2)");
+                    b.Property<byte?>("EndMinute")
+                        .HasColumnType("smallint");
 
-                    b.Property<string>("StartHour")
-                        .IsRequired()
-                        .HasMaxLength(2)
-                        .HasColumnType("character varying(2)");
+                    b.Property<bool>("IsOpened")
+                        .HasColumnType("boolean");
 
-                    b.Property<string>("StartMinute")
-                        .IsRequired()
-                        .HasMaxLength(2)
-                        .HasColumnType("character varying(2)");
+                    b.Property<byte?>("StartHour")
+                        .HasColumnType("smallint");
+
+                    b.Property<byte?>("StartMinute")
+                        .HasColumnType("smallint");
 
                     b.HasKey("Id");
 
@@ -182,7 +183,7 @@ namespace ProjectForFarmers.Persistence.Migrations
                     b.Property<Guid>("ScheduleId")
                         .HasColumnType("uuid");
 
-                    b.Property<string>("WebsiteUrl")
+                    b.Property<string>("SocialPageUrl")
                         .HasColumnType("text");
 
                     b.HasKey("Id");
@@ -193,8 +194,7 @@ namespace ProjectForFarmers.Persistence.Migrations
                     b.HasIndex("Id")
                         .IsUnique();
 
-                    b.HasIndex("OwnerId")
-                        .IsUnique();
+                    b.HasIndex("OwnerId");
 
                     b.HasIndex("ScheduleId")
                         .IsUnique();
@@ -208,16 +208,13 @@ namespace ProjectForFarmers.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("BookedOrdersId")
-                        .HasColumnType("uuid");
-
                     b.Property<Guid>("BookedOrdersStatisticId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("CompleteOrdersStatisticId")
+                    b.Property<Guid>("CompletedOrdersStatisticId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("CompletedOrdersId")
+                    b.Property<Guid?>("CustomerWithHighestPaymentId")
                         .HasColumnType("uuid");
 
                     b.Property<DateTime>("EndDate")
@@ -226,19 +223,13 @@ namespace ProjectForFarmers.Persistence.Migrations
                     b.Property<Guid?>("FarmId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("NewOrdersId")
-                        .HasColumnType("uuid");
+                    b.Property<decimal>("HighestCustomerPayment")
+                        .HasColumnType("numeric");
+
+                    b.Property<float>("HighestCustomerPaymentPercentage")
+                        .HasColumnType("real");
 
                     b.Property<Guid>("NewOrdersStatisticId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("PreviousOrdersId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("PreviousOrdersStatisticId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("ProcessingOrdersId")
                         .HasColumnType("uuid");
 
                     b.Property<Guid>("ProcessingOrdersStatisticId")
@@ -253,51 +244,33 @@ namespace ProjectForFarmers.Persistence.Migrations
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("TotalActivityId")
-                        .HasColumnType("uuid");
-
                     b.Property<Guid>("TotalActivityStatisticId")
                         .HasColumnType("uuid");
 
                     b.Property<decimal>("TotalRevenue")
                         .HasColumnType("numeric");
 
-                    b.Property<float>("TotalRevenuePercentage")
+                    b.Property<float>("TotalRevenueChangePercentage")
                         .HasColumnType("real");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("BookedOrdersId");
-
                     b.HasIndex("BookedOrdersStatisticId")
                         .IsUnique();
 
-                    b.HasIndex("CompleteOrdersStatisticId")
+                    b.HasIndex("CompletedOrdersStatisticId")
                         .IsUnique();
-
-                    b.HasIndex("CompletedOrdersId");
 
                     b.HasIndex("FarmId");
 
                     b.HasIndex("Id")
                         .IsUnique();
 
-                    b.HasIndex("NewOrdersId");
-
                     b.HasIndex("NewOrdersStatisticId")
                         .IsUnique();
 
-                    b.HasIndex("PreviousOrdersId");
-
-                    b.HasIndex("PreviousOrdersStatisticId")
-                        .IsUnique();
-
-                    b.HasIndex("ProcessingOrdersId");
-
                     b.HasIndex("ProcessingOrdersStatisticId")
                         .IsUnique();
-
-                    b.HasIndex("TotalActivityId");
 
                     b.HasIndex("TotalActivityStatisticId")
                         .IsUnique();
@@ -329,9 +302,6 @@ namespace ProjectForFarmers.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<Guid>("FarmId")
-                        .HasColumnType("uuid");
-
                     b.Property<long>("Number")
                         .ValueGeneratedOnAdd()
                         .HasMaxLength(7)
@@ -339,17 +309,24 @@ namespace ProjectForFarmers.Persistence.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseSerialColumn(b.Property<long>("Number"));
 
-                    b.Property<decimal>("PaymentTotal")
-                        .HasColumnType("numeric");
-
                     b.Property<int>("PaymentType")
                         .HasColumnType("integer");
+
+                    b.Property<int>("Producer")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("ProducerId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal>("TotalPayment")
+                        .HasColumnType("numeric");
 
                     b.HasKey("Id");
 
                     b.HasIndex("CustomerId");
-
-                    b.HasIndex("FarmId");
 
                     b.HasIndex("Id")
                         .IsUnique();
@@ -439,8 +416,8 @@ namespace ProjectForFarmers.Persistence.Migrations
                         .IsRequired();
 
                     b.HasOne("ProjectForFarmers.Domain.Account", "Owner")
-                        .WithOne()
-                        .HasForeignKey("ProjectForFarmers.Domain.Farm", "OwnerId")
+                        .WithMany()
+                        .HasForeignKey("OwnerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -459,27 +436,15 @@ namespace ProjectForFarmers.Persistence.Migrations
 
             modelBuilder.Entity("ProjectForFarmers.Domain.MonthStatistic", b =>
                 {
-                    b.HasOne("ProjectForFarmers.Domain.OrderGroupStatistic", "BookedOrders")
-                        .WithMany()
-                        .HasForeignKey("BookedOrdersId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ProjectForFarmers.Domain.OrderGroupStatistic", null)
+                    b.HasOne("ProjectForFarmers.Domain.OrderGroupStatistic", "BookedOrdersStatistic")
                         .WithOne()
                         .HasForeignKey("ProjectForFarmers.Domain.MonthStatistic", "BookedOrdersStatisticId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ProjectForFarmers.Domain.OrderGroupStatistic", null)
+                    b.HasOne("ProjectForFarmers.Domain.OrderGroupStatistic", "CompletedOrdersStatistic")
                         .WithOne()
-                        .HasForeignKey("ProjectForFarmers.Domain.MonthStatistic", "CompleteOrdersStatisticId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ProjectForFarmers.Domain.OrderGroupStatistic", "CompletedOrders")
-                        .WithMany()
-                        .HasForeignKey("CompletedOrdersId")
+                        .HasForeignKey("ProjectForFarmers.Domain.MonthStatistic", "CompletedOrdersStatisticId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -487,65 +452,33 @@ namespace ProjectForFarmers.Persistence.Migrations
                         .WithMany("Dashboard")
                         .HasForeignKey("FarmId");
 
-                    b.HasOne("ProjectForFarmers.Domain.OrderGroupStatistic", "NewOrders")
-                        .WithMany()
-                        .HasForeignKey("NewOrdersId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ProjectForFarmers.Domain.OrderGroupStatistic", null)
+                    b.HasOne("ProjectForFarmers.Domain.OrderGroupStatistic", "NewOrdersStatistic")
                         .WithOne()
                         .HasForeignKey("ProjectForFarmers.Domain.MonthStatistic", "NewOrdersStatisticId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ProjectForFarmers.Domain.OrderGroupStatistic", "PreviousOrders")
-                        .WithMany()
-                        .HasForeignKey("PreviousOrdersId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ProjectForFarmers.Domain.OrderGroupStatistic", null)
-                        .WithOne()
-                        .HasForeignKey("ProjectForFarmers.Domain.MonthStatistic", "PreviousOrdersStatisticId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ProjectForFarmers.Domain.OrderGroupStatistic", "ProcessingOrders")
-                        .WithMany()
-                        .HasForeignKey("ProcessingOrdersId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ProjectForFarmers.Domain.OrderGroupStatistic", null)
+                    b.HasOne("ProjectForFarmers.Domain.OrderGroupStatistic", "ProcessingOrdersStatistic")
                         .WithOne()
                         .HasForeignKey("ProjectForFarmers.Domain.MonthStatistic", "ProcessingOrdersStatisticId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ProjectForFarmers.Domain.OrderGroupStatistic", "TotalActivity")
-                        .WithMany()
-                        .HasForeignKey("TotalActivityId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ProjectForFarmers.Domain.OrderGroupStatistic", null)
+                    b.HasOne("ProjectForFarmers.Domain.OrderGroupStatistic", "TotalActivityStatistic")
                         .WithOne()
                         .HasForeignKey("ProjectForFarmers.Domain.MonthStatistic", "TotalActivityStatisticId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("BookedOrders");
+                    b.Navigation("BookedOrdersStatistic");
 
-                    b.Navigation("CompletedOrders");
+                    b.Navigation("CompletedOrdersStatistic");
 
-                    b.Navigation("NewOrders");
+                    b.Navigation("NewOrdersStatistic");
 
-                    b.Navigation("PreviousOrders");
+                    b.Navigation("ProcessingOrdersStatistic");
 
-                    b.Navigation("ProcessingOrders");
-
-                    b.Navigation("TotalActivity");
+                    b.Navigation("TotalActivityStatistic");
                 });
 
             modelBuilder.Entity("ProjectForFarmers.Domain.Order", b =>
@@ -556,15 +489,7 @@ namespace ProjectForFarmers.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ProjectForFarmers.Domain.Farm", "Farm")
-                        .WithMany()
-                        .HasForeignKey("FarmId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Customer");
-
-                    b.Navigation("Farm");
                 });
 
             modelBuilder.Entity("ProjectForFarmers.Domain.Schedule", b =>

@@ -8,7 +8,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ProjectForFarmers.Persistence.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialMigration : Migration
+    public partial class RenameMonthStatisticProperties : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -40,7 +40,9 @@ namespace ProjectForFarmers.Persistence.Migrations
                     Street = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
                     HouseNumber = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: false),
                     PostalCode = table.Column<string>(type: "character varying(5)", maxLength: 5, nullable: false),
-                    Note = table.Column<string>(type: "text", nullable: false)
+                    Note = table.Column<string>(type: "text", nullable: false),
+                    Longtitude = table.Column<double>(type: "double precision", nullable: false),
+                    Latitude = table.Column<double>(type: "double precision", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -52,10 +54,11 @@ namespace ProjectForFarmers.Persistence.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    StartHour = table.Column<string>(type: "character varying(2)", maxLength: 2, nullable: false),
-                    StartMinute = table.Column<string>(type: "character varying(2)", maxLength: 2, nullable: false),
-                    EndHour = table.Column<string>(type: "character varying(2)", maxLength: 2, nullable: false),
-                    EndMinute = table.Column<string>(type: "character varying(2)", maxLength: 2, nullable: false)
+                    IsOpened = table.Column<bool>(type: "boolean", nullable: false),
+                    StartHour = table.Column<byte>(type: "smallint", nullable: true),
+                    StartMinute = table.Column<byte>(type: "smallint", nullable: true),
+                    EndHour = table.Column<byte>(type: "smallint", nullable: true),
+                    EndMinute = table.Column<byte>(type: "smallint", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -73,6 +76,35 @@ namespace ProjectForFarmers.Persistence.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_OrderGroupStatistic", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Orders",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Number = table.Column<long>(type: "bigint", maxLength: 7, nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn),
+                    CreationDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    CustomerName = table.Column<string>(type: "text", nullable: false),
+                    CustomerPhone = table.Column<string>(type: "text", nullable: false),
+                    CustomerEmail = table.Column<string>(type: "text", nullable: false),
+                    TotalPayment = table.Column<decimal>(type: "numeric", nullable: false),
+                    PaymentType = table.Column<int>(type: "integer", nullable: false),
+                    Producer = table.Column<int>(type: "integer", nullable: false),
+                    Status = table.Column<int>(type: "integer", nullable: false),
+                    ProducerId = table.Column<Guid>(type: "uuid", nullable: false),
+                    CustomerId = table.Column<Guid>(type: "uuid", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Orders", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Orders_Accounts_CustomerId",
+                        column: x => x.CustomerId,
+                        principalTable: "Accounts",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -144,7 +176,7 @@ namespace ProjectForFarmers.Persistence.Migrations
                     Description = table.Column<string>(type: "text", nullable: false),
                     ContactEmail = table.Column<string>(type: "text", nullable: false),
                     ContactPhone = table.Column<string>(type: "text", nullable: false),
-                    WebsiteUrl = table.Column<string>(type: "text", nullable: true),
+                    SocialPageUrl = table.Column<string>(type: "text", nullable: true),
                     ImagesNames = table.Column<List<string>>(type: "text[]", nullable: false),
                     CreationDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     OwnerId = table.Column<Guid>(type: "uuid", nullable: false),
@@ -183,20 +215,16 @@ namespace ProjectForFarmers.Persistence.Migrations
                     Producer = table.Column<int>(type: "integer", nullable: false),
                     StartDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     EndDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    BookedOrdersId = table.Column<Guid>(type: "uuid", nullable: false),
                     BookedOrdersStatisticId = table.Column<Guid>(type: "uuid", nullable: false),
-                    CompletedOrdersId = table.Column<Guid>(type: "uuid", nullable: false),
-                    CompleteOrdersStatisticId = table.Column<Guid>(type: "uuid", nullable: false),
-                    ProcessingOrdersId = table.Column<Guid>(type: "uuid", nullable: false),
+                    CompletedOrdersStatisticId = table.Column<Guid>(type: "uuid", nullable: false),
                     ProcessingOrdersStatisticId = table.Column<Guid>(type: "uuid", nullable: false),
-                    NewOrdersId = table.Column<Guid>(type: "uuid", nullable: false),
                     NewOrdersStatisticId = table.Column<Guid>(type: "uuid", nullable: false),
-                    PreviousOrdersId = table.Column<Guid>(type: "uuid", nullable: false),
-                    PreviousOrdersStatisticId = table.Column<Guid>(type: "uuid", nullable: false),
-                    TotalActivityId = table.Column<Guid>(type: "uuid", nullable: false),
                     TotalActivityStatisticId = table.Column<Guid>(type: "uuid", nullable: false),
                     TotalRevenue = table.Column<decimal>(type: "numeric", nullable: false),
-                    TotalRevenuePercentage = table.Column<float>(type: "real", nullable: false),
+                    TotalRevenueChangePercentage = table.Column<float>(type: "real", nullable: false),
+                    CustomerWithHighestPaymentId = table.Column<Guid>(type: "uuid", nullable: true),
+                    HighestCustomerPayment = table.Column<decimal>(type: "numeric", nullable: false),
+                    HighestCustomerPaymentPercentage = table.Column<float>(type: "real", nullable: false),
                     FarmId = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
@@ -208,32 +236,14 @@ namespace ProjectForFarmers.Persistence.Migrations
                         principalTable: "Farms",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_MonthesStatistics_OrderGroupStatistic_BookedOrdersId",
-                        column: x => x.BookedOrdersId,
-                        principalTable: "OrderGroupStatistic",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
                         name: "FK_MonthesStatistics_OrderGroupStatistic_BookedOrdersStatistic~",
                         column: x => x.BookedOrdersStatisticId,
                         principalTable: "OrderGroupStatistic",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_MonthesStatistics_OrderGroupStatistic_CompleteOrdersStatist~",
-                        column: x => x.CompleteOrdersStatisticId,
-                        principalTable: "OrderGroupStatistic",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_MonthesStatistics_OrderGroupStatistic_CompletedOrdersId",
-                        column: x => x.CompletedOrdersId,
-                        principalTable: "OrderGroupStatistic",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_MonthesStatistics_OrderGroupStatistic_NewOrdersId",
-                        column: x => x.NewOrdersId,
+                        name: "FK_MonthesStatistics_OrderGroupStatistic_CompletedOrdersStatis~",
+                        column: x => x.CompletedOrdersStatisticId,
                         principalTable: "OrderGroupStatistic",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -244,32 +254,8 @@ namespace ProjectForFarmers.Persistence.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_MonthesStatistics_OrderGroupStatistic_PreviousOrdersId",
-                        column: x => x.PreviousOrdersId,
-                        principalTable: "OrderGroupStatistic",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_MonthesStatistics_OrderGroupStatistic_PreviousOrdersStatist~",
-                        column: x => x.PreviousOrdersStatisticId,
-                        principalTable: "OrderGroupStatistic",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_MonthesStatistics_OrderGroupStatistic_ProcessingOrdersId",
-                        column: x => x.ProcessingOrdersId,
-                        principalTable: "OrderGroupStatistic",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
                         name: "FK_MonthesStatistics_OrderGroupStatistic_ProcessingOrdersStati~",
                         column: x => x.ProcessingOrdersStatisticId,
-                        principalTable: "OrderGroupStatistic",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_MonthesStatistics_OrderGroupStatistic_TotalActivityId",
-                        column: x => x.TotalActivityId,
                         principalTable: "OrderGroupStatistic",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -277,39 +263,6 @@ namespace ProjectForFarmers.Persistence.Migrations
                         name: "FK_MonthesStatistics_OrderGroupStatistic_TotalActivityStatisti~",
                         column: x => x.TotalActivityStatisticId,
                         principalTable: "OrderGroupStatistic",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Orders",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Number = table.Column<long>(type: "bigint", maxLength: 7, nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn),
-                    CreationDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    CustomerName = table.Column<string>(type: "text", nullable: false),
-                    CustomerPhone = table.Column<string>(type: "text", nullable: false),
-                    CustomerEmail = table.Column<string>(type: "text", nullable: false),
-                    PaymentTotal = table.Column<decimal>(type: "numeric", nullable: false),
-                    PaymentType = table.Column<int>(type: "integer", nullable: false),
-                    FarmId = table.Column<Guid>(type: "uuid", nullable: false),
-                    CustomerId = table.Column<Guid>(type: "uuid", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Orders", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Orders_Accounts_CustomerId",
-                        column: x => x.CustomerId,
-                        principalTable: "Accounts",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Orders_Farms_FarmId",
-                        column: x => x.FarmId,
-                        principalTable: "Farms",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -347,8 +300,7 @@ namespace ProjectForFarmers.Persistence.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_Farms_OwnerId",
                 table: "Farms",
-                column: "OwnerId",
-                unique: true);
+                column: "OwnerId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Farms_ScheduleId",
@@ -357,25 +309,15 @@ namespace ProjectForFarmers.Persistence.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_MonthesStatistics_BookedOrdersId",
-                table: "MonthesStatistics",
-                column: "BookedOrdersId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_MonthesStatistics_BookedOrdersStatisticId",
                 table: "MonthesStatistics",
                 column: "BookedOrdersStatisticId",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_MonthesStatistics_CompletedOrdersId",
+                name: "IX_MonthesStatistics_CompletedOrdersStatisticId",
                 table: "MonthesStatistics",
-                column: "CompletedOrdersId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_MonthesStatistics_CompleteOrdersStatisticId",
-                table: "MonthesStatistics",
-                column: "CompleteOrdersStatisticId",
+                column: "CompletedOrdersStatisticId",
                 unique: true);
 
             migrationBuilder.CreateIndex(
@@ -390,42 +332,16 @@ namespace ProjectForFarmers.Persistence.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_MonthesStatistics_NewOrdersId",
-                table: "MonthesStatistics",
-                column: "NewOrdersId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_MonthesStatistics_NewOrdersStatisticId",
                 table: "MonthesStatistics",
                 column: "NewOrdersStatisticId",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_MonthesStatistics_PreviousOrdersId",
-                table: "MonthesStatistics",
-                column: "PreviousOrdersId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_MonthesStatistics_PreviousOrdersStatisticId",
-                table: "MonthesStatistics",
-                column: "PreviousOrdersStatisticId",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_MonthesStatistics_ProcessingOrdersId",
-                table: "MonthesStatistics",
-                column: "ProcessingOrdersId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_MonthesStatistics_ProcessingOrdersStatisticId",
                 table: "MonthesStatistics",
                 column: "ProcessingOrdersStatisticId",
                 unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_MonthesStatistics_TotalActivityId",
-                table: "MonthesStatistics",
-                column: "TotalActivityId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_MonthesStatistics_TotalActivityStatisticId",
@@ -437,11 +353,6 @@ namespace ProjectForFarmers.Persistence.Migrations
                 name: "IX_Orders_CustomerId",
                 table: "Orders",
                 column: "CustomerId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Orders_FarmId",
-                table: "Orders",
-                column: "FarmId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Orders_Id",
@@ -508,10 +419,10 @@ namespace ProjectForFarmers.Persistence.Migrations
                 name: "Orders");
 
             migrationBuilder.DropTable(
-                name: "OrderGroupStatistic");
+                name: "Farms");
 
             migrationBuilder.DropTable(
-                name: "Farms");
+                name: "OrderGroupStatistic");
 
             migrationBuilder.DropTable(
                 name: "Accounts");
