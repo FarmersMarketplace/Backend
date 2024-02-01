@@ -16,5 +16,6 @@ namespace ProjectForFarmers.Application.Services
         Task ResetPassword(Guid accountId, string? email, ResetPasswordDto resetPasswordDto);
         Task ForgotPassword(ForgotPasswordDto forgotPasswordDto);
         Task<JwtVm> AuthenticateWithGoogle(AuthenticateWithGoogleDto authenticateWithGoogleDto);
+        Task ConfirmFarmEmail(Guid farmId, string email);
     }
 }

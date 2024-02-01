@@ -35,7 +35,6 @@ namespace ProjectForFarmers.WebApi.Controllers
 
         [HttpPost]
         [Authorize(Roles = "FarmOwner")]
-        [Consumes("multipart/form-data")]
         public async Task<IActionResult> Create([FromForm] CreateFarmDto createFarmDto)
         {
             createFarmDto.OwnerId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
@@ -53,14 +52,14 @@ namespace ProjectForFarmers.WebApi.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> Update([FromBody] UpdateFarmDto updateFarmDto)
+        public async Task<IActionResult> Update([FromForm] UpdateFarmDto updateFarmDto)
         {
             await FarmService.Update(updateFarmDto);
             return NoContent();
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdateFarmImages([FromBody] UpdateFarmImagesDto updateFarmImagesDto)
+        public async Task<IActionResult> UpdateFarmImages([FromForm] UpdateFarmImagesDto updateFarmImagesDto)
         {
             await FarmService.UpdateFarmImages(updateFarmImagesDto);
             return NoContent();

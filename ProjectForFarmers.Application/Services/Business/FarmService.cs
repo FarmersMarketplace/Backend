@@ -14,6 +14,8 @@ using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Address = ProjectForFarmers.Domain.Address;
 using ProjectForFarmers.Application.Mappings;
 using System.Net;
+using ProjectForFarmers.Application.Services.Auth;
+using DayOfWeek = ProjectForFarmers.Domain.DayOfWeek;
 
 namespace ProjectForFarmers.Application.Services.Business
 {
@@ -21,11 +23,15 @@ namespace ProjectForFarmers.Application.Services.Business
     {
         private readonly string FarmsImageFolder;
         private readonly ImageHelper ImageHelper;
+        private readonly EmailHelper EmailHelper;
+        private readonly JwtService JwtService;
 
         public FarmService(IMapper mapper, IApplicationDbContext dbContext, IConfiguration configuration) : base(mapper, dbContext, configuration)
         {
             FarmsImageFolder = Configuration["Images:Farms"];
             ImageHelper = new ImageHelper();
+            EmailHelper = new EmailHelper(configuration);
+            JwtService = new JwtService(configuration);
         }
 
         public async Task Create(CreateFarmDto createFarmDto)
@@ -36,6 +42,20 @@ namespace ProjectForFarmers.Application.Services.Business
             var coords = await GetCoordinates(address);
             address.Latitude = coords.Latitude;
             address.Longtitude = coords.Longitude;
+
+            if(createFarmDto.Images != null)
+            {
+                farm.ImagesNames = await ImageHelper.SaveImages(createFarmDto.Images, FarmsImageFolder);
+            }
+            else
+            {
+                farm.ImagesNames = new List<string>();
+            }
+            string token = await JwtService.EmailConfirmationToken(farm.Id, createFarmDto.ContactEmail);
+            var owner = await DbContext.Accounts.FirstOrDefaultAsync(a => a.Id == farm.OwnerId);
+
+            string message = EmailContentBuilder.FarmEmailConfirmationMessageBody(farm.Name, owner.Name, owner.Surname, createFarmDto.ContactEmail, token);
+            await EmailHelper.SendEmail(message, createFarmDto.ContactEmail, "Farm Email Confirmation");
 
             await DbContext.Farms.AddAsync(farm);
             await DbContext.SaveChangesAsync();
@@ -68,37 +88,93 @@ namespace ProjectForFarmers.Application.Services.Business
 
         public async Task Update(UpdateFarmDto updateFarmDto)
         {
-            var farm = await DbContext.Farms.FirstOrDefaultAsync(f => f.Id == updateFarmDto.FarmId);
+            var farm = await DbContext.Farms
+                .Include(f => f.Owner)
+                .Include(f => f.Address)
+                .Include(f => f.Schedule)
+                    .ThenInclude(s => s.Monday)
+                .Include(f => f.Schedule)
+                    .ThenInclude(s => s.Tuesday)
+                .Include(f => f.Schedule)
+                    .ThenInclude(s => s.Wednesday)
+                .Include(f => f.Schedule)
+                    .ThenInclude(s => s.Thursday)
+                .Include(f => f.Schedule)
+                    .ThenInclude(s => s.Friday)
+                .Include(f => f.Schedule)
+                    .ThenInclude(s => s.Saturday)
+                .Include(f => f.Schedule)
+                    .ThenInclude(s => s.Sunday)
+                .FirstOrDefaultAsync(f => f.Id == updateFarmDto.FarmId);
+
             if (farm == null) throw new NotFoundException($"Farm with Id {updateFarmDto.FarmId} does not exist.");
 
-            var farmAddress = farm.Address;
-            var addressDto = updateFarmDto.Address;
-            var farmCreationDate = farm.CreationDate;
-
-            farm = Mapper.Map<Farm>(updateFarmDto);
-
-            if(farmAddress.Region != addressDto.Region
-                || farmAddress.District != addressDto.District
-                || farmAddress.Settlement != addressDto.Settlement
-                || farmAddress.Street != addressDto.Street
-                || farmAddress.HouseNumber != addressDto.HouseNumber)
-            {
-                var coords = await GetCoordinates(addressDto);
-                farm.Address.Latitude = coords.Latitude;
-                farm.Address.Longtitude = coords.Longitude;
-            }
-
-            farm.CreationDate = farmCreationDate;
+            await UpdateAddress(farm.Address, updateFarmDto.Address);
+            await UpdateSchedule(farm.Schedule, updateFarmDto.Schedule);
+            await UpdateFarm(farm, updateFarmDto);
 
             await DbContext.SaveChangesAsync();
         }
 
+        private async Task UpdateFarm(Farm farm, UpdateFarmDto updateFarmDto)
+        {
+            farm.Name = updateFarmDto.Name;
+            farm.Description = updateFarmDto.Description;
+            farm.ContactEmail = updateFarmDto.ContactEmail;
+            farm.ContactPhone = updateFarmDto.ContactPhone;
+            farm.SocialPageUrl = updateFarmDto.SocialPageUrl;
+        }
+
+        private async Task UpdateSchedule(Schedule schedule, ScheduleDto scheduleDto)
+        {
+            await UpdateDayOfWeek(schedule.Monday, scheduleDto.Monday);
+            await UpdateDayOfWeek(schedule.Tuesday, scheduleDto.Tuesday);
+            await UpdateDayOfWeek(schedule.Wednesday, scheduleDto.Wednesday);
+            await UpdateDayOfWeek(schedule.Thursday, scheduleDto.Thursday);
+            await UpdateDayOfWeek(schedule.Friday, scheduleDto.Friday);
+            await UpdateDayOfWeek(schedule.Saturday, scheduleDto.Saturday);
+            await UpdateDayOfWeek(schedule.Sunday, scheduleDto.Sunday);
+        }
+
+        private async Task UpdateDayOfWeek(DayOfWeek dayOfWeek, DayOfWeekDto dayOfWeekDto)
+        {
+            dayOfWeek.IsOpened = dayOfWeekDto.IsOpened;
+            dayOfWeek.StartHour = dayOfWeekDto.StartHour;
+            dayOfWeek.StartMinute = dayOfWeekDto.StartMinute;
+            dayOfWeek.EndHour = dayOfWeekDto.EndHour;
+            dayOfWeek.EndMinute = dayOfWeekDto.EndMinute;
+        }
+
+        private async Task UpdateAddress(Address address, AddressDto addressDto)
+        {
+            if (address.Region != addressDto.Region
+                || address.District != addressDto.District
+                || address.Settlement != addressDto.Settlement
+                || address.Street != addressDto.Street
+                || address.HouseNumber != addressDto.HouseNumber)
+            {
+                var coords = await GetCoordinates(addressDto);
+                address.Latitude = coords.Latitude;
+                address.Longtitude = coords.Longitude;
+            }
+
+            address.Region = addressDto.Region;
+            address.District = addressDto.District;
+            address.Settlement = addressDto.Settlement;
+            address.Street = addressDto.Street;
+            address.HouseNumber = addressDto.HouseNumber;
+            address.PostalCode = addressDto.PostalCode;
+            address.Note = addressDto.Note;
+        }
+
         public async Task<FarmVm> Get(Guid farmId)
         {
-            var farm = await DbContext.Farms.FirstOrDefaultAsync(f => f.Id == farmId);
+            var farm = await DbContext.Farms
+                .Include(f => f.Owner)
+                .Include(f => f.Address)
+                .Include(f => f.Schedule)
+                .FirstOrDefaultAsync(f => f.Id == farmId);
             if (farm == null) throw new NotFoundException($"Farm with Id {farmId} does not exist.");
-
-            var imagesPaths = farm.ImagesNames.Select(i => Path.Combine(FarmsImageFolder.Replace("wwwroot/", ""), i)).ToList();
 
             var request = new FarmVm
             {
@@ -108,8 +184,8 @@ namespace ProjectForFarmers.Application.Services.Business
                 ContactEmail = farm.ContactEmail,
                 OwnerName = farm.Owner.Name + " " + farm.Owner.Surname,
                 Address = farm.Address,
-                WebsiteUrl = farm.WebsiteUrl,
-                ImagesNames = imagesPaths
+                SocialPageUrl = farm.SocialPageUrl,
+                ImagesNames = farm.ImagesNames
             };
 
             return request;
@@ -131,12 +207,21 @@ namespace ProjectForFarmers.Application.Services.Business
         public async Task UpdateFarmImages(UpdateFarmImagesDto updateFarmImagesDto)
         {
             var farm = await DbContext.Farms.FirstOrDefaultAsync(f => f.Id == updateFarmImagesDto.FarmId);
-            if(farm == null) throw new NotFoundException($"Farm with Id {updateFarmImagesDto.FarmId} does not exist.");
+            if (farm == null) throw new NotFoundException($"Farm with Id {updateFarmImagesDto.FarmId} does not exist.");
 
-            await ImageHelper.DeleteImages(farm.ImagesNames, FarmsImageFolder);
-            var imagesPaths = await ImageHelper.SaveImages(updateFarmImagesDto.Images, FarmsImageFolder);
+            if (updateFarmImagesDto.Images == null)
+            {
+                await ImageHelper.DeleteImages(farm.ImagesNames, FarmsImageFolder);
+                farm.ImagesNames = new List<string>();
+            }
+            else
+            {
+                await ImageHelper.DeleteImages(farm.ImagesNames, FarmsImageFolder);
+                var imagesPaths = await ImageHelper.SaveImages(updateFarmImagesDto.Images, FarmsImageFolder);
 
-            farm.ImagesNames = imagesPaths;
+                farm.ImagesNames = imagesPaths;
+            }
+
             await DbContext.SaveChangesAsync();
         }
 
