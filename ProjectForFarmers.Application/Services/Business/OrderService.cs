@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using FastExcel;
+using Hangfire.Server;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using ProjectForFarmers.Application.DataTransferObjects.Order;
@@ -7,6 +8,7 @@ using ProjectForFarmers.Application.Exceptions;
 using ProjectForFarmers.Application.Interfaces;
 using ProjectForFarmers.Application.ViewModels.Order;
 using ProjectForFarmers.Domain;
+using System.Data.Common;
 
 namespace ProjectForFarmers.Application.Services.Business
 {
@@ -52,7 +54,7 @@ namespace ProjectForFarmers.Application.Services.Business
 
         public async Task<OrderListVm> GetAll(Guid producerId, Producer producer)
         {
-            var orders = DbContext.Orders.Where(o => o.Producer == producer
+            var orders = DbContext.Orders.Include(o => o.Customer).Where(o => o.Producer == producer
                 && o.ProducerId == producerId).ToList();
 
             var vm = new OrderListVm();
@@ -111,9 +113,9 @@ namespace ProjectForFarmers.Application.Services.Business
                     cells.Add(new Cell(1, orders[i].Id));
                     cells.Add(new Cell(2, orders[i].Number));
                     cells.Add(new Cell(3, orders[i].CreationDate));
-                    cells.Add(new Cell(4, orders[i].CustomerName));
-                    cells.Add(new Cell(5, orders[i].CustomerEmail));
-                    cells.Add(new Cell(6, orders[i].CustomerPhone));
+                    cells.Add(new Cell(4, orders[i].Customer.Name + " " + orders[i].Customer.Surname));
+                    cells.Add(new Cell(5, orders[i].Customer.Email));
+                    cells.Add(new Cell(6, orders[i].Customer.Phone));
                     cells.Add(new Cell(7, orders[i].TotalPayment));
 
                     if(orders[i].PaymentType == PaymentType.Online) cells.Add(new Cell(8, "Онлайн"));
@@ -179,20 +181,27 @@ namespace ProjectForFarmers.Application.Services.Business
 
                 if (order == null) 
                     throw new NotFoundException($"Order with id {orderId} was not found.");
+
                 var newOrder = new Order
                 {
                     Id = Guid.NewGuid(),
-                    CustomerId = order.CustomerId,
                     Number = order.Number,
                     CreationDate = DateTime.UtcNow,
-                    CustomerName = order.CustomerName,
-                    CustomerPhone = order.CustomerPhone,
-                    CustomerEmail = order.CustomerEmail,
+                    ReceiveDate = order.ReceiveDate,
                     TotalPayment = order.TotalPayment,
                     PaymentType = order.PaymentType,
+                    PaymentStatus = order.PaymentStatus,
+                    ReceivingType = order.ReceivingType,
+                    SupplyPointId = order.SupplyPointId,
+                    DeliveryPointId = order.DeliveryPointId,
+                    SupplyPoint = order.SupplyPoint,
+                    DeliveryPoint = order.DeliveryPoint,
                     Producer = order.Producer,
                     Status = OrderStatus.New,
                     ProducerId = order.ProducerId,
+                    CustomerId = order.CustomerId,
+                    Customer = order.Customer,
+                    Items = order.Items
                 };
 
                 await DbContext.Orders.AddAsync(newOrder);
@@ -210,10 +219,37 @@ namespace ProjectForFarmers.Application.Services.Business
                 if (order == null)
                     throw new NotFoundException($"Order with id {orderId} was not found.");
 
+                foreach(var item in order.Items)
+                {
+                    DbContext.OrdersItems.Remove(item);
+                }
+
                 DbContext.Orders.Remove(order);
             }
 
             await DbContext.SaveChangesAsync();
+        }
+
+        public async Task<OrderVm> Get(Guid orderId)
+        {
+            var order = await DbContext.Orders.Include(o => o.Items).FirstOrDefaultAsync();
+
+            if (order == null)
+                throw new NotFoundException($"Order with id {orderId} was not found.");
+
+            var vm = Mapper.Map<OrderVm>(order);
+
+            foreach (var item in order.Items)
+            {
+
+            }
+
+            return vm;
+        }
+
+        public Task Update(Guid orderId)
+        {
+            throw new NotImplementedException();
         }
     }
 
