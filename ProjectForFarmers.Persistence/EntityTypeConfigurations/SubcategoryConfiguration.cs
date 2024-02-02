@@ -16,8 +16,11 @@ namespace ProjectForFarmers.Persistence.EntityTypeConfigurations
             builder.ToTable("Subcategories");
 
             builder.HasKey(subcategory => subcategory.Id);
-            builder.Property(subcategory => subcategory.CategoryId).IsRequired();
+
             builder.Property(subcategory => subcategory.Name).IsRequired();
+            builder.HasOne(subcategory => subcategory.Category)
+                .WithMany(category => category.Subcategories)
+                .HasForeignKey(subcategory => subcategory.CategoryId);
 
             builder.HasIndex(subcategory => subcategory.Id).IsUnique();
         }

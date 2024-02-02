@@ -15,8 +15,9 @@ namespace ProjectForFarmers.Application.Interfaces
         DbSet<Schedule> Schedules { get; set; }
         DbSet<MonthStatistic> MonthesStatistics { get; set; }
         DbSet<OrderItem> OrdersItems { get; set; }
+        DbSet<Category> Categories { get; set; }
+        DbSet<Subcategory> Subcategories { get; set; }
         Task<int> SaveChangesAsync(CancellationToken token);
         Task<int> SaveChangesAsync();
-        DatabaseFacade Database { get; }
     }
 }
