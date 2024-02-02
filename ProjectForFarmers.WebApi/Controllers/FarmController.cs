@@ -3,6 +3,8 @@ using ProjectForFarmers.Application.Services.Business;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using ProjectForFarmers.Application.ViewModels.Auth;
+using ProjectForFarmers.Application.ViewModels.Farm;
 
 namespace ProjectForFarmers.WebApi.Controllers
 {
@@ -18,6 +20,7 @@ namespace ProjectForFarmers.WebApi.Controllers
         }
 
         [HttpGet("{farmId}")]
+        [ProducesResponseType(typeof(FarmVm), 200)]
         public async Task<IActionResult> Get([FromRoute] Guid farmId)
         {
             var request = await FarmService.Get(farmId);
@@ -26,6 +29,7 @@ namespace ProjectForFarmers.WebApi.Controllers
 
         [HttpGet]
         [Authorize(Roles = "FarmOwner")]
+        [ProducesResponseType(typeof(FarmListVm), 200)]
         public async Task<IActionResult> GetAll()
         {
             var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
@@ -35,6 +39,7 @@ namespace ProjectForFarmers.WebApi.Controllers
 
         [HttpPost]
         [Authorize(Roles = "FarmOwner")]
+        [ProducesResponseType(204)]
         public async Task<IActionResult> Create([FromForm] CreateFarmDto createFarmDto)
         {
             createFarmDto.OwnerId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
@@ -44,6 +49,7 @@ namespace ProjectForFarmers.WebApi.Controllers
 
         [HttpDelete("{farmId}")]
         [Authorize(Roles = "FarmOwner")]
+        [ProducesResponseType(204)]
         public async Task<IActionResult> Delete([FromRoute] Guid farmId)
         {
             var ownerId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
@@ -52,6 +58,7 @@ namespace ProjectForFarmers.WebApi.Controllers
         }
 
         [HttpPut]
+        [Authorize(Roles = "FarmOwner")]
         public async Task<IActionResult> Update([FromForm] UpdateFarmDto updateFarmDto)
         {
             await FarmService.Update(updateFarmDto);
@@ -59,6 +66,17 @@ namespace ProjectForFarmers.WebApi.Controllers
         }
 
         [HttpPut]
+        [Authorize(Roles = "FarmOwner")]
+        [ProducesResponseType(204)]
+        public async Task<IActionResult> UpdateFarmCategoriesAndSubcategories([FromBody] UpdateFarmCategoriesAndSubcategoriesDto updateFarmCategoriesAndSubcategoriesDto)
+        {
+            await FarmService.UpdateFarmCategoriesAndSubcategories(updateFarmCategoriesAndSubcategoriesDto);
+            return NoContent();
+        }
+
+        [HttpPut]
+        [Authorize(Roles = "FarmOwner")]
+        [ProducesResponseType(204)]
         public async Task<IActionResult> UpdateFarmImages([FromForm] UpdateFarmImagesDto updateFarmImagesDto)
         {
             await FarmService.UpdateFarmImages(updateFarmImagesDto);

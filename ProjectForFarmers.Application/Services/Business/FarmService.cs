@@ -8,7 +8,6 @@ using Microsoft.Extensions.Configuration;
 using Geocoding;
 using ProjectForFarmers.Application.Helpers;
 using AutoMapper;
-using ;
 using Geocoding.Google;
 using Address = ProjectForFarmers.Domain.Address;
 using ProjectForFarmers.Application.Services.Auth;
