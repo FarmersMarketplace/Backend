@@ -26,11 +26,10 @@ namespace ProjectForFarmers.Domain
         public List<PaymentType> PaymentTypes { get; set; }
         public List<ReceivingType> ReceivingTypes { get; set; }
         public Guid SupplyPointId { get; set; }
-        public Guid? DeliveryPointId { get; set; }
         public Address SupplyPoint { get; set; }
-        public Address? DeliveryPoint { get; set; }
         public List<string> ImagesNames { get; set; }
-        public List<Characteristic> Characteristics { get; set; }
+        public DateTime ExpirationDate { get; set; }
+        public List<string> DocumentsNames { get; set; }
     }
 
 }
