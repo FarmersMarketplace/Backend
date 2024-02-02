@@ -35,7 +35,7 @@ namespace ProjectForFarmers.WebApi.Controllers
 
         }
 
-        [HttpDelete]
+        [HttpDelete("{categoryId}")]
         [ProducesResponseType(204)]
         public async Task<IActionResult> Delete([FromRoute] Guid categoryId)
         {
