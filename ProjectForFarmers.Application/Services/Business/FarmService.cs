@@ -8,12 +8,9 @@ using Microsoft.Extensions.Configuration;
 using Geocoding;
 using ProjectForFarmers.Application.Helpers;
 using AutoMapper;
-using Geocoding;
+using ;
 using Geocoding.Google;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Address = ProjectForFarmers.Domain.Address;
-using ProjectForFarmers.Application.Mappings;
-using System.Net;
 using ProjectForFarmers.Application.Services.Auth;
 using DayOfWeek = ProjectForFarmers.Domain.DayOfWeek;
 
@@ -225,5 +222,16 @@ namespace ProjectForFarmers.Application.Services.Business
             await DbContext.SaveChangesAsync();
         }
 
+        public async Task UpdateFarmCategoriesAndSubcategories(UpdateFarmCategoriesAndSubcategoriesDto updateFarmCategoriesAndSubcategoriesDto)
+        {
+            var farm = await DbContext.Farms.FirstOrDefaultAsync(f => f.Id == updateFarmCategoriesAndSubcategoriesDto.FarmId);
+            if (farm == null) 
+                throw new NotFoundException($"Farm with Id {updateFarmCategoriesAndSubcategoriesDto.FarmId} does not exist.");
+
+            farm.Categories = updateFarmCategoriesAndSubcategoriesDto.Categories;
+            farm.Subcategories = updateFarmCategoriesAndSubcategoriesDto.Subcategories;
+
+            await DbContext.SaveChangesAsync();
+        }
     }
 }

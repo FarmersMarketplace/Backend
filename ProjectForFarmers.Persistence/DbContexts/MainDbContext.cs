@@ -4,7 +4,6 @@ using ProjectForFarmers.Persistence.EntityTypeConfigurations;
 using Microsoft.EntityFrameworkCore;
 using DayOfWeek = ProjectForFarmers.Domain.DayOfWeek;
 
-
 namespace ProjectForFarmers.Persistence.DbContexts
 {
     public class MainDbContext : DbContext, IApplicationDbContext

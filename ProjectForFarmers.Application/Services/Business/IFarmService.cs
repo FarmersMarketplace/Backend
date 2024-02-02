@@ -17,5 +17,6 @@ namespace ProjectForFarmers.Application.Services.Business
         Task Delete(Guid farmId, Guid ownerId);
         Task<FarmListVm> GetAll(Guid userId);
         Task UpdateFarmImages(UpdateFarmImagesDto updateFarmImagesDto);
+        Task UpdateFarmCategoriesAndSubcategories(UpdateFarmCategoriesAndSubcategoriesDto UpdateFarmCategoriesAndSubcategoriesDto);
     }
 }

@@ -23,10 +23,7 @@ namespace ProjectForFarmers.Domain
         public string PricePerOne { get; set; }
         public int MinPurchaseQuantity { get; set; }
         public int Count { get; set; }
-        public List<PaymentType> PaymentTypes { get; set; }
         public List<ReceivingType> ReceivingTypes { get; set; }
-        public Guid SupplyPointId { get; set; }
-        public Address SupplyPoint { get; set; }
         public List<string> ImagesNames { get; set; }
         public DateTime ExpirationDate { get; set; }
         public List<string> DocumentsNames { get; set; }
