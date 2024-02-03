@@ -24,34 +24,34 @@ namespace ProjectForFarmers.Application.Services.Business
 
         public FarmService(IMapper mapper, IApplicationDbContext dbContext, IConfiguration configuration) : base(mapper, dbContext, configuration)
         {
-            FarmsImageFolder = Configuration["Images:Farms"];
+            FarmsImageFolder = Configuration["Images:Farm"];
             FileHelper = new FileHelper();
             EmailHelper = new EmailHelper(configuration);
             JwtService = new JwtService(configuration);
         }
 
-        public async Task Create(CreateFarmDto createFarmDto)
+        public async Task Create(CreateFarmDto farmDto)
         {
-            var farm = Mapper.Map<Farm>(createFarmDto);
+            var farm = Mapper.Map<Farm>(farmDto);
             var address = farm.Address;
 
             var coords = await GetCoordinates(address);
             address.Latitude = coords.Latitude;
             address.Longtitude = coords.Longitude;
 
-            if(createFarmDto.Images != null)
+            if(farmDto.Images != null)
             {
-                farm.ImagesNames = await FileHelper.SaveImages(createFarmDto.Images, FarmsImageFolder);
+                farm.ImagesNames = await FileHelper.SaveImages(farmDto.Images, FarmsImageFolder);
             }
             else
             {
                 farm.ImagesNames = new List<string>();
             }
-            string token = await JwtService.EmailConfirmationToken(farm.Id, createFarmDto.ContactEmail);
+            string token = await JwtService.EmailConfirmationToken(farm.Id, farmDto.ContactEmail);
             var owner = await DbContext.Accounts.FirstOrDefaultAsync(a => a.Id == farm.OwnerId);
 
-            string message = EmailContentBuilder.FarmEmailConfirmationMessageBody(farm.Name, owner.Name, owner.Surname, createFarmDto.ContactEmail, token);
-            await EmailHelper.SendEmail(message, createFarmDto.ContactEmail, "Farm Email Confirmation");
+            string message = EmailContentBuilder.FarmEmailConfirmationMessageBody(farm.Name, owner.Name, owner.Surname, farmDto.ContactEmail, token);
+            await EmailHelper.SendEmail(message, farmDto.ContactEmail, "Farm Email Confirmation");
 
             await DbContext.Farms.AddAsync(farm);
             await DbContext.SaveChangesAsync();
@@ -105,21 +105,16 @@ namespace ProjectForFarmers.Application.Services.Business
 
             if (farm == null) throw new NotFoundException($"Farm with Id {updateFarmDto.FarmId} does not exist.");
 
-            await UpdateAddress(farm.Address, updateFarmDto.Address);
-            await UpdateSchedule(farm.Schedule, updateFarmDto.Schedule);
-            await UpdateImages(farm, updateFarmDto);
-            await UpdateFarm(farm, updateFarmDto);
-
-            await DbContext.SaveChangesAsync();
-        }
-
-        private async Task UpdateFarm(Farm farm, UpdateFarmDto updateFarmDto)
-        {
             farm.Name = updateFarmDto.Name;
             farm.Description = updateFarmDto.Description;
             farm.ContactEmail = updateFarmDto.ContactEmail;
             farm.ContactPhone = updateFarmDto.ContactPhone;
             farm.SocialPageUrl = updateFarmDto.SocialPageUrl;
+
+            await UpdateAddress(farm.Address, updateFarmDto.Address);
+            await UpdateSchedule(farm.Schedule, updateFarmDto.Schedule);
+
+            await DbContext.SaveChangesAsync();
         }
 
         private async Task UpdateSchedule(Schedule schedule, ScheduleDto scheduleDto)
@@ -201,9 +196,14 @@ namespace ProjectForFarmers.Application.Services.Business
             return response;
         }
 
-        private async Task UpdateImages(Farm farm, UpdateFarmDto updateFarmDto)
+        public async Task UpdateImages(UpdateFarmImagesDto updateFarmImagesDto)
         {
-            if (updateFarmDto.Images == null)
+            var farm = await DbContext.Farms.FirstOrDefaultAsync(f => f.Id == updateFarmImagesDto.FarmId);
+
+            if (farm == null) 
+                throw new NotFoundException($"Farm with Id {updateFarmImagesDto.FarmId} does not exist.");
+
+            if (updateFarmImagesDto.Images == null)
             {
                 await FileHelper.DeleteFiles(farm.ImagesNames, FarmsImageFolder);
                 farm.ImagesNames = new List<string>();
@@ -211,7 +211,7 @@ namespace ProjectForFarmers.Application.Services.Business
             else
             {
                 await FileHelper.DeleteFiles(farm.ImagesNames, FarmsImageFolder);
-                var imagesPaths = await FileHelper.SaveImages(updateFarmDto.Images, FarmsImageFolder);
+                var imagesPaths = await FileHelper.SaveImages(updateFarmImagesDto.Images, FarmsImageFolder);
 
                 farm.ImagesNames = imagesPaths;
             }

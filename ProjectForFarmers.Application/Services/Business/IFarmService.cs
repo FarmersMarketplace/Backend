@@ -14,9 +14,9 @@ namespace ProjectForFarmers.Application.Services.Business
         Task<FarmVm> Get(Guid farmId);
         Task Create(CreateFarmDto createFarmDto);
         Task Update(UpdateFarmDto updateFarmDto);
+        Task UpdateImages(UpdateFarmImagesDto updateFarmImagesDto);
         Task Delete(Guid farmId, Guid ownerId);
         Task<FarmListVm> GetAll(Guid userId);
-        //Task UpdateFarmImages(UpdateFarmImagesDto updateFarmImagesDto);
         Task UpdateFarmCategoriesAndSubcategories(UpdateFarmCategoriesAndSubcategoriesDto updateFarmCategoriesAndSubcategoriesDto);
     }
 }
