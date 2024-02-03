@@ -17,6 +17,7 @@ namespace ProjectForFarmers.Application.Interfaces
         DbSet<OrderItem> OrdersItems { get; set; }
         DbSet<Category> Categories { get; set; }
         DbSet<Subcategory> Subcategories { get; set; }
+        DbSet<Product> Products { get; set; }
         Task<int> SaveChangesAsync(CancellationToken token);
         Task<int> SaveChangesAsync();
     }

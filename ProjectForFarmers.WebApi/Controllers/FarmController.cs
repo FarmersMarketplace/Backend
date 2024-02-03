@@ -73,14 +73,5 @@ namespace ProjectForFarmers.WebApi.Controllers
             await FarmService.UpdateFarmCategoriesAndSubcategories(updateFarmCategoriesAndSubcategoriesDto);
             return NoContent();
         }
-
-        [HttpPut]
-        [Authorize(Roles = "FarmOwner")]
-        [ProducesResponseType(204)]
-        public async Task<IActionResult> UpdateFarmImages([FromForm] UpdateFarmImagesDto updateFarmImagesDto)
-        {
-            await FarmService.UpdateFarmImages(updateFarmImagesDto);
-            return NoContent();
-        }
     }
 }

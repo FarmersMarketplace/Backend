@@ -20,6 +20,8 @@ namespace ProjectForFarmers.Application
             services.AddTransient<IAuthService, AuthService>();
             services.AddTransient<IFarmService, FarmService>();
             services.AddTransient<IOrderService, OrderService>();
+            services.AddTransient<ICategoryService, CategoryService>();
+            services.AddTransient<ISubcategoryService, SubcategoryService>();
 
             services.AddAutoMapper(config =>
             {
