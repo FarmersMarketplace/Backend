@@ -3,7 +3,6 @@ using ProjectForFarmers.Application.Services.Business;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
-using ProjectForFarmers.Application.ViewModels.Auth;
 using ProjectForFarmers.Application.ViewModels.Farm;
 
 namespace ProjectForFarmers.WebApi.Controllers
@@ -59,9 +58,17 @@ namespace ProjectForFarmers.WebApi.Controllers
 
         [HttpPut]
         [Authorize(Roles = "FarmOwner")]
-        public async Task<IActionResult> Update([FromForm] UpdateFarmDto updateFarmDto)
+        public async Task<IActionResult> Update([FromBody] UpdateFarmDto updateFarmDto)
         {
             await FarmService.Update(updateFarmDto);
+            return NoContent();
+        }
+
+        [HttpPut]
+        [Authorize(Roles = "FarmOwner")]
+        public async Task<IActionResult> UpdateImages([FromBody] UpdateFarmImagesDto updateFarmImagesDto)
+        {
+            await FarmService.UpdateImages(updateFarmImagesDto);
             return NoContent();
         }
 
