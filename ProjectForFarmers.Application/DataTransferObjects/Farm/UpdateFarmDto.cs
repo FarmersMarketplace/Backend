@@ -14,9 +14,10 @@ namespace ProjectForFarmers.Application.DataTransferObjects.Farm
         public string Description { get; set; }
         public string ContactEmail { get; set; }
         public string ContactPhone { get; set; }
-        public string? SocialPageUrl { get; internal set; }
+        public string? SocialPageUrl { get; set; }
+        public Guid OwnerId { get; set; }
         public AddressDto Address { get; set; }
         public ScheduleDto Schedule { get; set; }
-        public List<IFormFile>? Images { get; set; }
     }
+
 }
