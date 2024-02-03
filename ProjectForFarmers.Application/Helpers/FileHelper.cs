@@ -83,6 +83,16 @@ namespace ProjectForFarmers.Application.Helpers
                 File.Delete(filePaths[i]);
             }
         }
+
+        public void DeleteFile(string fileName, string directoryPath)
+        {
+            var filePath = Path.Combine(directoryPath, fileName);
+
+            if (File.Exists(filePath))
+            {
+                File.Delete(filePath);
+            }
+        }
     }
 
 }
