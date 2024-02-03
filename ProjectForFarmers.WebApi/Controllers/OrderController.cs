@@ -20,6 +20,14 @@ namespace ProjectForFarmers.WebApi.Controllers
             Configuration = configuration;
         }
 
+        [HttpGet("{orderId}")]
+        [ProducesResponseType(typeof(OrderVm), 200)]
+        public async Task<IActionResult> LoadDashboard([FromRoute] Guid orderId)
+        {
+            var vm = await OrderService.Get(orderId);
+            return Ok(vm);
+        }
+
         [HttpGet("{producerId}/{producer}")]
         [ProducesResponseType(typeof(LoadDashboardVm), 200)]
         public async Task<IActionResult> LoadDashboard([FromRoute] Guid producerId, [FromRoute] Producer producer)

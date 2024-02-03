@@ -1,4 +1,6 @@
-﻿using ProjectForFarmers.Domain;
+﻿using ProjectForFarmers.Application.DataTransferObjects.Farm;
+using ProjectForFarmers.Application.ViewModels;
+using ProjectForFarmers.Domain;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +17,7 @@ namespace ProjectForFarmers.Application.DataTransferObjects.Order
         public PaymentStatus PaymentStatus { get; set; }
         public ReceivingType ReceivingType { get; set; }
         public OrderStatus Status { get; set; }
+        public AddressDto DeliveryAddress { get; set; }
         public List<OrderItemDto> Items { get; set; }
     }
 

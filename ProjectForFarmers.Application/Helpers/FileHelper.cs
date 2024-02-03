@@ -47,18 +47,25 @@ namespace ProjectForFarmers.Application.Helpers
 
             foreach (var file in files)
             {
-                var fileName = Guid.NewGuid().ToString("N") + Path.GetExtension(file.FileName);
-                var filePath = Path.Combine(directoryPath, fileName);
-
-                using (var stream = new FileStream(filePath, FileMode.Create))
-                {
-                    await file.CopyToAsync(stream);
-                }
+                var fileName = await SaveFile(file, directoryPath);
 
                 filesNames.Add(fileName);
             }
 
             return filesNames;
+        }
+
+        public async Task<string> SaveFile(IFormFile file, string directoryPath)
+        {
+            var fileName = Guid.NewGuid().ToString("N") + Path.GetExtension(file.FileName);
+            var filePath = Path.Combine(directoryPath, fileName);
+
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            return fileName;
         }
 
         public async Task DeleteFiles(List<string> filesNames, string directoryPath)

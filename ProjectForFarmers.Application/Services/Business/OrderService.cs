@@ -1,8 +1,11 @@
 ﻿using AutoMapper;
 using FastExcel;
+using Geocoding.Google;
+using Geocoding;
 using Hangfire.Server;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using ProjectForFarmers.Application.DataTransferObjects.Farm;
 using ProjectForFarmers.Application.DataTransferObjects.Order;
 using ProjectForFarmers.Application.Exceptions;
 using ProjectForFarmers.Application.Filters;
@@ -315,6 +318,8 @@ namespace ProjectForFarmers.Application.Services.Business
             order.PaymentStatus = updateOrderDto.PaymentStatus;
             order.ReceivingType = updateOrderDto.ReceivingType;
             order.Status = updateOrderDto.Status;
+
+            await UpdateAddress(order.DeliveryPoint, updateOrderDto.DeliveryAddress);
             
             foreach (var item in order.Items)
             {
@@ -330,6 +335,36 @@ namespace ProjectForFarmers.Application.Services.Business
             }
 
             await DbContext.SaveChangesAsync();
+        }
+
+        private async Task UpdateAddress(Domain.Address address, AddressDto addressDto)
+        {
+            if (address.Region != addressDto.Region
+                || address.District != addressDto.District
+                || address.Settlement != addressDto.Settlement
+                || address.Street != addressDto.Street
+                || address.HouseNumber != addressDto.HouseNumber)
+            {
+                var coords = await GetCoordinates(addressDto);
+                address.Latitude = coords.Latitude;
+                address.Longtitude = coords.Longitude;
+            }
+
+            address.Region = addressDto.Region;
+            address.District = addressDto.District;
+            address.Settlement = addressDto.Settlement;
+            address.Street = addressDto.Street;
+            address.HouseNumber = addressDto.HouseNumber;
+            address.PostalCode = addressDto.PostalCode;
+            address.Note = addressDto.Note;
+        }
+
+        private async Task<Location> GetCoordinates(AddressDto dto)
+        {
+            IGeocoder geocoder = new GoogleGeocoder() { ApiKey = Configuration["Geocoding:Apikey"] };
+            var request = await geocoder.GeocodeAsync($"{dto.Region} oblast, {dto.District} district, {dto.Settlement} street {dto.Street}, {dto.HouseNumber}, Ukraine");
+            var coords = request.FirstOrDefault().Coordinates;
+            return coords;
         }
 
         public async Task AddOrderItem(AddOrderItemDto addOrderItemDto)

@@ -20,17 +20,17 @@ namespace ProjectForFarmers.WebApi.Controllers
 
         [HttpPost]
         [ProducesResponseType(204)]
-        public async Task<IActionResult> Create(CreateCategoryDto createCategoryDto)
+        public async Task<IActionResult> Create(CategoryDto categoryDto)
         {
-            await CategoryService.Create(createCategoryDto);
+            await CategoryService.Create(categoryDto);
             return NoContent();
         }
 
-        [HttpPut]
+        [HttpPut("{categoryId}")]
         [ProducesResponseType(204)]
-        public async Task<IActionResult> Update(UpdateCategoryDto updateCategoryDto)
+        public async Task<IActionResult> Update(Guid categoryId, CategoryDto categoryDto)
         {
-            await CategoryService.Update(updateCategoryDto);
+            await CategoryService.Update(categoryId, categoryDto);
             return NoContent();
 
         }

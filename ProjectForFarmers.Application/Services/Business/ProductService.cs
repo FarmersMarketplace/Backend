@@ -1,6 +1,9 @@
 ﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using ProjectForFarmers.Application.DataTransferObjects.Product;
+using ProjectForFarmers.Application.Exceptions;
+using ProjectForFarmers.Application.Filters;
 using ProjectForFarmers.Application.Helpers;
 using ProjectForFarmers.Application.Interfaces;
 using ProjectForFarmers.Domain;
@@ -21,15 +24,27 @@ namespace ProjectForFarmers.Application.Services.Business
             FileHelper = new FileHelper();
         }
 
-        public async Task Create(CreateProductDto createProductDto)
+        public async Task Create(ProductDto productDto)
         {
-            var product = Mapper.Map<Product>(createProductDto);
+            var product = Mapper.Map<Product>(productDto);
             product.ArticleNumber = GenerateArticleNumber();
 
-            product.ImagesNames = await FileHelper.SaveImages(createProductDto.Images, Configuration["Images:Farms"]);
-            product.DocumentsNames = await FileHelper.SaveFiles(createProductDto.Documents, Configuration["Documents"]);
+            product.ImagesNames = await FileHelper.SaveImages(productDto.Images, Configuration["Images:Product"]);
+            product.DocumentsNames = await FileHelper.SaveFiles(productDto.Documents, Configuration["Documents"]);
 
-            DbContext.
+            DbContext.Products.Add(product);
+            await DbContext.SaveChangesAsync();
+        }
+
+        public async Task Delete(Guid productId)
+        {
+            var product = await DbContext.Products.FirstAsync(p => p.Id == productId);
+
+            if (product == null)
+                throw new NotFoundException($"Product with Id {productId} was not found.");
+
+            DbContext.Products.Remove(product);
+            await DbContext.SaveChangesAsync();
         }
 
         public string GenerateArticleNumber()
@@ -46,6 +61,21 @@ namespace ProjectForFarmers.Application.Services.Business
                 .Select(s => s[random.Next(s.Length)]).ToArray());
 
             return randomLetters + "-" + randomNumbers;
+        }
+
+        public Task Get(Guid productId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task GetAll(Guid producerId, Producer producer, ProductFilter filter)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task Update(Guid productId, ProductDto productDto)
+        {
+            throw new NotImplementedException();
         }
     }
 

@@ -34,8 +34,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\images\farms\" />
+    <Folder Include="wwwroot\images\farm\" />
     <Folder Include="wwwroot\documents\" />
+    <Folder Include="wwwroot\images\account\" />
+    <Folder Include="wwwroot\images\product\" />
   </ItemGroup>
 
 </Project>
