@@ -44,7 +44,7 @@ namespace ProjectForFarmers.Application.Mappings
 
         private void MapProductDtoToProduct()
         {
-            CreateMap<ProductDto, Product>()
+            CreateMap<CreateProductDto, Product>()
                 .ForMember(product => product.Id, opt => opt.MapFrom(dto => Guid.NewGuid()))
                 .ForMember(product => product.Name, opt => opt.MapFrom(dto => dto.Name))
                 .ForMember(product => product.Description, opt => opt.MapFrom(dto => dto.Description))
