@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ProjectForFarmers.Application.DataTransferObjects.Order;
+using ProjectForFarmers.Application.Filters;
 using ProjectForFarmers.Application.Services.Business;
 using ProjectForFarmers.Application.ViewModels.Order;
 using ProjectForFarmers.Domain;
@@ -29,9 +30,9 @@ namespace ProjectForFarmers.WebApi.Controllers
 
         [HttpGet("{producerId}/{producer}")]
         [ProducesResponseType(typeof(OrderListVm), 200)]
-        public async Task<IActionResult> GetAll([FromRoute] Guid producerId, [FromRoute] Producer producer)
+        public async Task<IActionResult> GetAll([FromRoute] Guid producerId, [FromRoute] Producer producer, [FromBody] OrderFilter? filter)
         {
-            var vm = await OrderService.GetAll(producerId, producer);
+            var vm = await OrderService.GetAll(producerId, producer, filter);
             return Ok(vm);
         }
 
