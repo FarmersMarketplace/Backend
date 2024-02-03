@@ -6,6 +6,7 @@ using ProjectForFarmers.Application.Exceptions;
 using ProjectForFarmers.Application.Filters;
 using ProjectForFarmers.Application.Helpers;
 using ProjectForFarmers.Application.Interfaces;
+using ProjectForFarmers.Application.ViewModels.Product;
 using ProjectForFarmers.Domain;
 using System;
 using System.Collections.Generic;
@@ -43,6 +44,8 @@ namespace ProjectForFarmers.Application.Services.Business
             if (product == null)
                 throw new NotFoundException($"Product with Id {productId} was not found.");
 
+            await FileHelper.DeleteFiles(product.ImagesNames, Configuration["Images:Product"]); 
+
             DbContext.Products.Remove(product);
             await DbContext.SaveChangesAsync();
         }
@@ -63,14 +66,21 @@ namespace ProjectForFarmers.Application.Services.Business
             return randomLetters + "-" + randomNumbers;
         }
 
-        public Task Get(Guid productId)
+        public async Task<ProductVm> Get(Guid productId)
         {
-            throw new NotImplementedException();
+            var product = await DbContext.Products.FirstAsync(p => p.Id == productId);
+
+            if (product == null)
+                throw new NotFoundException($"Product with Id {productId} was not found.");
+
+            var vm = Mapper.Map<ProductVm>(product);
+
+            return vm;
         }
 
         public Task GetAll(Guid producerId, Producer producer, ProductFilter filter)
         {
-            throw new NotImplementedException();
+            
         }
 
         public Task Update(Guid productId, ProductDto productDto)

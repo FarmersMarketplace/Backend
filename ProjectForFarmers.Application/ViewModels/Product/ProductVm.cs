@@ -19,6 +19,7 @@ namespace ProjectForFarmers.Application.ViewModels.Product
         public string Subcategory { get; set; }
         public ProductStatus Status { get; set; }
         public Producer Producer { get; set; }
+        public Guid ProducerId { get; set; }
         public string ProducerName { get; set; }
         public string PackagingType { get; set; }
         public string UnitOfMeasurement { get; set; }
