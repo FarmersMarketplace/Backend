@@ -18,14 +18,14 @@ namespace ProjectForFarmers.Application.Services.Business
     public class FarmService : Service, IFarmService
     {
         private readonly string FarmsImageFolder;
-        private readonly ImageHelper ImageHelper;
+        private readonly FileHelper FileHelper;
         private readonly EmailHelper EmailHelper;
         private readonly JwtService JwtService;
 
         public FarmService(IMapper mapper, IApplicationDbContext dbContext, IConfiguration configuration) : base(mapper, dbContext, configuration)
         {
             FarmsImageFolder = Configuration["Images:Farms"];
-            ImageHelper = new ImageHelper();
+            FileHelper = new FileHelper();
             EmailHelper = new EmailHelper(configuration);
             JwtService = new JwtService(configuration);
         }
@@ -41,7 +41,7 @@ namespace ProjectForFarmers.Application.Services.Business
 
             if(createFarmDto.Images != null)
             {
-                farm.ImagesNames = await ImageHelper.SaveImages(createFarmDto.Images, FarmsImageFolder);
+                farm.ImagesNames = await FileHelper.SaveImages(createFarmDto.Images, FarmsImageFolder);
             }
             else
             {
@@ -62,7 +62,7 @@ namespace ProjectForFarmers.Application.Services.Business
             var farm = await DbContext.Farms.FirstOrDefaultAsync(f => f.Id == farmId && f.OwnerId == ownerId);
             if (farm == null) throw new NotFoundException($"Farm with Id {farmId} does not exist.");
             DbContext.Farms.Remove(farm);
-            await ImageHelper.DeleteImages(farm.ImagesNames, FarmsImageFolder);
+            await FileHelper.DeleteFiles(farm.ImagesNames, FarmsImageFolder);
             await DbContext.SaveChangesAsync();
         }
 
@@ -107,6 +107,7 @@ namespace ProjectForFarmers.Application.Services.Business
 
             await UpdateAddress(farm.Address, updateFarmDto.Address);
             await UpdateSchedule(farm.Schedule, updateFarmDto.Schedule);
+            await UpdateImages(farm, updateFarmDto);
             await UpdateFarm(farm, updateFarmDto);
 
             await DbContext.SaveChangesAsync();
@@ -200,20 +201,17 @@ namespace ProjectForFarmers.Application.Services.Business
             return response;
         }
 
-        public async Task UpdateFarmImages(UpdateFarmImagesDto updateFarmImagesDto)
+        private async Task UpdateImages(Farm farm, UpdateFarmDto updateFarmDto)
         {
-            var farm = await DbContext.Farms.FirstOrDefaultAsync(f => f.Id == updateFarmImagesDto.FarmId);
-            if (farm == null) throw new NotFoundException($"Farm with Id {updateFarmImagesDto.FarmId} does not exist.");
-
-            if (updateFarmImagesDto.Images == null)
+            if (updateFarmDto.Images == null)
             {
-                await ImageHelper.DeleteImages(farm.ImagesNames, FarmsImageFolder);
+                await FileHelper.DeleteFiles(farm.ImagesNames, FarmsImageFolder);
                 farm.ImagesNames = new List<string>();
             }
             else
             {
-                await ImageHelper.DeleteImages(farm.ImagesNames, FarmsImageFolder);
-                var imagesPaths = await ImageHelper.SaveImages(updateFarmImagesDto.Images, FarmsImageFolder);
+                await FileHelper.DeleteFiles(farm.ImagesNames, FarmsImageFolder);
+                var imagesPaths = await FileHelper.SaveImages(updateFarmDto.Images, FarmsImageFolder);
 
                 farm.ImagesNames = imagesPaths;
             }
