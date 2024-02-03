@@ -70,7 +70,7 @@ namespace ProjectForFarmers.WebApi.Controllers
 
         [HttpPut]
         [ProducesResponseType(204)]
-        public async Task<IActionResult> Duplicate(OrderListDto orderListDto)
+        public async Task<IActionResult> Duplicate([FromBody] OrderListDto orderListDto)
         {
             await OrderService.Duplicate(orderListDto);
 
@@ -79,9 +79,27 @@ namespace ProjectForFarmers.WebApi.Controllers
 
         [HttpDelete]
         [ProducesResponseType(204)]
-        public async Task<IActionResult> Delete(OrderListDto orderListDto)
+        public async Task<IActionResult> Delete([FromBody] OrderListDto orderListDto)
         {
             await OrderService.Delete(orderListDto);
+
+            return NoContent();
+        }
+
+        [HttpPut]
+        [ProducesResponseType(204)]
+        public async Task<IActionResult> Update([FromBody] UpdateOrderDto updateOrderDto)
+        {
+            await OrderService.Update(updateOrderDto);
+
+            return NoContent();
+        }
+
+        [HttpPut]
+        [ProducesResponseType(204)]
+        public async Task<IActionResult> AddOrderItem([FromBody] AddOrderItemDto addOrderItemDto)
+        {
+            await OrderService.AddOrderItem(addOrderItemDto);
 
             return NoContent();
         }

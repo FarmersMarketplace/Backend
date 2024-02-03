@@ -9,7 +9,6 @@ using ProjectForFarmers.Application.Filters;
 using ProjectForFarmers.Application.Interfaces;
 using ProjectForFarmers.Application.ViewModels.Order;
 using ProjectForFarmers.Domain;
-using System.Data.Common;
 
 namespace ProjectForFarmers.Application.Services.Business
 {
@@ -207,9 +206,25 @@ namespace ProjectForFarmers.Application.Services.Business
                 if (order == null) 
                     throw new NotFoundException($"Order with id {orderId} was not found.");
 
+                var newOrderId = Guid.NewGuid();
+                var items = new List<OrderItem>();
+
+                foreach(var item  in order.Items)
+                {
+                    var newItem = new OrderItem
+                    {
+                        Id = Guid.NewGuid(),
+                        ProductId = item.ProductId,
+                        OrderId = newOrderId,
+                        Count = item.Count,
+                        TotalPrice = item.TotalPrice
+                    };
+                    items.Add(newItem);
+                }
+
                 var newOrder = new Order
                 {
-                    Id = Guid.NewGuid(),
+                    Id = newOrderId,
                     Number = order.Number,
                     CreationDate = DateTime.UtcNow,
                     ReceiveDate = order.ReceiveDate,
@@ -217,16 +232,14 @@ namespace ProjectForFarmers.Application.Services.Business
                     PaymentType = order.PaymentType,
                     PaymentStatus = order.PaymentStatus,
                     ReceivingType = order.ReceivingType,
-                    SupplyPointId = order.SupplyPointId,
                     DeliveryPointId = order.DeliveryPointId,
-                    SupplyPoint = order.SupplyPoint,
                     DeliveryPoint = order.DeliveryPoint,
                     Producer = order.Producer,
                     Status = OrderStatus.New,
                     ProducerId = order.ProducerId,
                     CustomerId = order.CustomerId,
                     Customer = order.Customer,
-                    Items = order.Items
+                    Items = items
                 };
 
                 await DbContext.Orders.AddAsync(newOrder);
@@ -263,18 +276,86 @@ namespace ProjectForFarmers.Application.Services.Business
                 throw new NotFoundException($"Order with id {orderId} was not found.");
 
             var vm = Mapper.Map<OrderVm>(order);
+            var items = new List<OrderItemVm>();
 
             foreach (var item in order.Items)
             {
+                var product = await DbContext.Products.FirstOrDefaultAsync(p => p.Id == item.ProductId);
 
+                if (product == null)
+                    throw new NotFoundException($"Product with id {item.ProductId} was not found.");
+
+                var itemVm = new OrderItemVm
+                {
+                    Id = item.Id,
+                    Name = product.Name,
+                    Count = item.Count,
+                    PhotoName = product.ImagesNames.Count > 0 ? product.ImagesNames[0] : null,
+                    PricePerOne = product.PricePerOne,
+                    TotalPrice = product.PricePerOne * item.Count
+                };
+
+                items.Add(itemVm);
             }
+
+            vm.Items = items;
 
             return vm;
         }
 
-        public Task Update(Guid orderId)
+        public async Task Update(UpdateOrderDto updateOrderDto)
         {
-            throw new NotImplementedException();
+            var order = await DbContext.Orders.Include(o => o.Items).FirstOrDefaultAsync(o => o.Id == updateOrderDto.OrderId);
+
+            if (order == null)
+                throw new NotFoundException($"Order with id {updateOrderDto.OrderId} was not found.");
+
+            order.ReceiveDate = updateOrderDto.ReceiveDate;
+            order.PaymentType = updateOrderDto.PaymentType;
+            order.PaymentStatus = updateOrderDto.PaymentStatus;
+            order.ReceivingType = updateOrderDto.ReceivingType;
+            order.Status = updateOrderDto.Status;
+            
+            foreach (var item in order.Items)
+            {
+                var itemDto = updateOrderDto.Items.FirstOrDefault(i => i.Id == item.Id);
+                if(itemDto == null)
+                {
+                    order.Items.Remove(item);
+                }
+                else
+                {
+                    item.Count = itemDto.Count;
+                }
+            }
+
+            await DbContext.SaveChangesAsync();
+        }
+
+        public async Task AddOrderItem(AddOrderItemDto addOrderItemDto)
+        {
+            var order = await DbContext.Orders.Include(o => o.Items).FirstOrDefaultAsync(o => o.Id == addOrderItemDto.OrderId);
+
+            if (order == null)
+                throw new NotFoundException($"Order with id {addOrderItemDto.OrderId} was not found.");
+
+            var product = await DbContext.Products.FirstOrDefaultAsync(p => p.Id == addOrderItemDto.ProductId);
+
+            if (product == null)
+                throw new NotFoundException($"Product with id {addOrderItemDto.ProductId} was not found.");
+
+            var item = new OrderItem
+            {
+                Id = Guid.NewGuid(),
+                ProductId = product.Id,
+                OrderId = order.Id,
+                Count = addOrderItemDto.Count,
+                TotalPrice = product.PricePerOne * addOrderItemDto.Count
+            };
+
+            order.Items.Add(item);
+
+            await DbContext.SaveChangesAsync();
         }
     }
 

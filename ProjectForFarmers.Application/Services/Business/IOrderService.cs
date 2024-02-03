@@ -15,7 +15,8 @@ namespace ProjectForFarmers.Application.Services.Business
         public Task<DashboardVm> GetCurrentMonthDashboard(Guid producerId, Producer producer);
         public Task Duplicate(OrderListDto orderListDto);
         public Task Delete(OrderListDto orderListDto);
-        public Task Update(Guid orderId);
+        public Task Update(UpdateOrderDto updateOrderDto);
+        public Task AddOrderItem(AddOrderItemDto addOrderItemDto);
     }
 
 }

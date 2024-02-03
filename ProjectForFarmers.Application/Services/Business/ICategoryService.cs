@@ -10,8 +10,8 @@ namespace ProjectForFarmers.Application.Services.Business
 {
     public interface ICategoryService
     {
-        Task Create(CreateCategoryDto createCategoryDto);
-        Task Update(UpdateCategoryDto updateCategoryDto);
+        Task Create(CategoryDto createCategoryDto);
+        Task Update(Guid categoryId, CategoryDto categoryDto);
         Task Delete(Guid categoryId);
         Task<CategoryListVm> GetAll();
     }

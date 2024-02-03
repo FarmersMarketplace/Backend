@@ -15,7 +15,7 @@ namespace ProjectForFarmers.Application.Services.Business
         {
         }
 
-        public async Task Create(CreateCategoryDto createCategoryDto)
+        public async Task Create(CategoryDto createCategoryDto)
         {
             Guid id = Guid.NewGuid();
             var category = new Category 
@@ -48,14 +48,14 @@ namespace ProjectForFarmers.Application.Services.Business
             return vm;
         }
 
-        public async Task Update(UpdateCategoryDto updateCategoryDto)
+        public async Task Update(Guid categoryId, CategoryDto categoryDto)
         {
-            var category = DbContext.Categories.FirstOrDefault(c => c.Id == updateCategoryDto.Id);
+            var category = DbContext.Categories.FirstOrDefault(c => c.Id == categoryId);
 
             if (category != null)
-                throw new NotFoundException($"Category with Id {updateCategoryDto.Id} was not found.");
+                throw new NotFoundException($"Category with Id {categoryId} was not found.");
 
-            category.Name = updateCategoryDto.Name;
+            category.Name = categoryDto.Name;
 
             await DbContext.SaveChangesAsync();
         }
