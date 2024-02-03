@@ -1,13 +1,14 @@
 ﻿using ProjectForFarmers.Application.DataTransferObjects.Product;
 using ProjectForFarmers.Application.Filters;
+using ProjectForFarmers.Application.ViewModels.Product;
 using ProjectForFarmers.Domain;
 
 namespace ProjectForFarmers.Application.Services.Business
 {
     public interface IProductService
     {
-        Task Create(ProductDto productDto);
-        Task Update(Guid productId, ProductDto productDto);
+        Task Create(CreateProductDto createProductDto);
+        Task Update(UpdateProductDto updateProductDto);
         Task Delete(Guid productId);
         Task<ProductVm> Get(Guid productId);
         Task GetAll (Guid producerId, Producer producer, ProductFilter filter);

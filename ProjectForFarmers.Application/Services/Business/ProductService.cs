@@ -25,13 +25,13 @@ namespace ProjectForFarmers.Application.Services.Business
             FileHelper = new FileHelper();
         }
 
-        public async Task Create(ProductDto productDto)
+        public async Task Create(CreateProductDto createProductDto)
         {
-            var product = Mapper.Map<Product>(productDto);
+            var product = Mapper.Map<Product>(createProductDto);
             product.ArticleNumber = GenerateArticleNumber();
 
-            product.ImagesNames = await FileHelper.SaveImages(productDto.Images, Configuration["Images:Product"]);
-            product.DocumentsNames = await FileHelper.SaveFiles(productDto.Documents, Configuration["Documents"]);
+            product.ImagesNames = await FileHelper.SaveImages(createProductDto.Images, Configuration["Images:Product"]);
+            product.DocumentsNames = await FileHelper.SaveFiles(createProductDto.Documents, Configuration["Documents"]);
 
             DbContext.Products.Add(product);
             await DbContext.SaveChangesAsync();
@@ -68,7 +68,9 @@ namespace ProjectForFarmers.Application.Services.Business
 
         public async Task<ProductVm> Get(Guid productId)
         {
-            var product = await DbContext.Products.FirstAsync(p => p.Id == productId);
+            var product = await DbContext.Products.Include(p => p.Category)
+                .Include(p => p.Subcategory)
+                .FirstAsync(p => p.Id == productId);
 
             if (product == null)
                 throw new NotFoundException($"Product with Id {productId} was not found.");
@@ -78,14 +80,78 @@ namespace ProjectForFarmers.Application.Services.Business
             return vm;
         }
 
-        public Task GetAll(Guid producerId, Producer producer, ProductFilter filter)
+        public async Task GetAll(Guid producerId, Producer producer, ProductFilter filter)
         {
             
         }
 
-        public Task Update(Guid productId, ProductDto productDto)
+        public async Task Update(UpdateProductDto updateProductDto)
         {
-            throw new NotImplementedException();
+            var product = await DbContext.Products.FirstAsync(p => p.Id == updateProductDto.Id);
+
+            if (product == null)
+                throw new NotFoundException($"Product with Id {updateProductDto.Id} was not found.");
+
+            product.Name = updateProductDto.Name;
+            product.Description = updateProductDto.Description;
+            product.CategoryId = updateProductDto.CategoryId;
+            product.SubcategoryId = updateProductDto.SubcategoryId;
+            product.PackagingType = updateProductDto.PackagingType;
+            product.Status = updateProductDto.Status;
+            product.UnitOfMeasurement = updateProductDto.UnitOfMeasurement;
+            product.PricePerOne = updateProductDto.PricePerOne;
+            product.MinPurchaseQuantity = updateProductDto.MinPurchaseQuantity;
+            product.Count = updateProductDto.Count;
+            product.ReceivingTypes = updateProductDto.ReceivingTypes;
+            product.ExpirationDate = updateProductDto.ExpirationDate;
+
+            if (updateProductDto.Images != null && product.ImagesNames != null)
+            {
+                foreach (var imageName in product.ImagesNames)
+                {
+                    if (!updateProductDto.Images.Any(file => file.FileName == imageName))
+                    {
+                        FileHelper.DeleteFile(imageName, Configuration["Images:Product"]);
+                    }
+                }
+            }
+
+            if (updateProductDto.Documents != null && product.DocumentsNames != null)
+            {
+                foreach (var documentName in product.DocumentsNames)
+                {
+                    if (!updateProductDto.Documents.Any(file => file.FileName == documentName))
+                    {
+                        FileHelper.DeleteFile(documentName, Configuration["Documents"]);
+                    }
+                }
+            }
+
+            if (updateProductDto.Images != null)
+            {
+                foreach (var newImage in updateProductDto.Images)
+                {
+                    if (!product.ImagesNames.Contains(newImage.FileName))
+                    {
+                        string imageName = await FileHelper.SaveFile(newImage, Configuration["Images:Product"]);
+                        product.ImagesNames.Add(imageName);
+                    }
+                }
+            }
+
+            if (updateProductDto.Documents != null)
+            {
+                foreach (var newDocument in updateProductDto.Documents)
+                {
+                    if (!product.DocumentsNames.Contains(newDocument.FileName))
+                    {
+                        string documentName = await FileHelper.SaveFile(newDocument, Configuration["Documents"]);
+                        product.DocumentsNames.Add(documentName);
+                    }
+                }
+            }
+
+            await DbContext.SaveChangesAsync();
         }
     }
 
