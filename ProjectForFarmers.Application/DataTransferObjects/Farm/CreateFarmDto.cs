@@ -18,5 +18,6 @@ namespace ProjectForFarmers.Application.DataTransferObjects.Farm
         public List<IFormFile>? Images { get; set; }
         public AddressDto Address { get; set; }
         public ScheduleDto Schedule { get; set; }
+        public PaymentDataDto PaymentData { get; set; }
     }
 }
