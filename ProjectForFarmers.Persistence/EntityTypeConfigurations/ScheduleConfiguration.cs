@@ -20,37 +20,44 @@ namespace ProjectForFarmers.Persistence.EntityTypeConfigurations
             builder.HasOne(f => f.Monday)
                 .WithOne()
                 .HasForeignKey<Schedule>(f => f.MondayId)
-                .IsRequired();
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasOne(f => f.Tuesday)
                 .WithOne()
                 .HasForeignKey<Schedule>(f => f.TuesdayId)
-                .IsRequired();
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasOne(f => f.Wednesday)
                 .WithOne()
                 .HasForeignKey<Schedule>(f => f.WednesdayId)
-                .IsRequired();
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasOne(f => f.Thursday)
                 .WithOne()
                 .HasForeignKey<Schedule>(f => f.ThursdayId)
-                .IsRequired();
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasOne(f => f.Friday)
                 .WithOne()
                 .HasForeignKey<Schedule>(f => f.FridayId)
-                .IsRequired();
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasOne(f => f.Saturday)
                 .WithOne()
                 .HasForeignKey<Schedule>(f => f.SaturdayId)
-                .IsRequired();
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasOne(f => f.Sunday)
                 .WithOne()
                 .HasForeignKey<Schedule>(f => f.SundayId)
-                .IsRequired();
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasIndex(schedule => schedule.Id).IsUnique();
         }

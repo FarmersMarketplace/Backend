@@ -23,19 +23,26 @@ namespace ProjectForFarmers.Persistence.EntityTypeConfigurations
             builder.Property(farm => farm.CreationDate).IsRequired();
 
             builder.HasOne(f => f.Address)
-                .WithOne()
-                .HasForeignKey<Farm>(f => f.AddressId)
-                .IsRequired();
+                 .WithOne()
+                 .HasForeignKey<Farm>(f => f.AddressId)
+                 .IsRequired()
+                 .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasOne(f => f.Owner)
-                .WithMany()
-                .HasForeignKey(f => f.OwnerId)
-                .IsRequired();
+                 .WithMany()
+                 .HasForeignKey(f => f.OwnerId)
+                 .IsRequired();
 
             builder.HasOne(f => f.Schedule)
-                .WithOne()
-                .HasForeignKey<Farm>(f => f.ScheduleId)
-                .IsRequired();
+                 .WithOne()
+                 .HasForeignKey<Farm>(f => f.ScheduleId)
+                 .IsRequired()
+                 .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasOne(f => f.PaymentData)
+                 .WithMany()
+                 .HasForeignKey(f => f.PaymentDataId)
+                 .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasIndex(farm => farm.Id).IsUnique();
         }
