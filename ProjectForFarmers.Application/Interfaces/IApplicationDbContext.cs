@@ -1,7 +1,6 @@
 ﻿using ProjectForFarmers.Domain;
 using Microsoft.EntityFrameworkCore;
 using DayOfWeek = ProjectForFarmers.Domain.DayOfWeek;
-using Microsoft.EntityFrameworkCore.Infrastructure;
 
 namespace ProjectForFarmers.Application.Interfaces
 {
@@ -18,6 +17,7 @@ namespace ProjectForFarmers.Application.Interfaces
         DbSet<Category> Categories { get; set; }
         DbSet<Subcategory> Subcategories { get; set; }
         DbSet<Product> Products { get; set; }
+        DbSet<PaymentData> PaymentData { get; set; }
         Task<int> SaveChangesAsync(CancellationToken token);
         Task<int> SaveChangesAsync();
     }
