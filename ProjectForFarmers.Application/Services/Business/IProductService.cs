@@ -11,7 +11,8 @@ namespace ProjectForFarmers.Application.Services.Business
         Task Update(UpdateProductDto updateProductDto);
         Task Delete(Guid productId);
         Task<ProductVm> Get(Guid productId);
-        Task GetAll (Guid producerId, Producer producer, ProductFilter filter);
+        Task<AllProductsVm> GetAll (Guid producerId, Producer producer);
+        Task<ProductsListVm> GetFilteredProducts(Guid producerId, Producer producer, ProductFilter filter);
     }
 
 }

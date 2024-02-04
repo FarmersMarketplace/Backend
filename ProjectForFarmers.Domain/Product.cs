@@ -27,6 +27,7 @@ namespace ProjectForFarmers.Domain
         public List<ReceivingType> ReceivingTypes { get; set; }
         public List<string> ImagesNames { get; set; }
         public DateTime ExpirationDate { get; set; }
+        public DateTime CreationDate { get; set; }
         public List<string> DocumentsNames { get; set; }
     }
 

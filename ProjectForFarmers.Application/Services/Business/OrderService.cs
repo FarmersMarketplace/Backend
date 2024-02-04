@@ -60,7 +60,8 @@ namespace ProjectForFarmers.Application.Services.Business
             var orders = DbContext.Orders.Include(o => o.Customer).Where(o => o.Producer == producer
                 && o.ProducerId == producerId).ToList();
 
-            await Filter(orders, filter);
+            if(filter != null)
+                await filter.Filter(orders);
 
             var vm = new OrderListVm();
 
@@ -70,28 +71,6 @@ namespace ProjectForFarmers.Application.Services.Business
             }
 
             return vm;
-        }
-
-        public async Task Filter(List<Order> orders, OrderFilter filter)
-        {
-            if (filter == null) return;
-
-            if(filter.Statuses != null)
-            {
-                orders = orders.Where(order => filter.Statuses.Contains(order.Status)).ToList();
-            }
-            if(filter.StartDate != default)
-            {
-                orders = orders.Where(o => o.CreationDate >= filter.StartDate).ToList();
-            }
-            if (filter.EndDate != default)
-            {
-                orders = orders.Where(o => o.CreationDate <= filter.EndDate).ToList();
-            }
-            if(filter.PaymentTypes != null && filter.PaymentTypes.Count > 0)
-            {
-                orders = orders.Where(o => filter.PaymentTypes.Contains(o.PaymentType)).ToList();
-            }
         }
 
         public async Task<DashboardVm> GetDashboard(Guid id)

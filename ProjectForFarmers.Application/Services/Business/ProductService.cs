@@ -8,11 +8,6 @@ using ProjectForFarmers.Application.Helpers;
 using ProjectForFarmers.Application.Interfaces;
 using ProjectForFarmers.Application.ViewModels.Product;
 using ProjectForFarmers.Domain;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ProjectForFarmers.Application.Services.Business
 {
@@ -80,10 +75,53 @@ namespace ProjectForFarmers.Application.Services.Business
             return vm;
         }
 
-        public async Task GetAll(Guid producerId, Producer producer, ProductFilter filter)
+        public async Task<AllProductsVm> GetAll(Guid producerId, Producer producer)
         {
-            
+            var products = DbContext.Products.Where(p => p.ProducerId == producerId 
+            && p.Producer == producer)
+                .ToList();
+
+            var unitsOfMeasurements = new HashSet<string>();
+
+            var vm = new AllProductsVm
+            {
+                Products = new List<ProductLookupVm>()
+            };
+
+            foreach (var product in products)
+            {
+                vm.Products.Add(Mapper.Map<ProductLookupVm>(product));
+                if(!unitsOfMeasurements.Contains(product.UnitOfMeasurement))
+                    unitsOfMeasurements.Add(product.UnitOfMeasurement);
+            }
+
+            vm.FilterData = new FilterData { UnitsOfMeasurement = unitsOfMeasurements.ToList() };
+
+            return vm;
         }
+
+        public async Task<ProductsListVm> GetFilteredProducts(Guid producerId, Producer producer, ProductFilter filter)
+        {
+            var products = DbContext.Products.Where(p => p.ProducerId == producerId
+                && p.Producer == producer)
+                .ToList();
+
+            await filter.Filter(products);
+
+            var vm = new ProductsListVm
+            {
+                Products = new List<ProductLookupVm>()
+            };
+
+            foreach (var product in products)
+            {
+                vm.Products.Add(Mapper.Map<ProductLookupVm>(product));
+            }
+
+            return vm;
+        }
+
+        
 
         public async Task Update(UpdateProductDto updateProductDto)
         {
