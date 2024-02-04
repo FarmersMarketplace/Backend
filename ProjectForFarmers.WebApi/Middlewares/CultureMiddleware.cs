@@ -18,7 +18,6 @@ namespace ProjectForFarmers.WebApi.Middlewares
             if (string.IsNullOrEmpty(culture))
                 culture = "uk-UA";
 
-            CultureInfo.CurrentCulture = new CultureInfo(culture);
             CultureInfo.CurrentUICulture = new CultureInfo(culture);
 
             await _next(context);
