@@ -14,8 +14,12 @@ namespace ProjectForFarmers.Application.ViewModels.Farm
         public string Description { get; set; }
         public string ContactEmail { get; set; }
         public string OwnerName { get; set; }
-        public Address Address { get; set; }
+        public AddressVm Address { get; set; }
+        public ScheduleVm Schedule { get; set; }
+        public PaymentDataVm PaymentData { get; set; }
         public string? SocialPageUrl { get; set; }
         public List<string> ImagesNames { get; set; }
+        public List<Guid>? Categories { get; set; }
+        public List<Guid>? Subcategories { get; set; }
     }
 }
