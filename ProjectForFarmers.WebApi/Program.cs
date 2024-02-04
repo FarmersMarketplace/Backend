@@ -104,16 +104,6 @@ namespace ProjectForFarmers.WebApi
 
             HangfireHelper.RegisterTasks(app.Services);
 
-            using (var scope = app.Services.CreateScope())
-            {
-                var services = scope.ServiceProvider;
-
-                var context = services.GetRequiredService<IApplicationDbContext>();
-
-                context.Database.ExecuteSqlRaw("DELETE FROM logs WHERE timestamp < NOW() - INTERVAL '2 months'");
-            }
-        
-
             app.UseMiddleware<ExceptionHandlerMiddleware>();
             app.UseRouting();
             app.UseHttpsRedirection();

@@ -358,6 +358,9 @@ namespace ProjectForFarmers.Application.Services.Business
             if (product == null)
                 throw new NotFoundException($"Product with id {addOrderItemDto.ProductId} was not found.");
 
+            if (product.CreationDate > order.ReceiveDate)
+                throw new InvalidOperationException("Creation date of product cannot be later than receive date.");
+
             var item = new OrderItem
             {
                 Id = Guid.NewGuid(),
