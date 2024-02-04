@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace ProjectForFarmers.Application.Exceptions
 {
-    public class DuplicateEmailException : ApplicationException
+    public class DuplicateException : ApplicationException
     {
-        public DuplicateEmailException(string message, string userFacingMessage) : base(message, userFacingMessage)
+        public DuplicateException(string message, string userFacingMessage) : base(message, userFacingMessage)
         {
         }
     }

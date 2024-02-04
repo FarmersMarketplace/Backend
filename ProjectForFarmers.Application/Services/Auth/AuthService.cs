@@ -39,11 +39,23 @@ namespace ProjectForFarmers.Application.Services.Auth
         public async Task ConfirmEmail(Guid accountId, string email)
         {
             var existingAccountWithSameEmail = await DbContext.Accounts.FirstOrDefaultAsync(a => a.Email == email);
-            if (existingAccountWithSameEmail != null) throw new DuplicateEmailException($"Email '{email}' is already associated with another account.");
+            if (existingAccountWithSameEmail != null) 
+            {
+                string message = $"Email {email} is already associated with another account.";
+                string userFacingMessage = CultureHelper.GetString("DuplicateEmail", email);
+
+                throw new DuplicateException(message, userFacingMessage);
+            } 
 
             var account = await DbContext.Accounts.FirstOrDefaultAsync(a => a.Id == accountId);
 
-            if (account == null) throw new NotFoundException($"Account with Id {accountId} not found.");
+            if (account == null) 
+            {
+                string message = $"Account with Id {accountId} was not found.";
+                string userFacingMessage = CultureHelper.GetString("AccountWithIdNotFound", accountId.ToString());
+
+                throw new NotFoundException(message, userFacingMessage);
+            } 
             
             account.Email = email;
             await DbContext.SaveChangesAsync();
@@ -52,7 +64,13 @@ namespace ProjectForFarmers.Application.Services.Auth
         public async Task<JwtVm> Login(LoginDto loginDto)
         {
             var account = DbContext.Accounts.FirstOrDefault(a => a.Email ==  loginDto.Email);
-            if (account == null) throw new NotFoundException($"Account with {loginDto.Email} email is not found.");
+            if (account == null) 
+            {
+                string message = $"Account with email {loginDto.Email} was not found.";
+                string userFacingMessage = CultureHelper.GetString("AccountWithEmailNotFound", loginDto.Email);
+
+                throw new NotFoundException(message, userFacingMessage);
+            } 
             else if(CryptoHelper.ComputeSha256Hash(loginDto.Password) != account.Password) throw new UnauthorizedAccessException("Invalid password.");
 
             var request = await JwtService.Authenticate(account);
@@ -64,7 +82,13 @@ namespace ProjectForFarmers.Application.Services.Auth
         {
             if(accountDto.Password != accountDto.ConfirmPassword) throw new ValidationException("The password and confirm password do not match.");
             var existingAccountWithSameEmail = await DbContext.Accounts.FirstOrDefaultAsync(a => a.Email == accountDto.Email);
-            if (existingAccountWithSameEmail != null) throw new DuplicateEmailException($"Email '{accountDto.Email}' is already associated with another account.");
+            if (existingAccountWithSameEmail != null) 
+            {
+                string message = $"Email {accountDto.Email} is already associated with another account.";
+                string userFacingMessage = CultureHelper.GetString("EmailIsAssociatedWithAnotherAccount", accountDto.Email);
+
+                throw new DuplicateException(message, userFacingMessage);
+            } 
 
             var account = new Account
             {
@@ -81,7 +105,14 @@ namespace ProjectForFarmers.Application.Services.Auth
         public async Task ResetPassword(Guid accountId, string email, ResetPasswordDto resetPasswordDto)
         {
             var account = await DbContext.Accounts.FirstOrDefaultAsync(a => a.Id == accountId && a.Email == email);
-            if (account == null) throw new NotFoundException("Account not found or email does not match the provided account.");
+            if (account == null)
+            {
+                string message = $"Account with Id {accountId} and email {email} was not found or email does not match the provided account.";
+                string userFacingMessage = CultureHelper.GetString("AccountWithIdEmailNotFound");
+
+                throw new NotFoundException(message, userFacingMessage);
+            }
+            
             else if(resetPasswordDto.Password != resetPasswordDto.ConfirmPassword) throw new UnauthorizedAccessException("Password and confirm password do not match.");
 
             account.Password = CryptoHelper.ComputeSha256Hash(resetPasswordDto.Password);
@@ -91,16 +122,28 @@ namespace ProjectForFarmers.Application.Services.Auth
         public async Task ForgotPassword(ForgotPasswordDto forgotPasswordDto)
         {
             var account = await DbContext.Accounts.FirstOrDefaultAsync(a => a.Email == forgotPasswordDto.Email);
-            if (account == null) throw new NotFoundException($"Account with email {forgotPasswordDto.Email} is not found.");
-            string message = EmailContentBuilder.ResetPasswordMessageBody(account.Name, account.Surname, await JwtService.EmailConfirmationToken(account.Id, account.Email));
-            await EmailHelper.SendEmail(message, forgotPasswordDto.Email, "Password reset request for Agroforum account");
+            if (account == null)
+            {
+                string message = $"Account with email {forgotPasswordDto.Email} was not found.";
+                string userFacingMessage = CultureHelper.GetString("AccountWithEmailNotFound", forgotPasswordDto.Email);
+
+                throw new NotFoundException(message, userFacingMessage);
+            }
+            string letterMessage = EmailContentBuilder.ResetPasswordMessageBody(account.Name, account.Surname, await JwtService.EmailConfirmationToken(account.Id, account.Email));
+            await EmailHelper.SendEmail(letterMessage, forgotPasswordDto.Email, "Password reset request for Agroforum account");
         }
 
         public async Task ConfirmFarmEmail(Guid farmId, string email)
         {
             var farm = await DbContext.Farms.FirstOrDefaultAsync(a => a.Id == farmId);
 
-            if (farm == null) throw new NotFoundException($"Farm with Id {farmId} not found.");
+            if (farm == null)
+            {
+                string message = $"Farm with Id {farmId} was not found.";
+                string userFacingMessage = CultureHelper.GetString("FarmWithIdNotFound", farmId.ToString());
+
+                throw new NotFoundException(message, userFacingMessage);
+            }
 
             farm.ContactEmail = email;
             await DbContext.SaveChangesAsync();
