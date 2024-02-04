@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace ProjectForFarmers.Application.Exceptions
 {
-    public class NotFoundException : Exception
+    public class NotFoundException : ApplicationException
     {
-        public NotFoundException(string message) : base(message)
+        public NotFoundException(string message, string userFacingMessage) : base(message, userFacingMessage)
         {
         }
     }
