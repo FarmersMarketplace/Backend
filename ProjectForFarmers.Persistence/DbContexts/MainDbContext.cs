@@ -19,6 +19,7 @@ namespace ProjectForFarmers.Persistence.DbContexts
         public DbSet<Category> Categories { get; set; }
         public DbSet<Subcategory> Subcategories { get; set; }
         public DbSet<Product> Products { get; set; }
+        public DbSet<PaymentData> PaymentData { get; set; }
 
         public MainDbContext(DbContextOptions<MainDbContext> options) : base(options)
         {
@@ -36,6 +37,7 @@ namespace ProjectForFarmers.Persistence.DbContexts
             modelBuilder.ApplyConfiguration(new MonthStatisticConfiguration());
             modelBuilder.ApplyConfiguration(new CategoryConfiguration());
             modelBuilder.ApplyConfiguration(new SubcategoryConfiguration());
+            modelBuilder.ApplyConfiguration(new PaymentDataConfiguration());
 
             base.OnModelCreating(modelBuilder);
         }

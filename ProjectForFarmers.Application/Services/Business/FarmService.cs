@@ -12,6 +12,7 @@ using Geocoding.Google;
 using Address = ProjectForFarmers.Domain.Address;
 using ProjectForFarmers.Application.Services.Auth;
 using DayOfWeek = ProjectForFarmers.Domain.DayOfWeek;
+using ProjectForFarmers.Application.DataTransferObjects;
 
 namespace ProjectForFarmers.Application.Services.Business
 {
@@ -61,6 +62,7 @@ namespace ProjectForFarmers.Application.Services.Business
         {
             var farm = await DbContext.Farms.FirstOrDefaultAsync(f => f.Id == farmId && f.OwnerId == ownerId);
             if (farm == null) throw new NotFoundException($"Farm with Id {farmId} does not exist.");
+
             DbContext.Farms.Remove(farm);
             await FileHelper.DeleteFiles(farm.ImagesNames, FarmsImageFolder);
             await DbContext.SaveChangesAsync();
@@ -87,6 +89,7 @@ namespace ProjectForFarmers.Application.Services.Business
             var farm = await DbContext.Farms
                 .Include(f => f.Owner)
                 .Include(f => f.Address)
+                .Include(f => f.PaymentData)
                 .Include(f => f.Schedule)
                     .ThenInclude(s => s.Monday)
                 .Include(f => f.Schedule)
@@ -113,8 +116,18 @@ namespace ProjectForFarmers.Application.Services.Business
 
             await UpdateAddress(farm.Address, updateFarmDto.Address);
             await UpdateSchedule(farm.Schedule, updateFarmDto.Schedule);
+            await UpdatePaymentData(farm.PaymentData, updateFarmDto.PaymentData);
 
             await DbContext.SaveChangesAsync();
+        }
+
+        private async Task UpdatePaymentData(PaymentData paymentData, PaymentDataDto paymentDataDto)
+        {
+            paymentData.CardNumber = paymentDataDto.CardNumber;
+            paymentData.AccountNumber = paymentDataDto.AccountNumber;
+            paymentData.BankUSREOU = paymentDataDto.BankUSREOU;
+            paymentData.BIC = paymentDataDto.BIC;
+            paymentData.HolderFullName = paymentDataDto.HolderFullName;
         }
 
         private async Task UpdateSchedule(Schedule schedule, ScheduleDto scheduleDto)
@@ -165,22 +178,15 @@ namespace ProjectForFarmers.Application.Services.Business
                 .Include(f => f.Owner)
                 .Include(f => f.Address)
                 .Include(f => f.Schedule)
+                .Include(f => f.Categories)
+                .Include(f => f.Subcategories)
+                .Include(f => f.PaymentData)
                 .FirstOrDefaultAsync(f => f.Id == farmId);
             if (farm == null) throw new NotFoundException($"Farm with Id {farmId} does not exist.");
 
-            var request = new FarmVm
-            {
-                Id = farm.Id,
-                Name = farm.Name,
-                Description = farm.Description,
-                ContactEmail = farm.ContactEmail,
-                OwnerName = farm.Owner.Name + " " + farm.Owner.Surname,
-                Address = farm.Address,
-                SocialPageUrl = farm.SocialPageUrl,
-                ImagesNames = farm.ImagesNames
-            };
+            var vm = Mapper.Map<FarmVm>(farm);
 
-            return request;
+            return vm;
         }
 
         public async Task<FarmListVm> GetAll(Guid userId)
