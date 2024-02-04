@@ -19,5 +19,9 @@
         public virtual List<MonthStatistic> Dashboard {  get; set; }
         public List<Guid>? Categories { get; set; }
         public List<Guid>? Subcategories { get; set; }
+        public List<ReceivingType>? ReceivingTypes { get; set; }
+        public List<PaymentType>? PaymentTypes { get; set; }
+        public Guid PaymentDataId { get; set; }
+        public PaymentData PaymentData { get; set; }
     }
 }
