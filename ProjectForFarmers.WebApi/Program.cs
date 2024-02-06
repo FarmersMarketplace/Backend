@@ -104,6 +104,7 @@ namespace ProjectForFarmers.WebApi
 
             HangfireHelper.RegisterTasks(app.Services);
 
+            app.UseMiddleware<CultureMiddleware>();
             app.UseMiddleware<ExceptionHandlerMiddleware>();
             app.UseRouting();
             app.UseHttpsRedirection();

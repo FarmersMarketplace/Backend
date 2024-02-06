@@ -1,6 +1,7 @@
 ﻿using Serilog;
 using System.Net;
 using System.Text.Json;
+using ApplicationException = ProjectForFarmers.Application.Exceptions.ApplicationException;
 
 namespace ProjectForFarmers.WebApi.Middlewares
 {
@@ -19,17 +20,22 @@ namespace ProjectForFarmers.WebApi.Middlewares
             {
                 await _next(context);
             }
+            catch (ApplicationException ex)
+            {
+                Log.Error(ex, "{ErrorMessage}", ex.Message);
+                await HandleExceptionAsync(context, ex.UserFacingMessage);
+            }
             catch (Exception ex)
             {
-                Log.Error(ex, "An unhandled exception occurred: {ErrorMessage}", ex.Message);
-                await HandleExceptionAsync(context, ex);
+                Log.Error(ex, "{ErrorMessage}", ex.Message);
+                await HandleExceptionAsync(context, ex.Message);
             }
         }
 
-        private Task HandleExceptionAsync(HttpContext context, Exception exception)
+        private Task HandleExceptionAsync(HttpContext context, string message)
         {
             var code = HttpStatusCode.InternalServerError;
-            var result = JsonSerializer.Serialize(new { error = exception.Message });
+            var result = JsonSerializer.Serialize(new { error = message });
 
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = (int)code;
