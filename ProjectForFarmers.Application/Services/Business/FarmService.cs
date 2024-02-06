@@ -13,6 +13,9 @@ using Address = ProjectForFarmers.Domain.Address;
 using ProjectForFarmers.Application.Services.Auth;
 using DayOfWeek = ProjectForFarmers.Domain.DayOfWeek;
 using ProjectForFarmers.Application.DataTransferObjects;
+using ProjectForFarmers.Application.DataTransferObjects.Product;
+using Microsoft.AspNetCore.Http;
+using ProjectForFarmers.Application.ViewModels;
 
 namespace ProjectForFarmers.Application.Services.Business
 {
@@ -61,7 +64,13 @@ namespace ProjectForFarmers.Application.Services.Business
         public async Task Delete(Guid farmId, Guid ownerId)
         {
             var farm = await DbContext.Farms.FirstOrDefaultAsync(f => f.Id == farmId && f.OwnerId == ownerId);
-            if (farm == null) throw new NotFoundException($"Farm with Id {farmId} does not exist.");
+            if (farm == null)
+            {
+                string message = $"Farm with Id {farmId} was not found.";
+                string userFacingMessage = CultureHelper.GetString("FarmWithIdNotFound", farmId.ToString());
+
+                throw new NotFoundException(message, userFacingMessage);
+            }
 
             DbContext.Farms.Remove(farm);
             await FileHelper.DeleteFiles(farm.ImagesNames, FarmsImageFolder);
@@ -106,7 +115,13 @@ namespace ProjectForFarmers.Application.Services.Business
                     .ThenInclude(s => s.Sunday)
                 .FirstOrDefaultAsync(f => f.Id == updateFarmDto.FarmId);
 
-            if (farm == null) throw new NotFoundException($"Farm with Id {updateFarmDto.FarmId} does not exist.");
+            if (farm == null)
+            {
+                string message = $"Farm with Id {updateFarmDto.FarmId} was not found.";
+                string userFacingMessage = CultureHelper.GetString("FarmWithIdNotFound", updateFarmDto.FarmId.ToString());
+
+                throw new NotFoundException(message, userFacingMessage);
+            }
 
             farm.Name = updateFarmDto.Name;
             farm.Description = updateFarmDto.Description;
@@ -116,18 +131,35 @@ namespace ProjectForFarmers.Application.Services.Business
 
             await UpdateAddress(farm.Address, updateFarmDto.Address);
             await UpdateSchedule(farm.Schedule, updateFarmDto.Schedule);
-            await UpdatePaymentData(farm.PaymentData, updateFarmDto.PaymentData);
+            await UpdateImages(farm, updateFarmDto.Images);
 
             await DbContext.SaveChangesAsync();
         }
 
-        private async Task UpdatePaymentData(PaymentData paymentData, PaymentDataDto paymentDataDto)
+        private async Task UpdateImages(Farm farm, List<IFormFile> images)
         {
-            paymentData.CardNumber = paymentDataDto.CardNumber;
-            paymentData.AccountNumber = paymentDataDto.AccountNumber;
-            paymentData.BankUSREOU = paymentDataDto.BankUSREOU;
-            paymentData.BIC = paymentDataDto.BIC;
-            paymentData.HolderFullName = paymentDataDto.HolderFullName;
+            if (images != null && images != null)
+            {
+                foreach (var imageName in farm.ImagesNames)
+                {
+                    if (!images.Any(file => file.FileName == imageName))
+                    {
+                        FileHelper.DeleteFile(imageName, Configuration["Images:Farm"]);
+                    }
+                }
+            }
+
+            if (images != null)
+            {
+                foreach (var newImage in images)
+                {
+                    if (!farm.ImagesNames.Contains(newImage.FileName))
+                    {
+                        string imageName = await FileHelper.SaveFile(newImage, Configuration["Images:Farm"]);
+                        farm.ImagesNames.Add(imageName);
+                    }
+                }
+            }
         }
 
         private async Task UpdateSchedule(Schedule schedule, ScheduleDto scheduleDto)
@@ -182,7 +214,12 @@ namespace ProjectForFarmers.Application.Services.Business
                 .Include(f => f.Subcategories)
                 .Include(f => f.PaymentData)
                 .FirstOrDefaultAsync(f => f.Id == farmId);
-            if (farm == null) throw new NotFoundException($"Farm with Id {farmId} does not exist.");
+            if (farm == null) 
+            {
+                string message = $"Farm with Id {farmId} was not found.";
+                string userFacingMessage = CultureHelper.GetString("FarmWithIdNotFound", farmId.ToString());
+                throw new NotFoundException(message, userFacingMessage);
+            } 
 
             var vm = Mapper.Map<FarmVm>(farm);
 
@@ -202,39 +239,55 @@ namespace ProjectForFarmers.Application.Services.Business
             return response;
         }
 
-        public async Task UpdateImages(UpdateFarmImagesDto updateFarmImagesDto)
-        {
-            var farm = await DbContext.Farms.FirstOrDefaultAsync(f => f.Id == updateFarmImagesDto.FarmId);
-
-            if (farm == null) 
-                throw new NotFoundException($"Farm with Id {updateFarmImagesDto.FarmId} does not exist.");
-
-            if (updateFarmImagesDto.Images == null)
-            {
-                await FileHelper.DeleteFiles(farm.ImagesNames, FarmsImageFolder);
-                farm.ImagesNames = new List<string>();
-            }
-            else
-            {
-                await FileHelper.DeleteFiles(farm.ImagesNames, FarmsImageFolder);
-                var imagesPaths = await FileHelper.SaveImages(updateFarmImagesDto.Images, FarmsImageFolder);
-
-                farm.ImagesNames = imagesPaths;
-            }
-
-            await DbContext.SaveChangesAsync();
-        }
-
         public async Task UpdateFarmCategoriesAndSubcategories(UpdateFarmCategoriesAndSubcategoriesDto updateFarmCategoriesAndSubcategoriesDto)
         {
             var farm = await DbContext.Farms.FirstOrDefaultAsync(f => f.Id == updateFarmCategoriesAndSubcategoriesDto.FarmId);
-            if (farm == null) 
-                throw new NotFoundException($"Farm with Id {updateFarmCategoriesAndSubcategoriesDto.FarmId} does not exist.");
+            if (farm == null)
+            {
+                string message = $"Farm with Id {updateFarmCategoriesAndSubcategoriesDto.FarmId} was not found.";
+                string userFacingMessage = CultureHelper.GetString("FarmWithIdNotFound", updateFarmCategoriesAndSubcategoriesDto.FarmId.ToString());
+                throw new NotFoundException(message, userFacingMessage);
+            }
 
             farm.Categories = updateFarmCategoriesAndSubcategoriesDto.Categories;
             farm.Subcategories = updateFarmCategoriesAndSubcategoriesDto.Subcategories;
 
             await DbContext.SaveChangesAsync();
+        }
+
+        public async Task UpdateSettings(UpdateFarmSettingsDto updateFarmSettingsDto)
+        {
+            var farm = await DbContext.Farms.FirstOrDefaultAsync(f => f.Id == updateFarmSettingsDto.FarmId);
+            if (farm == null)
+            {
+                string message = $"Farm with Id {updateFarmSettingsDto.FarmId} was not found.";
+                string userFacingMessage = CultureHelper.GetString("FarmWithIdNotFound", updateFarmSettingsDto.FarmId.ToString());
+                throw new NotFoundException(message, userFacingMessage);
+            }
+
+            if(updateFarmSettingsDto.PaymentData != null)
+            {
+                farm.PaymentData.CardNumber = updateFarmSettingsDto.PaymentData.CardNumber;
+                farm.PaymentData.AccountNumber = updateFarmSettingsDto.PaymentData.AccountNumber;
+                farm.PaymentData.BankUSREOU = updateFarmSettingsDto.PaymentData.BankUSREOU;
+                farm.PaymentData.BIC = updateFarmSettingsDto.PaymentData.BIC;
+                farm.PaymentData.HolderFullName = updateFarmSettingsDto.PaymentData.HolderFullName;
+            }
+            if(updateFarmSettingsDto.ReceivingTypes != null)
+            {
+                farm.ReceivingTypes = updateFarmSettingsDto.ReceivingTypes;
+            }
+            if(updateFarmSettingsDto.PaymentTypes != null)
+            {
+                farm.PaymentTypes = updateFarmSettingsDto.PaymentTypes;
+            }
+
+            await DbContext.SaveChangesAsync();
+        }
+
+        private async Task UpdatePaymentData(PaymentData paymentData, PaymentDataDto paymentDataDto)
+        {
+            
         }
     }
 }

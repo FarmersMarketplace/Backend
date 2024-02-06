@@ -1,11 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Configuration;
 using ProjectForFarmers.Application.Exceptions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ProjectForFarmers.Application.Helpers
 {
@@ -33,7 +27,12 @@ namespace ProjectForFarmers.Application.Helpers
             foreach (var image in images)
             {
                 if (!IsValidImage(image))
-                    throw new InvalidFormatException($"Invalid format of image {image.FileName}. Acceptable formats: {string.Join(", ", AllowedImagesExtensions)}");
+                {
+                    string acceptableFormats = string.Join(", ", AllowedImagesExtensions);
+                    string message = $"Invalid format of image {image.FileName}. Acceptable formats: {acceptableFormats}.";
+                    string userFacingMessage = CultureHelper.GetString("InvalidImageFormat", image.FileName, acceptableFormats);
+                    throw new NotFoundException(message, userFacingMessage);
+                }
             }
 
             var imagePaths = await SaveFiles(images, directoryPath);
@@ -75,7 +74,12 @@ namespace ProjectForFarmers.Application.Helpers
             for (int i = 0; i < filesNames.Count; i++)
             {
                 filePaths[i] = Path.Combine(directoryPath, filesNames[i]);
-                if (!File.Exists(filePaths[i])) throw new NotFoundException($"File with name {filesNames[i]} does not exist in directory {directoryPath}.");
+                if (!File.Exists(filePaths[i]))
+                {
+                    string message = $"File with name {filesNames[i]} does not exist in directory {directoryPath}.";
+                    string userFacingMessage = CultureHelper.GetString("FileNotExist", filesNames[i].ToString(), directoryPath);
+                    throw new NotFoundException(message, userFacingMessage);
+                }
             }
 
             for (int i = 0; i < filePaths.Length; i++)

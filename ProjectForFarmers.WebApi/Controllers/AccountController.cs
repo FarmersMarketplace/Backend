@@ -22,7 +22,7 @@ namespace ProjectForFarmers.WebApi.Controllers
         [ProducesResponseType(204)]
         public async Task<IActionResult> Update([FromBody] UpdateAccountDto updateAccountDto)
         {
-            await AccountService.Update(updateAccountDto);
+            //await AccountService.Update(updateAccountDto);
             return NoContent();
         }
 
@@ -30,16 +30,16 @@ namespace ProjectForFarmers.WebApi.Controllers
         [ProducesResponseType(204)]
         public async Task<IActionResult> UpdatePhoto([FromBody] UpdateAccountPhotoDto updateAccountPhotoDto)
         {
-            await AccountService.UpdatePhoto(updateAccountPhotoDto);
+            //await AccountService.UpdatePhoto(updateAccountPhotoDto);
             return NoContent();
         }
 
-        [HttpGet("{accountId}")]
-        [ProducesResponseType(typeof(AccountVm), 200)]
-        public async Task<IActionResult> Get(Guid accountId)
-        {
-            var accountVm = await AccountService.Get(accountId);
-            return Ok(accountVm);
-        }
+        //[HttpGet("{accountId}")]
+        //[ProducesResponseType(typeof(AccountVm), 200)]
+        //public async Task<IActionResult> Get(Guid accountId)
+        //{
+        //    var accountVm = await AccountService.Get(accountId);
+        //    return Ok(accountVm);
+        //}
     }
 }

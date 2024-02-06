@@ -36,7 +36,6 @@ namespace ProjectForFarmers.Application.Mappings
                 .ForMember(vm => vm.PricePerOne, opt => opt.MapFrom(product => product.PricePerOne))
                 .ForMember(vm => vm.MinPurchaseQuantity, opt => opt.MapFrom(dto => dto.MinPurchaseQuantity))
                 .ForMember(vm => vm.Count, opt => opt.MapFrom(dto => dto.Count))
-                .ForMember(vm => vm.ReceivingTypes, opt => opt.MapFrom(dto => dto.ReceivingTypes))
                 .ForMember(vm => vm.ExpirationDate, opt => opt.MapFrom(dto => dto.ExpirationDate))
                 .ForMember(vm => vm.ImagesNames, opt => opt.MapFrom(dto => dto.ImagesNames))
                 .ForMember(vm => vm.DocumentsNames, opt => opt.MapFrom(dto => dto.DocumentsNames));
@@ -57,7 +56,6 @@ namespace ProjectForFarmers.Application.Mappings
                 .ForMember(product => product.PricePerOne, opt => opt.MapFrom(dto => dto.PricePerOne))
                 .ForMember(product => product.MinPurchaseQuantity, opt => opt.MapFrom(dto => dto.MinPurchaseQuantity))
                 .ForMember(product => product.Count, opt => opt.MapFrom(dto => dto.Count))
-                .ForMember(product => product.ReceivingTypes, opt => opt.MapFrom(dto => dto.ReceivingTypes))
                 .ForMember(product => product.ExpirationDate, opt => opt.MapFrom(dto => dto.ExpirationDate));
         }
     }

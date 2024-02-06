@@ -6,6 +6,7 @@ using ProjectForFarmers.Application.Exceptions;
 using ProjectForFarmers.Application.Filters;
 using ProjectForFarmers.Application.Helpers;
 using ProjectForFarmers.Application.Interfaces;
+using ProjectForFarmers.Application.ViewModels.Farm;
 using ProjectForFarmers.Application.ViewModels.Product;
 using ProjectForFarmers.Domain;
 
@@ -37,7 +38,12 @@ namespace ProjectForFarmers.Application.Services.Business
             var product = await DbContext.Products.FirstAsync(p => p.Id == productId);
 
             if (product == null)
-                throw new NotFoundException($"Product with Id {productId} was not found.");
+            {
+                string message = $"Product with Id {productId} was not found.";
+                string userFacingMessage = CultureHelper.GetString("ProductWithIdNotFound", productId.ToString());
+
+                throw new NotFoundException(message, userFacingMessage);
+            }
 
             await FileHelper.DeleteFiles(product.ImagesNames, Configuration["Images:Product"]); 
 
@@ -68,7 +74,12 @@ namespace ProjectForFarmers.Application.Services.Business
                 .FirstAsync(p => p.Id == productId);
 
             if (product == null)
-                throw new NotFoundException($"Product with Id {productId} was not found.");
+            {
+                string message = $"Product with Id {productId} was not found.";
+                string userFacingMessage = CultureHelper.GetString("ProductWithIdNotFound", productId.ToString());
+
+                throw new NotFoundException(message, userFacingMessage);
+            }
 
             var vm = Mapper.Map<ProductVm>(product);
 
@@ -102,33 +113,32 @@ namespace ProjectForFarmers.Application.Services.Business
 
         public async Task<ProductsListVm> GetFilteredProducts(Guid producerId, Producer producer, ProductFilter filter)
         {
-            var products = DbContext.Products.Where(p => p.ProducerId == producerId
-                && p.Producer == producer)
-                .ToList();
+            var productsQuery = DbContext.Products.Where(p => p.ProducerId == producerId && p.Producer == producer);
 
-            await filter.Filter(products);
+            productsQuery = await filter.ApplyFilter(productsQuery);
 
             var vm = new ProductsListVm
             {
-                Products = new List<ProductLookupVm>()
+                Products = Mapper.Map<List<ProductLookupVm>>(await productsQuery.ToListAsync())
             };
-
-            foreach (var product in products)
-            {
-                vm.Products.Add(Mapper.Map<ProductLookupVm>(product));
-            }
 
             return vm;
         }
 
-        
+
+
 
         public async Task Update(UpdateProductDto updateProductDto)
         {
             var product = await DbContext.Products.FirstAsync(p => p.Id == updateProductDto.Id);
 
             if (product == null)
-                throw new NotFoundException($"Product with Id {updateProductDto.Id} was not found.");
+            {
+                string message = $"Product with Id {updateProductDto.Id} was not found.";
+                string userFacingMessage = CultureHelper.GetString("ProductWithIdNotFound", updateProductDto.Id.ToString());
+
+                throw new NotFoundException(message, userFacingMessage);
+            }
 
             product.Name = updateProductDto.Name;
             product.Description = updateProductDto.Description;

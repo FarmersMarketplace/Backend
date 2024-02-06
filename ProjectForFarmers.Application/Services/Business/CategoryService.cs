@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using ProjectForFarmers.Application.DataTransferObjects.Catefory;
 using ProjectForFarmers.Application.Exceptions;
+using ProjectForFarmers.Application.Helpers;
 using ProjectForFarmers.Application.Interfaces;
 using ProjectForFarmers.Application.ViewModels.Category;
 using ProjectForFarmers.Domain;
@@ -33,7 +34,12 @@ namespace ProjectForFarmers.Application.Services.Business
             var category = DbContext.Categories.FirstOrDefault(c => c.Id == categoryId);
 
             if (category != null)
-                throw new NotFoundException($"Category with Id {categoryId} was not found.");
+            {
+                string message = $"Category with Id {categoryId} was not found.";
+                string userFacingMessage = CultureHelper.GetString("CategoryWithIdNotFound", categoryId.ToString());
+
+                throw new NotFoundException(message, userFacingMessage);
+            }
 
             DbContext.Categories.Remove(category);
             await DbContext.SaveChangesAsync();
@@ -53,7 +59,12 @@ namespace ProjectForFarmers.Application.Services.Business
             var category = DbContext.Categories.FirstOrDefault(c => c.Id == categoryId);
 
             if (category != null)
-                throw new NotFoundException($"Category with Id {categoryId} was not found.");
+            {
+                string message = $"Category with Id {categoryId} was not found.";
+                string userFacingMessage = CultureHelper.GetString("CategoryWithIdNotFound", categoryId.ToString());
+
+                throw new NotFoundException(message, userFacingMessage);
+            }
 
             category.Name = categoryDto.Name;
 

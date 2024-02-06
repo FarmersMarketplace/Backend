@@ -3,19 +3,19 @@ using ProjectForFarmers.Domain;
 
 namespace ProjectForFarmers.Application.Filters
 {
-    public class ProductFilter : IFilter<List<Product>>
+    public class ProductFilter : IFilter<Product>
     {
         public List<Guid>? CategoryIds { get; set; }
         public List<Guid>? SubcategoryIds { get; set; }
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
         public List<string>? UnitsOfMeasurement { get; set; }
-        public uint? MinRest {  get; set; }
+        public uint? MinRest { get; set; }
         public uint? MaxRest { get; set; }
 
-        public async Task Filter(List<Product> collection)
+        public async Task<IQueryable<Product>> ApplyFilter(IQueryable<Product> query)
         {
-            collection = collection
+            return query
                 .Where(p =>
                     (IsCategoryValid(p.CategoryId)) &&
                     (IsSubcategoryValid(p.SubcategoryId)) &&
@@ -23,8 +23,7 @@ namespace ProjectForFarmers.Application.Filters
                     (IsEndDateValid(p.CreationDate)) &&
                     (IsUnitsOfMeasurementValid(p.UnitOfMeasurement)) &&
                     (IsMinRestValid(p.Count)) &&
-                    (IsMaxRestValid(p.Count)))
-                .ToList();
+                    (IsMaxRestValid(p.Count)));
         }
 
         private bool IsCategoryValid(Guid productCategoryId) => CategoryIds == null || !CategoryIds.Any() || CategoryIds.Contains(productCategoryId);
@@ -35,4 +34,5 @@ namespace ProjectForFarmers.Application.Filters
         private bool IsMinRestValid(uint productCount) => !MinRest.HasValue || productCount >= MinRest;
         private bool IsMaxRestValid(uint productCount) => !MaxRest.HasValue || productCount <= MaxRest;
     }
+
 }

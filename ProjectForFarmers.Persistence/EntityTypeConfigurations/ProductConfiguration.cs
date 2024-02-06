@@ -21,7 +21,6 @@ namespace ProjectForFarmers.Persistence.EntityTypeConfigurations
             builder.Property(product => product.PricePerOne).IsRequired();
             builder.Property(product => product.MinPurchaseQuantity).IsRequired();
             builder.Property(product => product.Count).IsRequired();
-            builder.Property(product => product.ReceivingTypes).IsRequired();
 
             builder.HasOne(product => product.Category)
                 .WithMany()

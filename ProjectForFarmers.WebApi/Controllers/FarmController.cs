@@ -66,18 +66,19 @@ namespace ProjectForFarmers.WebApi.Controllers
 
         [HttpPut]
         [Authorize(Roles = "FarmOwner")]
-        public async Task<IActionResult> UpdateImages([FromBody] UpdateFarmImagesDto updateFarmImagesDto)
+        [ProducesResponseType(204)]
+        public async Task<IActionResult> UpdateFarmCategoriesAndSubcategories([FromBody] UpdateFarmCategoriesAndSubcategoriesDto updateFarmCategoriesAndSubcategoriesDto)
         {
-            await FarmService.UpdateImages(updateFarmImagesDto);
+            await FarmService.UpdateFarmCategoriesAndSubcategories(updateFarmCategoriesAndSubcategoriesDto);
             return NoContent();
         }
 
         [HttpPut]
         [Authorize(Roles = "FarmOwner")]
         [ProducesResponseType(204)]
-        public async Task<IActionResult> UpdateFarmCategoriesAndSubcategories([FromBody] UpdateFarmCategoriesAndSubcategoriesDto updateFarmCategoriesAndSubcategoriesDto)
+        public async Task<IActionResult> UpdateSettings([FromBody] UpdateFarmSettingsDto updateFarmSettingsDto)
         {
-            await FarmService.UpdateFarmCategoriesAndSubcategories(updateFarmCategoriesAndSubcategoriesDto);
+            await FarmService.UpdateSettings(updateFarmSettingsDto);
             return NoContent();
         }
     }
