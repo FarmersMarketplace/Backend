@@ -21,7 +21,6 @@ namespace ProjectForFarmers.Application.DataTransferObjects.Product
         public decimal PricePerOne { get; set; }
         public int MinPurchaseQuantity { get; set; }
         public int Count { get; set; }
-        public List<ReceivingType> ReceivingTypes { get; set; }
         public List<IFormFile>? Images { get; set; }
         public DateTime ExpirationDate { get; set; }
         public List<IFormFile>? Documents { get; set; }

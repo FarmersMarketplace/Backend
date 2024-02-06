@@ -13,12 +13,14 @@ namespace ProjectForFarmers.WebApi.Middlewares
 
         public async Task Invoke(HttpContext context)
         {
-            var culture = context.Request.Headers["Accept-Language"];
+            string culture = context.Request.Headers["Accept-Language"];
+            string[] languages = culture?.Split(',');
+            string primaryLanguage = languages?.FirstOrDefault()?.Trim();
 
-            if (string.IsNullOrEmpty(culture))
-                culture = "uk-UA";
+            if (string.IsNullOrEmpty(primaryLanguage))
+                primaryLanguage = "uk-UA";
 
-            CultureInfo.CurrentUICulture = new CultureInfo(culture);
+            CultureInfo.CurrentUICulture = new CultureInfo(primaryLanguage);
 
             await _next(context);
         }
