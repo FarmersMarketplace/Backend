@@ -11,8 +11,6 @@ namespace ProjectForFarmers.Application.Services.Business
 {
     public interface IAccountService
     {
-        Task Update(UpdateAccountDto updateAccountDto);
-        Task UpdatePhoto(UpdateAccountPhotoDto updateAccountPhototDto);
-        Task<AccountVm> Get(Guid accountId);
+        
     }
 }

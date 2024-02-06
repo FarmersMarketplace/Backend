@@ -1,11 +1,5 @@
 ﻿using ProjectForFarmers.Application.DataTransferObjects.Farm;
 using ProjectForFarmers.Application.ViewModels.Farm;
-using ProjectForFarmers.Domain;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ProjectForFarmers.Application.Services.Business
 {
@@ -14,7 +8,7 @@ namespace ProjectForFarmers.Application.Services.Business
         Task<FarmVm> Get(Guid farmId);
         Task Create(CreateFarmDto createFarmDto);
         Task Update(UpdateFarmDto updateFarmDto);
-        Task UpdateImages(UpdateFarmImagesDto updateFarmImagesDto);
+        Task UpdateSettings(UpdateFarmSettingsDto updateFarmSettingsDto);
         Task Delete(Guid farmId, Guid ownerId);
         Task<FarmListVm> GetAll(Guid userId);
         Task UpdateFarmCategoriesAndSubcategories(UpdateFarmCategoriesAndSubcategoriesDto updateFarmCategoriesAndSubcategoriesDto);

@@ -2,7 +2,6 @@
 using FastExcel;
 using Geocoding.Google;
 using Geocoding;
-using Hangfire.Server;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using ProjectForFarmers.Application.DataTransferObjects.Farm;
@@ -12,6 +11,8 @@ using ProjectForFarmers.Application.Filters;
 using ProjectForFarmers.Application.Interfaces;
 using ProjectForFarmers.Application.ViewModels.Order;
 using ProjectForFarmers.Domain;
+using ProjectForFarmers.Application.Helpers;
+using InvalidDataException = ProjectForFarmers.Application.Exceptions.InvalidDataException;
 
 namespace ProjectForFarmers.Application.Services.Business
 {
@@ -41,10 +42,15 @@ namespace ProjectForFarmers.Application.Services.Business
 
             var currentMonthDashboardVm = Mapper.Map<DashboardVm>(currentMonthStatistic);
             var customerWithHighestPayment = await DbContext.Accounts.FirstOrDefaultAsync(a => a.Id == currentMonthStatistic.CustomerWithHighestPaymentId);
-
-            if (customerWithHighestPayment != null) throw new NotFoundException($"Customer with highest payment was not found(account id: {currentMonthStatistic.CustomerWithHighestPaymentId}).");
-
-            currentMonthDashboardVm.CustomerWithHighestPaymentName = $"{customerWithHighestPayment.Surname} {customerWithHighestPayment.Name}";
+             
+            if (customerWithHighestPayment != null) 
+            {
+                currentMonthDashboardVm.CustomerWithHighestPaymentName = $"{customerWithHighestPayment.Surname} {customerWithHighestPayment.Name}";
+            }
+            else
+            {
+                currentMonthDashboardVm.CustomerWithHighestPaymentName = "Customer with highest payment was not found";
+            } 
 
             var vm = new LoadDashboardVm
             {
@@ -57,18 +63,18 @@ namespace ProjectForFarmers.Application.Services.Business
 
         public async Task<OrderListVm> GetAll(Guid producerId, Producer producer, OrderFilter filter)
         {
-            var orders = DbContext.Orders.Include(o => o.Customer).Where(o => o.Producer == producer
-                && o.ProducerId == producerId).ToList();
+            var ordersQuery = DbContext.Orders.Include(o => o.Customer)
+                .Where(o => o.Producer == producer && o.ProducerId == producerId);
 
-            if(filter != null)
-                await filter.Filter(orders);
+            if (filter != null)
+                ordersQuery = await filter.ApplyFilter(ordersQuery);
 
-            var vm = new OrderListVm();
+            var orders = await ordersQuery.ToListAsync();  
 
-            foreach (var order in orders)
+            var vm = new OrderListVm
             {
-                vm.Orders.Add(Mapper.Map<OrderLookupVm>(order));
-            }
+                Orders = Mapper.Map<List<OrderLookupVm>>(orders)
+            };
 
             return vm;
         }
@@ -78,7 +84,12 @@ namespace ProjectForFarmers.Application.Services.Business
             var monthStatistic = await DbContext.MonthesStatistics.FirstOrDefaultAsync(s => s.Id == id);
 
             if (monthStatistic == null)
-                throw new NotFoundException($"Statistic for month with id {id} was not found.");
+            {
+                string message = $"Statistic for month with id {id} was not found.";
+                string userFacingMessage = CultureHelper.GetString("StatisticWithIdNotExist", id.ToString());
+
+                throw new NotFoundException(message, userFacingMessage);
+            }
 
             var vm = Mapper.Map<DashboardVm>(monthStatistic);
 
@@ -101,15 +112,15 @@ namespace ProjectForFarmers.Application.Services.Business
                 var rows = new List<Row>();
                 var cells = new List<Cell>();
 
-                cells.Add(new Cell(1, "Id"));
-                cells.Add(new Cell(2, "Номер"));
-                cells.Add(new Cell(3, "Дата замовлення"));
-                cells.Add(new Cell(4, "Ім'я покупця"));
-                cells.Add(new Cell(5, "Email покупця"));
-                cells.Add(new Cell(6, "Телефон"));
-                cells.Add(new Cell(7, "Сума"));
-                cells.Add(new Cell(8, "Спосіб оплати"));
-                cells.Add(new Cell(9, "Статус"));
+                cells.Add(new Cell(1, CultureHelper.GetString("Id"))); //Id
+                cells.Add(new Cell(2, CultureHelper.GetString("Number"))); //Номер
+                cells.Add(new Cell(3, CultureHelper.GetString("OrderDate"))); //Дата замовлення
+                cells.Add(new Cell(4, CultureHelper.GetString("CustomerName"))); //Ім'я покупця
+                cells.Add(new Cell(5, CultureHelper.GetString("CustomerEmail"))); //Email покупця
+                cells.Add(new Cell(6, CultureHelper.GetString("Phone"))); //Телефон
+                cells.Add(new Cell(7, CultureHelper.GetString("Amount"))); //Сума
+                cells.Add(new Cell(8, CultureHelper.GetString("PaymentType"))); //Спосіб оплати
+                cells.Add(new Cell(9, CultureHelper.GetString("Status"))); //Статус
 
                 rows.Add(new Row(1, cells));
 
@@ -124,14 +135,14 @@ namespace ProjectForFarmers.Application.Services.Business
                     cells.Add(new Cell(6, orders[i].Customer.Phone));
                     cells.Add(new Cell(7, orders[i].TotalPayment));
 
-                    if(orders[i].PaymentType == PaymentType.Online) cells.Add(new Cell(8, "Онлайн"));
-                    else if (orders[i].PaymentType == PaymentType.Cash) cells.Add(new Cell(8, "Готівка"));
+                    if(orders[i].PaymentType == PaymentType.Online) cells.Add(new Cell(8, CultureHelper.GetString("Online"))); //Онлайн
+                    else if (orders[i].PaymentType == PaymentType.Cash) cells.Add(new Cell(8, "Cash")); //Готівка
 
-                    if (orders[i].Status == OrderStatus.New) cells.Add(new Cell(9, "Нове"));
-                    else if (orders[i].Status == OrderStatus.Processing) cells.Add(new Cell(9, "В обробці"));
-                    else if (orders[i].Status == OrderStatus.Collected) cells.Add(new Cell(9, "Зібрано"));
-                    else if (orders[i].Status == OrderStatus.InDelivery) cells.Add(new Cell(9, "В доставці"));
-                    else if (orders[i].Status == OrderStatus.Completed) cells.Add(new Cell(9, "Виконано"));
+                    if (orders[i].Status == OrderStatus.New) cells.Add(new Cell(9, "New")); //Нове
+                    else if (orders[i].Status == OrderStatus.Processing) cells.Add(new Cell(9, "InProcessing")); //В обробці
+                    else if (orders[i].Status == OrderStatus.Collected) cells.Add(new Cell(9, "Collected")); //Зібрано
+                    else if (orders[i].Status == OrderStatus.InDelivery) cells.Add(new Cell(9, "InDelivery")); //В доставці
+                    else if (orders[i].Status == OrderStatus.Completed) cells.Add(new Cell(9, "Completed")); //Виконано
 
                     rows.Add(new Row(i + 1, cells));
                 }
@@ -170,9 +181,21 @@ namespace ProjectForFarmers.Application.Services.Business
             var currentMonthStatistic = await StatisticService.CalculateStatisticForMonth(producerId, producer, DateTimeOffset.Now);
 
             var currentMonthDashboardVm = Mapper.Map<DashboardVm>(currentMonthStatistic);
-            var customerWithHighestPayment = await DbContext.Accounts.FirstOrDefaultAsync(a => a.Id == currentMonthStatistic.CustomerWithHighestPaymentId);
 
-            if (customerWithHighestPayment != null) throw new NotFoundException($"Customer with highest payment was not found(account id: {currentMonthStatistic.CustomerWithHighestPaymentId}).");
+            if(currentMonthStatistic.CustomerWithHighestPaymentId == null)
+            {
+                currentMonthDashboardVm.CustomerWithHighestPaymentName = "Customer with highest payment was not found";
+            }
+
+            var customerWithHighestPayment = await DbContext.Accounts.FirstOrDefaultAsync(a => a.Id == currentMonthStatistic.CustomerWithHighestPaymentId);
+            if (customerWithHighestPayment != null)
+            {
+                currentMonthDashboardVm.CustomerWithHighestPaymentName = $"{customerWithHighestPayment.Surname} {customerWithHighestPayment.Name}";
+            }
+            else
+            {
+                currentMonthDashboardVm.CustomerWithHighestPaymentName = "Customer with highest payment was not found";
+            }
 
             currentMonthDashboardVm.CustomerWithHighestPaymentName = $"{customerWithHighestPayment.Surname} {customerWithHighestPayment.Name}";
 
@@ -185,8 +208,13 @@ namespace ProjectForFarmers.Application.Services.Business
             {
                 var order = DbContext.Orders.FirstOrDefault(o => o.Id == orderId);
 
-                if (order == null) 
-                    throw new NotFoundException($"Order with id {orderId} was not found.");
+                if (order == null)
+                {
+                    string message = $"Order with id {orderId} was not found.";
+                    string userFacingMessage = CultureHelper.GetString("OrderWithIdNotExist", orderId.ToString());
+
+                    throw new NotFoundException(message, userFacingMessage);
+                }
 
                 var newOrderId = Guid.NewGuid();
                 var items = new List<OrderItem>();
@@ -237,7 +265,12 @@ namespace ProjectForFarmers.Application.Services.Business
                 var order = DbContext.Orders.FirstOrDefault(o => o.Id == orderId);
 
                 if (order == null)
-                    throw new NotFoundException($"Order with id {orderId} was not found.");
+                {
+                    string message = $"Order with id {orderId} was not found.";
+                    string userFacingMessage = CultureHelper.GetString("OrderWithIdNotExist", orderId.ToString());
+
+                    throw new NotFoundException(message, userFacingMessage);
+                }
 
                 foreach(var item in order.Items)
                 {
@@ -255,7 +288,12 @@ namespace ProjectForFarmers.Application.Services.Business
             var order = await DbContext.Orders.Include(o => o.Items).FirstOrDefaultAsync();
 
             if (order == null)
-                throw new NotFoundException($"Order with id {orderId} was not found.");
+            {
+                string message = $"Order with id {orderId} was not found.";
+                string userFacingMessage = CultureHelper.GetString("OrderWithIdNotExist", orderId.ToString());
+
+                throw new NotFoundException(message, userFacingMessage);
+            }
 
             var vm = Mapper.Map<OrderVm>(order);
             var items = new List<OrderItemVm>();
@@ -265,7 +303,12 @@ namespace ProjectForFarmers.Application.Services.Business
                 var product = await DbContext.Products.FirstOrDefaultAsync(p => p.Id == item.ProductId);
 
                 if (product == null)
-                    throw new NotFoundException($"Product with id {item.ProductId} was not found.");
+                {
+                    string message = $"Product with id {item.ProductId} was not found.";
+                    string userFacingMessage = CultureHelper.GetString("ProductWithIdNotExist", item.ProductId.ToString());
+
+                    throw new NotFoundException(message, userFacingMessage);
+                }
 
                 var itemVm = new OrderItemVm
                 {
@@ -290,7 +333,12 @@ namespace ProjectForFarmers.Application.Services.Business
             var order = await DbContext.Orders.Include(o => o.Items).FirstOrDefaultAsync(o => o.Id == updateOrderDto.OrderId);
 
             if (order == null)
-                throw new NotFoundException($"Order with id {updateOrderDto.OrderId} was not found.");
+            {
+                string message = $"Order with id {updateOrderDto.OrderId} was not found.";
+                string userFacingMessage = CultureHelper.GetString("OrderWithIdNotExist", updateOrderDto.OrderId.ToString());
+
+                throw new NotFoundException(message, userFacingMessage);
+            }
 
             order.ReceiveDate = updateOrderDto.ReceiveDate;
             order.PaymentType = updateOrderDto.PaymentType;
@@ -351,15 +399,30 @@ namespace ProjectForFarmers.Application.Services.Business
             var order = await DbContext.Orders.Include(o => o.Items).FirstOrDefaultAsync(o => o.Id == addOrderItemDto.OrderId);
 
             if (order == null)
-                throw new NotFoundException($"Order with id {addOrderItemDto.OrderId} was not found.");
+            {
+                string message = $"Order with id {addOrderItemDto.OrderId} was not found.";
+                string userFacingMessage = CultureHelper.GetString("OrderWithIdNotExist", addOrderItemDto.OrderId.ToString());
+
+                throw new NotFoundException(message, userFacingMessage);
+            }
 
             var product = await DbContext.Products.FirstOrDefaultAsync(p => p.Id == addOrderItemDto.ProductId);
 
             if (product == null)
-                throw new NotFoundException($"Product with id {addOrderItemDto.ProductId} was not found.");
+            {
+                string message = $"Product with id {addOrderItemDto.ProductId} was not found.";
+                string userFacingMessage = CultureHelper.GetString("ProductWithIdNotExist", addOrderItemDto.ProductId.ToString());
+
+                throw new NotFoundException(message, userFacingMessage);
+            }
 
             if (product.CreationDate > order.ReceiveDate)
-                throw new InvalidOperationException("Creation date of product cannot be later than receive date.");
+            {
+                string message = "Creation date of product cannot be later than receive date.";
+                string userFacingMessage = CultureHelper.GetString("ProductCreationDateIsLaterThanReceiveDate");
+
+                throw new InvalidDataException(message, userFacingMessage);
+            }
 
             var item = new OrderItem
             {

@@ -26,7 +26,6 @@ namespace ProjectForFarmers.Application.ViewModels.Product
         public decimal PricePerOne { get; set; }
         public uint MinPurchaseQuantity { get; set; }
         public uint Count { get; set; }
-        public List<ReceivingType> ReceivingTypes { get; set; }
         public List<string> ImagesNames { get; set; }
         public DateTime ExpirationDate { get; set; }
         public List<string> DocumentsNames { get; set; }
