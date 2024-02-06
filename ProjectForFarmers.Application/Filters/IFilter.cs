@@ -8,6 +8,6 @@ namespace ProjectForFarmers.Application.Filters
 {
     internal interface IFilter<T>
     {
-        Task Filter(T collection);
+        Task<IQueryable<T>> ApplyFilter(IQueryable<T> query);
     }
 }
