@@ -29,10 +29,6 @@ namespace ProjectForFarmers.Persistence.EntityTypeConfigurations
                 .WithMany() 
                 .HasForeignKey(order => order.CustomerId);
 
-            builder.HasOne(order => order.SupplyPoint)
-                .WithMany()
-                .HasForeignKey(order => order.SupplyPointId);
-
             builder.HasOne(order => order.DeliveryPoint)
                 .WithMany()
                 .HasForeignKey(order => order.DeliveryPointId);
