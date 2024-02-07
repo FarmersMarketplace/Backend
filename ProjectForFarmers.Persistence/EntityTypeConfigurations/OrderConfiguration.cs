@@ -18,26 +18,29 @@ namespace ProjectForFarmers.Persistence.EntityTypeConfigurations
                 .ValueGeneratedOnAdd()
                 .UseSerialColumn();
 
-            builder.Property(account => account.CreationDate).IsRequired();
-            builder.Property(account => account.ReceiveDate).IsRequired();
-            builder.Property(account => account.TotalPayment).IsRequired();
-            builder.Property(account => account.PaymentType).IsRequired();
-            builder.Property(account => account.PaymentStatus).IsRequired();
-            builder.Property(account => account.ReceivingType).IsRequired();
+            builder.Property(order => order.CreationDate).IsRequired();
+            builder.Property(order => order.ReceiveDate).IsRequired();
+            builder.Property(order => order.TotalPayment).IsRequired();
+            builder.Property(order => order.PaymentType).IsRequired();
+            builder.Property(order => order.PaymentStatus).IsRequired();
+            builder.Property(order => order.ReceivingType).IsRequired();
 
             builder.HasOne(order => order.Customer)
                 .WithMany() 
-                .HasForeignKey(order => order.CustomerId);
+                .HasForeignKey(order => order.CustomerId)
+                .IsRequired();
 
             builder.HasOne(order => order.DeliveryPoint)
                 .WithMany()
                 .HasForeignKey(order => order.DeliveryPointId);
 
-            builder.HasOne(order => order.Customer)
-                .WithMany()
-                .HasForeignKey(order => order.CustomerId);
-            
+            builder.HasMany(o => o.Items)
+               .WithOne()
+               .HasForeignKey(oi => oi.OrderId)
+               .OnDelete(DeleteBehavior.Cascade);
+
             builder.HasIndex(order => order.Id).IsUnique();
+            builder.HasIndex(order => order.CreationDate).IsDescending();
         }
     }
 

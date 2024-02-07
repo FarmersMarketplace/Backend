@@ -23,25 +23,25 @@ namespace ProjectForFarmers.Persistence.EntityTypeConfigurations
             builder.Property(statistic => statistic.Producer).IsRequired();
             builder.Property(statistic => statistic.ProducerId).IsRequired();
 
-            builder.HasOne(f => f.BookedOrdersStatistic)
+            builder.HasOne(s => s.BookedOrdersStatistic)
                 .WithOne()
-                .HasForeignKey<MonthStatistic>(f => f.BookedOrdersStatisticId);
+                .HasForeignKey<MonthStatistic>(s => s.BookedOrdersStatisticId);
 
-            builder.HasOne(f => f.CompletedOrdersStatistic)
+            builder.HasOne(s => s.CompletedOrdersStatistic)
                 .WithOne()
-                .HasForeignKey<MonthStatistic>(f => f.CompletedOrdersStatisticId);
+                .HasForeignKey<MonthStatistic>(s => s.CompletedOrdersStatisticId);
 
-            builder.HasOne(f => f.ProcessingOrdersStatistic)
+            builder.HasOne(s => s.ProcessingOrdersStatistic)
                 .WithOne()
-                .HasForeignKey<MonthStatistic>(f => f.ProcessingOrdersStatisticId);
+                .HasForeignKey<MonthStatistic>(s => s.ProcessingOrdersStatisticId);
 
-            builder.HasOne(f => f.NewOrdersStatistic)
+            builder.HasOne(s => s.NewOrdersStatistic)
                 .WithOne()
-                .HasForeignKey<MonthStatistic>(f => f.NewOrdersStatisticId);
+                .HasForeignKey<MonthStatistic>(s => s.NewOrdersStatisticId);
 
-            builder.HasOne(f => f.TotalActivityStatistic)
+            builder.HasOne(s => s.TotalActivityStatistic)
                 .WithOne()
-                .HasForeignKey<MonthStatistic>(f => f.TotalActivityStatisticId);
+                .HasForeignKey<MonthStatistic>(s => s.TotalActivityStatisticId);
 
             builder.HasIndex(account => account.Id).IsUnique();
         }

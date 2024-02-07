@@ -21,8 +21,6 @@ namespace ProjectForFarmers.Persistence.EntityTypeConfigurations
             builder.HasOne(subcategory => subcategory.Category)
                 .WithMany(category => category.Subcategories)
                 .HasForeignKey(subcategory => subcategory.CategoryId);
-
-            builder.HasIndex(subcategory => subcategory.Id).IsUnique();
         }
     }
 

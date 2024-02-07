@@ -1,12 +1,12 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using ProjectForFarmers.Application.DataTransferObjects.Order;
 using ProjectForFarmers.Application.DataTransferObjects.Product;
 using ProjectForFarmers.Application.Exceptions;
 using ProjectForFarmers.Application.Filters;
 using ProjectForFarmers.Application.Helpers;
 using ProjectForFarmers.Application.Interfaces;
-using ProjectForFarmers.Application.ViewModels.Farm;
 using ProjectForFarmers.Application.ViewModels.Product;
 using ProjectForFarmers.Domain;
 
@@ -45,10 +45,22 @@ namespace ProjectForFarmers.Application.Services.Business
                 throw new NotFoundException(message, userFacingMessage);
             }
 
-            await FileHelper.DeleteFiles(product.ImagesNames, Configuration["Images:Product"]); 
+            bool hasOrdersWithProduct = await DbContext.OrdersItems.AnyAsync(oi => oi.ProductId == productId);
 
-            DbContext.Products.Remove(product);
-            await DbContext.SaveChangesAsync();
+            if (hasOrdersWithProduct)
+            {
+                string message = $"Product with Id {productId} is used in existing orders.";
+                string userFacingMessage = CultureHelper.GetString("ProductIsUsed", productId.ToString());
+
+                throw new NotFoundException(message, userFacingMessage);
+            }
+            else
+            {
+                await FileHelper.DeleteFiles(product.ImagesNames, Configuration["Images:Product"]);
+                await FileHelper.DeleteFiles(product.DocumentsNames, Configuration["Documents"]);
+                DbContext.Products.Remove(product);
+                await DbContext.SaveChangesAsync();
+            }
         }
 
         public string GenerateArticleNumber()
@@ -86,47 +98,54 @@ namespace ProjectForFarmers.Application.Services.Business
             return vm;
         }
 
-        public async Task<AllProductsVm> GetAll(Guid producerId, Producer producer)
+        public async Task<ProductsListVm> GetAll(GetProductListDto getProductListDto)
         {
-            var products = DbContext.Products.Where(p => p.ProducerId == producerId 
-            && p.Producer == producer)
-                .ToList();
+            var productsQuery = DbContext.Products.Where(p => p.CreationDate < getProductListDto.Cursor 
+                && p.ProducerId == getProductListDto.ProducerId
+                && p.Producer == getProductListDto.Producer);
 
-            var unitsOfMeasurements = new HashSet<string>();
+            if(getProductListDto.Filter != null)
+            {
+                productsQuery = await getProductListDto.Filter.ApplyFilter(productsQuery);
+            }
 
-            var vm = new AllProductsVm
+            var products = await productsQuery.OrderByDescending(product => product.CreationDate)
+                .Take(getProductListDto.PageSize)
+                .ToListAsync();
+
+            var vm = new ProductsListVm
             {
                 Products = new List<ProductLookupVm>()
             };
 
-            foreach (var product in products)
+            foreach(var product in products)
             {
-                vm.Products.Add(Mapper.Map<ProductLookupVm>(product));
-                if(!unitsOfMeasurements.Contains(product.UnitOfMeasurement))
-                    unitsOfMeasurements.Add(product.UnitOfMeasurement);
+                var productVm = Mapper.Map<ProductLookupVm>(product);
+                vm.Products.Add(productVm);
             }
 
-            vm.FilterData = new FilterData { UnitsOfMeasurement = unitsOfMeasurements.ToList() };
+            vm.Count = await productsQuery.CountAsync();
 
-            return vm;
-        }
-
-        public async Task<ProductsListVm> GetFilteredProducts(Guid producerId, Producer producer, ProductFilter filter)
-        {
-            var productsQuery = DbContext.Products.Where(p => p.ProducerId == producerId && p.Producer == producer);
-
-            productsQuery = await filter.ApplyFilter(productsQuery);
-
-            var vm = new ProductsListVm
+            if (getProductListDto.IncludeFilterData == true)
             {
-                Products = Mapper.Map<List<ProductLookupVm>>(await productsQuery.ToListAsync())
-            };
+                var unitsOfMeasurements = new HashSet<string>();
+
+                foreach (var product in products)
+                {
+                    vm.Products.Add(Mapper.Map<ProductLookupVm>(product));
+                    if (!unitsOfMeasurements.Contains(product.UnitOfMeasurement))
+                        unitsOfMeasurements.Add(product.UnitOfMeasurement);
+                }
+
+                vm.FilterData = new FilterData { UnitsOfMeasurement = unitsOfMeasurements.ToList() };
+            }
+            else
+            {
+                vm.FilterData = null;
+            }
 
             return vm;
         }
-
-
-
 
         public async Task Update(UpdateProductDto updateProductDto)
         {
@@ -150,8 +169,8 @@ namespace ProjectForFarmers.Application.Services.Business
             product.PricePerOne = updateProductDto.PricePerOne;
             product.MinPurchaseQuantity = updateProductDto.MinPurchaseQuantity;
             product.Count = updateProductDto.Count;
-            product.ReceivingTypes = updateProductDto.ReceivingTypes;
             product.ExpirationDate = updateProductDto.ExpirationDate;
+            product.CreationDate = updateProductDto.CreationDate;
 
             if (updateProductDto.Images != null && product.ImagesNames != null)
             {

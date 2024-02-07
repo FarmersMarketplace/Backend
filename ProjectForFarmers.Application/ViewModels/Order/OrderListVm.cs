@@ -9,6 +9,7 @@ namespace ProjectForFarmers.Application.ViewModels.Order
     public class OrderListVm
     {
         public List<OrderLookupVm> Orders {  get; set; }
+        public int Count { get; set; }
     }
 
 }

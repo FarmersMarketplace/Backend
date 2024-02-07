@@ -30,8 +30,8 @@ namespace ProjectForFarmers.Persistence.EntityTypeConfigurations
                 .WithMany()
                 .HasForeignKey(product => product.SubcategoryId);
 
-
             builder.HasIndex(product => product.Id).IsUnique();
+            builder.HasIndex(order => order.CreationDate).IsDescending();
         }
     }
 

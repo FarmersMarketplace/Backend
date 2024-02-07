@@ -9,7 +9,7 @@ namespace ProjectForFarmers.Application.ViewModels.Product
 {
     public class ProductVm
     {
-        public Guid ProductId { get; set; }
+        public Guid Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
         public string ArticleNumber { get; set; }
@@ -28,6 +28,7 @@ namespace ProjectForFarmers.Application.ViewModels.Product
         public uint Count { get; set; }
         public List<string> ImagesNames { get; set; }
         public DateTime ExpirationDate { get; set; }
+        public DateTime CreationDate { get; set; }
         public List<string> DocumentsNames { get; set; }
     }
 

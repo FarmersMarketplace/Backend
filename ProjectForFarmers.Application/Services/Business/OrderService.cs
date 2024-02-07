@@ -61,19 +61,25 @@ namespace ProjectForFarmers.Application.Services.Business
             return vm;
         }
 
-        public async Task<OrderListVm> GetAll(Guid producerId, Producer producer, OrderFilter filter)
+        public async Task<OrderListVm> GetAll(GetOrderListDto getOrderListDto)
         {
             var ordersQuery = DbContext.Orders.Include(o => o.Customer)
-                .Where(o => o.Producer == producer && o.ProducerId == producerId);
+                .Where(o => o.CreationDate < getOrderListDto.Cursor
+                && o.Producer == getOrderListDto.Producer
+                && o.ProducerId == getOrderListDto.ProducerId);
 
-            if (filter != null)
-                ordersQuery = await filter.ApplyFilter(ordersQuery);
 
-            var orders = await ordersQuery.ToListAsync();  
+            if (getOrderListDto.Filter != null)
+                ordersQuery = await getOrderListDto.Filter.ApplyFilter(ordersQuery);
+
+            var orders = await ordersQuery.OrderByDescending(order => order.CreationDate)
+                .Take(getOrderListDto.PageSize)
+                .ToListAsync();
 
             var vm = new OrderListVm
             {
-                Orders = Mapper.Map<List<OrderLookupVm>>(orders)
+                Orders = Mapper.Map<List<OrderLookupVm>>(orders),
+                Count = await ordersQuery.CountAsync()
             };
 
             return vm;

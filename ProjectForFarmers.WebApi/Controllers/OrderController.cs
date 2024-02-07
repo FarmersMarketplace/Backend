@@ -36,11 +36,11 @@ namespace ProjectForFarmers.WebApi.Controllers
             return Ok(vm);
         }
 
-        [HttpGet("{producerId}/{producer}")]
+        [HttpGet]
         [ProducesResponseType(typeof(OrderListVm), 200)]
-        public async Task<IActionResult> GetAll([FromRoute] Guid producerId, [FromRoute] Producer producer, [FromBody] OrderFilter? filter)
+        public async Task<IActionResult> GetAll([FromBody] GetOrderListDto getOrderListDto)
         {
-            var vm = await OrderService.GetAll(producerId, producer, filter);
+            var vm = await OrderService.GetAll(getOrderListDto);
             return Ok(vm);
         }
 

@@ -15,47 +15,47 @@ namespace ProjectForFarmers.Persistence.EntityTypeConfigurations
         {
             builder.ToTable("Schedules");
 
-            builder.HasKey(dayOfWeek => dayOfWeek.Id);
+            builder.HasKey(schedule => schedule.Id);
 
-            builder.HasOne(f => f.Monday)
+            builder.HasOne(s => s.Monday)
                 .WithOne()
-                .HasForeignKey<Schedule>(f => f.MondayId)
+                .HasForeignKey<Schedule>(s => s.MondayId)
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasOne(f => f.Tuesday)
                 .WithOne()
-                .HasForeignKey<Schedule>(f => f.TuesdayId)
+                .HasForeignKey<Schedule>(s => s.TuesdayId)
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Cascade);
 
-            builder.HasOne(f => f.Wednesday)
+            builder.HasOne(s => s.Wednesday)
                 .WithOne()
-                .HasForeignKey<Schedule>(f => f.WednesdayId)
+                .HasForeignKey<Schedule>(s => s.WednesdayId)
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Cascade);
 
-            builder.HasOne(f => f.Thursday)
+            builder.HasOne(s => s.Thursday)
                 .WithOne()
-                .HasForeignKey<Schedule>(f => f.ThursdayId)
+                .HasForeignKey<Schedule>(s => s.ThursdayId)
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Cascade);
 
-            builder.HasOne(f => f.Friday)
+            builder.HasOne(s => s.Friday)
                 .WithOne()
-                .HasForeignKey<Schedule>(f => f.FridayId)
+                .HasForeignKey<Schedule>(s => s.FridayId)
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Cascade);
 
-            builder.HasOne(f => f.Saturday)
+            builder.HasOne(s => s.Saturday)
                 .WithOne()
-                .HasForeignKey<Schedule>(f => f.SaturdayId)
+                .HasForeignKey<Schedule>(s => s.SaturdayId)
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Cascade);
 
-            builder.HasOne(f => f.Sunday)
+            builder.HasOne(s => s.Sunday)
                 .WithOne()
-                .HasForeignKey<Schedule>(f => f.SundayId)
+                .HasForeignKey<Schedule>(s => s.SundayId)
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Cascade);
 

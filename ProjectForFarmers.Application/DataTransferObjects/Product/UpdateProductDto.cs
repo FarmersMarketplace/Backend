@@ -24,6 +24,7 @@ namespace ProjectForFarmers.Application.DataTransferObjects.Product
         public List<ReceivingType> ReceivingTypes { get; set; }
         public List<IFormFile>? Images { get; set; }
         public DateTime ExpirationDate { get; set; }
+        public DateTime CreationDate { get; set; }
         public List<IFormFile>? Documents { get; set; }
     }
 

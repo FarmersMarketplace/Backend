@@ -25,9 +25,8 @@ namespace ProjectForFarmers.Persistence.EntityTypeConfigurations
                 .WithMany()
                 .HasForeignKey(item => item.OrderId);
 
-            throw new Exception("Add product connection.");
 
-            builder.HasIndex(account => account.Id).IsUnique();
+            builder.HasIndex(item => item.OrderId).IsUnique();
         }
     }
 
