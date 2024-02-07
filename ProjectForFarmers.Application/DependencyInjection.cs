@@ -22,6 +22,7 @@ namespace ProjectForFarmers.Application
             services.AddTransient<IOrderService, OrderService>();
             services.AddTransient<ICategoryService, CategoryService>();
             services.AddTransient<ISubcategoryService, SubcategoryService>();
+            services.AddTransient<IProductService, ProductService>();
 
             services.AddAutoMapper(config =>
             {
