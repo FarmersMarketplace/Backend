@@ -40,7 +40,7 @@ namespace ProjectForFarmers.WebApi.Controllers
         }
         
         [HttpPut]
-        [ProducesResponseType(typeof(JwtVm), 200)]
+        [ProducesResponseType(typeof(LoginVm), 200)]
         public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
         {
             var response = await AuthService.Login(loginDto);
@@ -48,7 +48,7 @@ namespace ProjectForFarmers.WebApi.Controllers
         }
 
         [HttpPut]
-        [ProducesResponseType(typeof(JwtVm), 200)]
+        [ProducesResponseType(typeof(LoginVm), 200)]
         public async Task<IActionResult> AuthenticateWithGoogle([FromBody] AuthenticateWithGoogleDto authenticateWithGoogleDto)
         {
             var response = await AuthService.AuthenticateWithGoogle(authenticateWithGoogleDto);

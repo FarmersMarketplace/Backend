@@ -22,7 +22,7 @@ namespace ProjectForFarmers.Application.Services.Auth
             Configuration = configuration;
         }
 
-        public async Task<JwtVm> Authenticate(Account account)
+        public async Task<string> Authenticate(Account account)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.UTF8.GetBytes(Configuration["Auth:Secret"]);
@@ -45,7 +45,7 @@ namespace ProjectForFarmers.Application.Services.Auth
             };
             var token = tokenHandler.CreateToken(tokenDescriptor);
 
-            return new JwtVm(tokenHandler.WriteToken(token));
+            return tokenHandler.WriteToken(token);
         }
 
         public async Task<string> EmailConfirmationToken(Guid id, string email)

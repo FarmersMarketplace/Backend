@@ -61,7 +61,7 @@ namespace ProjectForFarmers.Application.Services.Auth
             await DbContext.SaveChangesAsync();
         }
 
-        public async Task<JwtVm> Login(LoginDto loginDto)
+        public async Task<LoginVm> Login(LoginDto loginDto)
         {
             var account = DbContext.Accounts.FirstOrDefault(a => a.Email ==  loginDto.Email);
             if (account == null) 
@@ -73,9 +73,10 @@ namespace ProjectForFarmers.Application.Services.Auth
             } 
             else if(CryptoHelper.ComputeSha256Hash(loginDto.Password) != account.Password) throw new UnauthorizedAccessException("Invalid password.");
 
-            var request = await JwtService.Authenticate(account);
+            var token = await JwtService.Authenticate(account);
+            var vm = new LoginVm(token, account.Role, account.Id);
 
-            return request;
+            return vm;
         }
 
         private async Task CreateAccount(Guid id, RegisterDto accountDto)
@@ -149,7 +150,7 @@ namespace ProjectForFarmers.Application.Services.Auth
             await DbContext.SaveChangesAsync();
         }
 
-        public async Task<JwtVm> AuthenticateWithGoogle(AuthenticateWithGoogleDto authenticateWithGoogleDto)
+        public async Task<LoginVm> AuthenticateWithGoogle(AuthenticateWithGoogleDto authenticateWithGoogleDto)
         {
             Payload payload = await GoogleJsonWebSignature.ValidateAsync(authenticateWithGoogleDto.GoogleIdToken);
 
@@ -169,9 +170,10 @@ namespace ProjectForFarmers.Application.Services.Auth
                 await DbContext.SaveChangesAsync();
             }
 
-            var request = await JwtService.Authenticate(account);
+            var token = await JwtService.Authenticate(account);
+            var vm = new LoginVm(token, account.Role, account.Id);
 
-            return request;
+            return vm;
         }
     }
 }
