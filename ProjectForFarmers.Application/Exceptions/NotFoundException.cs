@@ -11,5 +11,13 @@ namespace ProjectForFarmers.Application.Exceptions
         public NotFoundException(string message, string userFacingMessage) : base(message, userFacingMessage)
         {
         }
+
+        public NotFoundException() : base()
+        {
+        }
+
+        public NotFoundException(string message, string userFacingMessage, string? environment, string? action) : base(message, userFacingMessage, environment, action)
+        {
+        }
     }
 }

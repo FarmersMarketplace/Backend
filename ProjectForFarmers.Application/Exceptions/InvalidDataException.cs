@@ -8,7 +8,16 @@ namespace ProjectForFarmers.Application.Exceptions
 {
     public class InvalidDataException : ApplicationException
     {
+
         public InvalidDataException(string message, string userFacingMessage) : base(message, userFacingMessage)
+        {
+        }
+
+        public InvalidDataException() : base()
+        {
+        }
+
+        public InvalidDataException(string message, string userFacingMessage, string? environment, string? action) : base(message, userFacingMessage, environment, action)
         {
         }
     }

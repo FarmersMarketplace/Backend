@@ -22,7 +22,9 @@ namespace ProjectForFarmers.WebApi.Middlewares
             }
             catch (ApplicationException ex)
             {
-                Log.Error(ex, "{ErrorMessage}", ex.Message);
+                Log.ForContext("Environment", ex.Environment)
+                    .ForContext("Action", ex.Action)
+                    .Error(ex, "{ErrorMessage}", ex.Message);
                 await HandleExceptionAsync(context, ex.UserFacingMessage);
             }
             catch (Exception ex)
