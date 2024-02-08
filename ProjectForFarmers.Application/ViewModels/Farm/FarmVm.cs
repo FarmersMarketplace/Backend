@@ -21,5 +21,6 @@ namespace ProjectForFarmers.Application.ViewModels.Farm
         public List<string> ImagesNames { get; set; }
         public List<Guid>? Categories { get; set; }
         public List<Guid>? Subcategories { get; set; }
+        public List<FarmLogVm> Logs { get; set; }
     }
 }

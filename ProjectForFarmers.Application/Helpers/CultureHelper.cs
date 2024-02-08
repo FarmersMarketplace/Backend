@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -11,22 +12,49 @@ namespace ProjectForFarmers.Application.Helpers
 {
     public static class CultureHelper
     {
-        private static readonly ResourceManager Manager;
+        private static readonly ResourceManager ExceptionManager;
+        private static readonly ResourceManager FarmLogManager;
+        private static readonly ResourceManager PropertyManager;
 
         static CultureHelper()
         {
-            string baseName = $"{typeof(Resources.Exceptions)}";
-            Manager = new ResourceManager(baseName, Assembly.GetExecutingAssembly());
+            string exceptionManagerbaseName = $"{typeof(Resources.Exceptions.Exceptions)}";
+            ExceptionManager = new ResourceManager(exceptionManagerbaseName, Assembly.GetExecutingAssembly());
+
+            string farmLogManagerbaseName = $"{typeof(Resources.FarmLogs.FarmLogs)}";
+            FarmLogManager = new ResourceManager(farmLogManagerbaseName, Assembly.GetExecutingAssembly());
+
+            string oropertyManagerbaseName = $"{typeof(Resources.Properties.Properties)}";
+            PropertyManager = new ResourceManager(oropertyManagerbaseName, Assembly.GetExecutingAssembly());
         }
 
-        public static string GetString(string key, params string[] parameters) 
+        public static string Exception(string key, params string[] parameters) 
         {
-            string str = Manager.GetString(key, CultureInfo.CurrentUICulture);
+            string str = ExceptionManager.GetString(key, CultureInfo.CurrentUICulture);
 
             if(parameters.Length > 0)
             {
                 str = string.Format(str, parameters);
             }
+
+            return str;
+        }
+
+        public static string FarmLog(string key, params string[] parameters)
+        {
+            string str = FarmLogManager.GetString(key, CultureInfo.CurrentUICulture);
+
+            if (parameters.Length > 0)
+            {
+                str = string.Format(str, parameters);
+            }
+
+            return str;
+        }
+
+        public static string Property(string key)
+        {
+            string str = PropertyManager.GetString(key, CultureInfo.CurrentUICulture);
 
             return str;
         }

@@ -17,6 +17,7 @@
         public Guid ScheduleId { get; set; }
         public virtual Schedule Schedule { get; set; }
         public virtual List<MonthStatistic> Dashboard {  get; set; }
+        public virtual List<FarmLog> Logs { get; set; }
         public List<Guid>? Categories { get; set; }
         public List<Guid>? Subcategories { get; set; }
         public List<ReceivingType>? ReceivingTypes { get; set; }

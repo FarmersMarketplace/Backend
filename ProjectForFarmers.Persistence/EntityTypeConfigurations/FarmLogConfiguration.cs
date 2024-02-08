@@ -1,11 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore;
 using ProjectForFarmers.Domain;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ProjectForFarmers.Persistence.EntityTypeConfigurations
 {
@@ -13,7 +8,7 @@ namespace ProjectForFarmers.Persistence.EntityTypeConfigurations
     {
         public void Configure(EntityTypeBuilder<FarmLog> builder)
         {
-            builder.ToTable("Accounts");
+            builder.ToTable("FarmsLogs");
 
             builder.HasKey(log => log.Id);
             builder.Property(log => log.Message).IsRequired();

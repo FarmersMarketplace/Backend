@@ -30,7 +30,7 @@ namespace ProjectForFarmers.Application.Helpers
                 {
                     string acceptableFormats = string.Join(", ", AllowedImagesExtensions);
                     string message = $"Invalid format of image {image.FileName}. Acceptable formats: {acceptableFormats}.";
-                    string userFacingMessage = CultureHelper.GetString("InvalidImageFormat", image.FileName, acceptableFormats);
+                    string userFacingMessage = CultureHelper.Exception("InvalidImageFormat", image.FileName, acceptableFormats);
                     throw new NotFoundException(message, userFacingMessage);
                 }
             }
@@ -77,7 +77,7 @@ namespace ProjectForFarmers.Application.Helpers
                 if (!File.Exists(filePaths[i]))
                 {
                     string message = $"File with name {filesNames[i]} does not exist in directory {directoryPath}.";
-                    string userFacingMessage = CultureHelper.GetString("FileNotExist", filesNames[i].ToString(), directoryPath);
+                    string userFacingMessage = CultureHelper.Exception("FileNotExist", filesNames[i].ToString(), directoryPath);
                     throw new NotFoundException(message, userFacingMessage);
                 }
             }

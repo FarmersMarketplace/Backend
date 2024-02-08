@@ -20,6 +20,7 @@ namespace ProjectForFarmers.Persistence.DbContexts
         public DbSet<Subcategory> Subcategories { get; set; }
         public DbSet<Product> Products { get; set; }
         public DbSet<PaymentData> PaymentData { get; set; }
+        public DbSet<FarmLog> FarmsLogs { get; set; }
 
         public MainDbContext(DbContextOptions<MainDbContext> options) : base(options)
         {
@@ -38,6 +39,7 @@ namespace ProjectForFarmers.Persistence.DbContexts
             modelBuilder.ApplyConfiguration(new CategoryConfiguration());
             modelBuilder.ApplyConfiguration(new SubcategoryConfiguration());
             modelBuilder.ApplyConfiguration(new PaymentDataConfiguration());
+            modelBuilder.ApplyConfiguration(new FarmLogConfiguration());
 
             base.OnModelCreating(modelBuilder);
         }

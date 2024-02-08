@@ -28,7 +28,7 @@ namespace ProjectForFarmers.Application.Services.Business
             if (category != null)
             {
                 string message = $"Category with Id {createSubcategoryDto.CategoryId} was not found.";
-                string userFacingMessage = CultureHelper.GetString("CategoryWithIdNotFound", createSubcategoryDto.CategoryId.ToString());
+                string userFacingMessage = CultureHelper.Exception("CategoryWithIdNotFound", createSubcategoryDto.CategoryId.ToString());
 
                 throw new NotFoundException(message, userFacingMessage);
             }
@@ -52,7 +52,7 @@ namespace ProjectForFarmers.Application.Services.Business
             if (subcategory != null)
             {
                 string message = $"Subcategory with Id {subcategoryId} was not found.";
-                string userFacingMessage = CultureHelper.GetString("SubcategoryWithIdNotFound", subcategoryId.ToString());
+                string userFacingMessage = CultureHelper.Exception("SubcategoryWithIdNotFound", subcategoryId.ToString());
                 throw new NotFoundException(message, userFacingMessage);
             }
 
@@ -67,7 +67,7 @@ namespace ProjectForFarmers.Application.Services.Business
             if (subcategory != null)
             {
                 string message = $"Subcategory with Id {updateSubcategoryDto.Id} was not found.";
-                string userFacingMessage = CultureHelper.GetString("SubcategoryWithIdNotFound", updateSubcategoryDto.Id.ToString());
+                string userFacingMessage = CultureHelper.Exception("SubcategoryWithIdNotFound", updateSubcategoryDto.Id.ToString());
                 throw new NotFoundException(message, userFacingMessage);
             }
 

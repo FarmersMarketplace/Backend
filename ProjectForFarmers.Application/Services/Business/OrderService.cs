@@ -92,7 +92,7 @@ namespace ProjectForFarmers.Application.Services.Business
             if (monthStatistic == null)
             {
                 string message = $"Statistic for month with id {id} was not found.";
-                string userFacingMessage = CultureHelper.GetString("StatisticWithIdNotExist", id.ToString());
+                string userFacingMessage = CultureHelper.Exception("StatisticWithIdNotExist", id.ToString());
 
                 throw new NotFoundException(message, userFacingMessage);
             }
@@ -118,15 +118,15 @@ namespace ProjectForFarmers.Application.Services.Business
                 var rows = new List<Row>();
                 var cells = new List<Cell>();
 
-                cells.Add(new Cell(1, CultureHelper.GetString("Id"))); //Id
-                cells.Add(new Cell(2, CultureHelper.GetString("Number"))); //Номер
-                cells.Add(new Cell(3, CultureHelper.GetString("OrderDate"))); //Дата замовлення
-                cells.Add(new Cell(4, CultureHelper.GetString("CustomerName"))); //Ім'я покупця
-                cells.Add(new Cell(5, CultureHelper.GetString("CustomerEmail"))); //Email покупця
-                cells.Add(new Cell(6, CultureHelper.GetString("Phone"))); //Телефон
-                cells.Add(new Cell(7, CultureHelper.GetString("Amount"))); //Сума
-                cells.Add(new Cell(8, CultureHelper.GetString("PaymentType"))); //Спосіб оплати
-                cells.Add(new Cell(9, CultureHelper.GetString("Status"))); //Статус
+                cells.Add(new Cell(1, CultureHelper.Exception("Id"))); //Id
+                cells.Add(new Cell(2, CultureHelper.Exception("Number"))); //Номер
+                cells.Add(new Cell(3, CultureHelper.Exception("OrderDate"))); //Дата замовлення
+                cells.Add(new Cell(4, CultureHelper.Exception("CustomerName"))); //Ім'я покупця
+                cells.Add(new Cell(5, CultureHelper.Exception("CustomerEmail"))); //Email покупця
+                cells.Add(new Cell(6, CultureHelper.Exception("Phone"))); //Телефон
+                cells.Add(new Cell(7, CultureHelper.Exception("Amount"))); //Сума
+                cells.Add(new Cell(8, CultureHelper.Exception("PaymentType"))); //Спосіб оплати
+                cells.Add(new Cell(9, CultureHelper.Exception("Status"))); //Статус
 
                 rows.Add(new Row(1, cells));
 
@@ -141,7 +141,7 @@ namespace ProjectForFarmers.Application.Services.Business
                     cells.Add(new Cell(6, orders[i].Customer.Phone));
                     cells.Add(new Cell(7, orders[i].TotalPayment));
 
-                    if(orders[i].PaymentType == PaymentType.Online) cells.Add(new Cell(8, CultureHelper.GetString("Online"))); //Онлайн
+                    if(orders[i].PaymentType == PaymentType.Online) cells.Add(new Cell(8, CultureHelper.Exception("Online"))); //Онлайн
                     else if (orders[i].PaymentType == PaymentType.Cash) cells.Add(new Cell(8, "Cash")); //Готівка
 
                     if (orders[i].Status == OrderStatus.New) cells.Add(new Cell(9, "New")); //Нове
@@ -217,7 +217,7 @@ namespace ProjectForFarmers.Application.Services.Business
                 if (order == null)
                 {
                     string message = $"Order with id {orderId} was not found.";
-                    string userFacingMessage = CultureHelper.GetString("OrderWithIdNotExist", orderId.ToString());
+                    string userFacingMessage = CultureHelper.Exception("OrderWithIdNotExist", orderId.ToString());
 
                     throw new NotFoundException(message, userFacingMessage);
                 }
@@ -273,7 +273,7 @@ namespace ProjectForFarmers.Application.Services.Business
                 if (order == null)
                 {
                     string message = $"Order with id {orderId} was not found.";
-                    string userFacingMessage = CultureHelper.GetString("OrderWithIdNotExist", orderId.ToString());
+                    string userFacingMessage = CultureHelper.Exception("OrderWithIdNotExist", orderId.ToString());
 
                     throw new NotFoundException(message, userFacingMessage);
                 }
@@ -296,7 +296,7 @@ namespace ProjectForFarmers.Application.Services.Business
             if (order == null)
             {
                 string message = $"Order with id {orderId} was not found.";
-                string userFacingMessage = CultureHelper.GetString("OrderWithIdNotExist", orderId.ToString());
+                string userFacingMessage = CultureHelper.Exception("OrderWithIdNotExist", orderId.ToString());
 
                 throw new NotFoundException(message, userFacingMessage);
             }
@@ -311,7 +311,7 @@ namespace ProjectForFarmers.Application.Services.Business
                 if (product == null)
                 {
                     string message = $"Product with id {item.ProductId} was not found.";
-                    string userFacingMessage = CultureHelper.GetString("ProductWithIdNotExist", item.ProductId.ToString());
+                    string userFacingMessage = CultureHelper.Exception("ProductWithIdNotExist", item.ProductId.ToString());
 
                     throw new NotFoundException(message, userFacingMessage);
                 }
@@ -341,7 +341,7 @@ namespace ProjectForFarmers.Application.Services.Business
             if (order == null)
             {
                 string message = $"Order with id {updateOrderDto.OrderId} was not found.";
-                string userFacingMessage = CultureHelper.GetString("OrderWithIdNotExist", updateOrderDto.OrderId.ToString());
+                string userFacingMessage = CultureHelper.Exception("OrderWithIdNotExist", updateOrderDto.OrderId.ToString());
 
                 throw new NotFoundException(message, userFacingMessage);
             }
@@ -380,7 +380,7 @@ namespace ProjectForFarmers.Application.Services.Business
             {
                 var coords = await GetCoordinates(addressDto);
                 address.Latitude = coords.Latitude;
-                address.Longtitude = coords.Longitude;
+                address.Longitude = coords.Longitude;
             }
 
             address.Region = addressDto.Region;
@@ -407,7 +407,7 @@ namespace ProjectForFarmers.Application.Services.Business
             if (order == null)
             {
                 string message = $"Order with id {addOrderItemDto.OrderId} was not found.";
-                string userFacingMessage = CultureHelper.GetString("OrderWithIdNotExist", addOrderItemDto.OrderId.ToString());
+                string userFacingMessage = CultureHelper.Exception("OrderWithIdNotExist", addOrderItemDto.OrderId.ToString());
 
                 throw new NotFoundException(message, userFacingMessage);
             }
@@ -417,7 +417,7 @@ namespace ProjectForFarmers.Application.Services.Business
             if (product == null)
             {
                 string message = $"Product with id {addOrderItemDto.ProductId} was not found.";
-                string userFacingMessage = CultureHelper.GetString("ProductWithIdNotExist", addOrderItemDto.ProductId.ToString());
+                string userFacingMessage = CultureHelper.Exception("ProductWithIdNotExist", addOrderItemDto.ProductId.ToString());
 
                 throw new NotFoundException(message, userFacingMessage);
             }
@@ -425,7 +425,7 @@ namespace ProjectForFarmers.Application.Services.Business
             if (product.CreationDate > order.ReceiveDate)
             {
                 string message = "Creation date of product cannot be later than receive date.";
-                string userFacingMessage = CultureHelper.GetString("ProductCreationDateIsLaterThanReceiveDate");
+                string userFacingMessage = CultureHelper.Exception("ProductCreationDateIsLaterThanReceiveDate");
 
                 throw new InvalidDataException(message, userFacingMessage);
             }

@@ -40,7 +40,7 @@ namespace ProjectForFarmers.Application.Services.Business
             if (product == null)
             {
                 string message = $"Product with Id {productId} was not found.";
-                string userFacingMessage = CultureHelper.GetString("ProductWithIdNotFound", productId.ToString());
+                string userFacingMessage = CultureHelper.Exception("ProductWithIdNotFound", productId.ToString());
 
                 throw new NotFoundException(message, userFacingMessage);
             }
@@ -50,7 +50,7 @@ namespace ProjectForFarmers.Application.Services.Business
             if (hasOrdersWithProduct)
             {
                 string message = $"Product with Id {productId} is used in existing orders.";
-                string userFacingMessage = CultureHelper.GetString("ProductIsUsed", productId.ToString());
+                string userFacingMessage = CultureHelper.Exception("ProductIsUsed", productId.ToString());
 
                 throw new NotFoundException(message, userFacingMessage);
             }
@@ -88,7 +88,7 @@ namespace ProjectForFarmers.Application.Services.Business
             if (product == null)
             {
                 string message = $"Product with Id {productId} was not found.";
-                string userFacingMessage = CultureHelper.GetString("ProductWithIdNotFound", productId.ToString());
+                string userFacingMessage = CultureHelper.Exception("ProductWithIdNotFound", productId.ToString());
 
                 throw new NotFoundException(message, userFacingMessage);
             }
@@ -154,7 +154,7 @@ namespace ProjectForFarmers.Application.Services.Business
             if (product == null)
             {
                 string message = $"Product with Id {updateProductDto.Id} was not found.";
-                string userFacingMessage = CultureHelper.GetString("ProductWithIdNotFound", updateProductDto.Id.ToString());
+                string userFacingMessage = CultureHelper.Exception("ProductWithIdNotFound", updateProductDto.Id.ToString());
 
                 throw new NotFoundException(message, userFacingMessage);
             }

@@ -12,10 +12,7 @@ using Geocoding.Google;
 using Address = ProjectForFarmers.Domain.Address;
 using ProjectForFarmers.Application.Services.Auth;
 using DayOfWeek = ProjectForFarmers.Domain.DayOfWeek;
-using ProjectForFarmers.Application.DataTransferObjects;
-using ProjectForFarmers.Application.DataTransferObjects.Product;
 using Microsoft.AspNetCore.Http;
-using ProjectForFarmers.Application.ViewModels;
 
 namespace ProjectForFarmers.Application.Services.Business
 {
@@ -41,7 +38,7 @@ namespace ProjectForFarmers.Application.Services.Business
 
             var coords = await GetCoordinates(address);
             address.Latitude = coords.Latitude;
-            address.Longtitude = coords.Longitude;
+            address.Longitude = coords.Longitude;
 
             if(farmDto.Images != null)
             {
@@ -57,8 +54,16 @@ namespace ProjectForFarmers.Application.Services.Business
             string message = EmailContentBuilder.FarmEmailConfirmationMessageBody(farm.Name, owner.Name, owner.Surname, farmDto.ContactEmail, token);
             await EmailHelper.SendEmail(message, farmDto.ContactEmail, "Farm Email Confirmation");
 
+            AddLog(farm, "FarmCreated");
+
             await DbContext.Farms.AddAsync(farm);
             await DbContext.SaveChangesAsync();
+        }
+
+        private static void AddLog(Farm farm, string message, List<string>? parameters = null)
+        {
+            var log = new FarmLog(Guid.NewGuid(), farm.Id, message, parameters, DateTime.UtcNow);
+            farm.Logs.Add(log);
         }
 
         public async Task Delete(Guid farmId, Guid ownerId)
@@ -67,10 +72,12 @@ namespace ProjectForFarmers.Application.Services.Business
             if (farm == null)
             {
                 string message = $"Farm with Id {farmId} was not found.";
-                string userFacingMessage = CultureHelper.GetString("FarmWithIdNotFound", farmId.ToString());
+                string userFacingMessage = CultureHelper.Exception("FarmWithIdNotFound", farmId.ToString());
 
                 throw new NotFoundException(message, userFacingMessage);
             }
+
+            AddLog(farm, "FarmDeleted");
 
             DbContext.Farms.Remove(farm);
             await FileHelper.DeleteFiles(farm.ImagesNames, FarmsImageFolder);
@@ -118,33 +125,60 @@ namespace ProjectForFarmers.Application.Services.Business
             if (farm == null)
             {
                 string message = $"Farm with Id {updateFarmDto.FarmId} was not found.";
-                string userFacingMessage = CultureHelper.GetString("FarmWithIdNotFound", updateFarmDto.FarmId.ToString());
+                string userFacingMessage = CultureHelper.Exception("FarmWithIdNotFound", updateFarmDto.FarmId.ToString());
 
                 throw new NotFoundException(message, userFacingMessage);
             }
 
-            farm.Name = updateFarmDto.Name;
-            farm.Description = updateFarmDto.Description;
-            farm.ContactEmail = updateFarmDto.ContactEmail;
-            farm.ContactPhone = updateFarmDto.ContactPhone;
-            farm.SocialPageUrl = updateFarmDto.SocialPageUrl;
+            LogAndUpdateIfChanged("Name", farm.Name, updateFarmDto.Name, () => farm.Name = updateFarmDto.Name, farm.Id);
+            LogAndUpdateIfChanged("Description", farm.Description, updateFarmDto.Description, () => farm.Description = updateFarmDto.Description, farm.Id);
+            LogAndUpdateIfChanged("ContactEmail", farm.ContactEmail, updateFarmDto.ContactEmail, () => farm.ContactEmail = updateFarmDto.ContactEmail, farm.Id);
+            LogAndUpdateIfChanged("ContactPhone", farm.ContactPhone, updateFarmDto.ContactPhone, () => farm.ContactPhone = updateFarmDto.ContactPhone, farm.Id);
+            LogAndUpdateIfChanged("SocialPageUrl", farm.SocialPageUrl, updateFarmDto.SocialPageUrl, () => farm.SocialPageUrl = updateFarmDto.SocialPageUrl, farm.Id);
+            await DbContext.SaveChangesAsync();
 
-            await UpdateAddress(farm.Address, updateFarmDto.Address);
-            await UpdateSchedule(farm.Schedule, updateFarmDto.Schedule);
+            await UpdateAddress(farm, updateFarmDto.Address);
+            await UpdateSchedule(farm, updateFarmDto.Schedule);
             await UpdateImages(farm, updateFarmDto.Images);
 
-            await DbContext.SaveChangesAsync();
+            
+        }
+
+        private void LogAndUpdateIfChanged(string propertyName, string oldValue, string newValue, Action updateAction, Guid farmId)
+        {
+            if (oldValue != newValue)
+            {
+                updateAction.Invoke();
+                var farmLog = new FarmLog
+                {
+                    Id = Guid.NewGuid(),
+                    PropertyName = propertyName,
+                    Message = "PropertyChanged",
+                    Parameters = new List<string> { oldValue, newValue },
+                    CreationDate = DateTime.UtcNow,
+                    FarmId = farmId
+                };
+                
+                DbContext.FarmsLogs.Add(farmLog);
+            }
         }
 
         private async Task UpdateImages(Farm farm, List<IFormFile> images)
         {
-            if (images != null && images != null)
+            if (farm.ImagesNames == null) 
+                farm.ImagesNames = new List<string>();
+
+            List<string> deletedImages = new List<string>();
+            List<string> newImages = new List<string>();
+
+            if (images != null)
             {
                 foreach (var imageName in farm.ImagesNames)
                 {
                     if (!images.Any(file => file.FileName == imageName))
                     {
                         FileHelper.DeleteFile(imageName, Configuration["Images:Farm"]);
+                        deletedImages.Add(imageName);
                     }
                 }
             }
@@ -157,33 +191,100 @@ namespace ProjectForFarmers.Application.Services.Business
                     {
                         string imageName = await FileHelper.SaveFile(newImage, Configuration["Images:Farm"]);
                         farm.ImagesNames.Add(imageName);
+                        newImages.Add(imageName);
                     }
                 }
             }
+
+            if(deletedImages.Count > 0)
+            {
+                foreach(var deletedImage in deletedImages)
+                {
+                    farm.ImagesNames.Remove(deletedImage);
+                }
+
+                var deletedImagesLog = new FarmLog
+                {
+                    Id = Guid.NewGuid(),
+                    PropertyName = null,
+                    Message = "ImagesDeleted",
+                    Parameters = new List<string> { string.Join(", ", deletedImages)},
+                    CreationDate = DateTime.UtcNow,
+                    FarmId = farm.Id
+                };
+
+                DbContext.FarmsLogs.Add(deletedImagesLog);
+
+                var newImagesLog = new FarmLog
+                {
+                    Id = Guid.NewGuid(),
+                    PropertyName = null,
+                    Message = "ImagesCreated",
+                    Parameters = new List<string> { string.Join(", ", newImages) },
+                    CreationDate = DateTime.UtcNow,
+                    FarmId = farm.Id
+                };
+
+                DbContext.FarmsLogs.Add(newImagesLog);
+            }
         }
 
-        private async Task UpdateSchedule(Schedule schedule, ScheduleDto scheduleDto)
+        private async Task UpdateSchedule(Farm farm, ScheduleDto scheduleDto)
         {
-            await UpdateDayOfWeek(schedule.Monday, scheduleDto.Monday);
-            await UpdateDayOfWeek(schedule.Tuesday, scheduleDto.Tuesday);
-            await UpdateDayOfWeek(schedule.Wednesday, scheduleDto.Wednesday);
-            await UpdateDayOfWeek(schedule.Thursday, scheduleDto.Thursday);
-            await UpdateDayOfWeek(schedule.Friday, scheduleDto.Friday);
-            await UpdateDayOfWeek(schedule.Saturday, scheduleDto.Saturday);
-            await UpdateDayOfWeek(schedule.Sunday, scheduleDto.Sunday);
+            var schedule = farm.Schedule;
+
+            await UpdateDayOfWeek("Monday", schedule.Monday, scheduleDto.Monday, farm.Id);
+            await UpdateDayOfWeek("Tuesday", schedule.Tuesday, scheduleDto.Tuesday, farm.Id);
+            await UpdateDayOfWeek("Wednesday", schedule.Wednesday, scheduleDto.Wednesday, farm.Id);
+            await UpdateDayOfWeek("Thursday", schedule.Thursday, scheduleDto.Thursday, farm.Id);
+            await UpdateDayOfWeek("Friday", schedule.Friday, scheduleDto.Friday, farm.Id);
+            await UpdateDayOfWeek("Saturday", schedule.Saturday, scheduleDto.Saturday, farm.Id);
+            await UpdateDayOfWeek("Sunday", schedule.Sunday, scheduleDto.Sunday, farm.Id);
+
+            await DbContext.SaveChangesAsync();
         }
 
-        private async Task UpdateDayOfWeek(DayOfWeek dayOfWeek, DayOfWeekDto dayOfWeekDto)
+        private async Task UpdateDayOfWeek(string dayName, DayOfWeek dayOfWeek, DayOfWeekDto dayOfWeekDto, Guid farmId)
         {
+            if (dayOfWeek.IsOpened == dayOfWeekDto.IsOpened &&
+                dayOfWeek.StartHour == dayOfWeekDto.StartHour &&
+                dayOfWeek.StartMinute == dayOfWeekDto.StartMinute &&
+                dayOfWeek.EndHour == dayOfWeekDto.EndHour &&
+                dayOfWeek.EndMinute == dayOfWeekDto.EndMinute)
+            {
+                return;
+            }
+
             dayOfWeek.IsOpened = dayOfWeekDto.IsOpened;
             dayOfWeek.StartHour = dayOfWeekDto.StartHour;
             dayOfWeek.StartMinute = dayOfWeekDto.StartMinute;
             dayOfWeek.EndHour = dayOfWeekDto.EndHour;
             dayOfWeek.EndMinute = dayOfWeekDto.EndMinute;
+
+            var farmLog = new FarmLog
+            {
+                Id = Guid.NewGuid(),
+                PropertyName = dayName,
+                Message = "DayScheduleChanged",
+                Parameters = new List<string> 
+                {
+                    dayOfWeekDto.IsOpened.ToString(),
+                    dayOfWeekDto.StartHour.ToString(),
+                    dayOfWeekDto.StartMinute.ToString(),
+                    dayOfWeekDto.EndHour.ToString(),
+                    dayOfWeekDto.EndMinute.ToString()
+                },
+                CreationDate = DateTime.UtcNow,
+                FarmId = farmId
+            };
+
+            DbContext.FarmsLogs.Add(farmLog);
         }
 
-        private async Task UpdateAddress(Address address, AddressDto addressDto)
+        private async Task UpdateAddress(Farm farm, AddressDto addressDto)
         {
+            var address = farm.Address;
+
             if (address.Region != addressDto.Region
                 || address.District != addressDto.District
                 || address.Settlement != addressDto.Settlement
@@ -191,17 +292,20 @@ namespace ProjectForFarmers.Application.Services.Business
                 || address.HouseNumber != addressDto.HouseNumber)
             {
                 var coords = await GetCoordinates(addressDto);
-                address.Latitude = coords.Latitude;
-                address.Longtitude = coords.Longitude;
+
+                LogAndUpdateIfChanged("Latitude", address.Latitude.ToString(), coords.Latitude.ToString(), () => address.Latitude = coords.Latitude, farm.Id);
+                LogAndUpdateIfChanged("Longitude", address.Longitude.ToString(), coords.Longitude.ToString(), () => address.Longitude = coords.Longitude, farm.Id);
             }
 
-            address.Region = addressDto.Region;
-            address.District = addressDto.District;
-            address.Settlement = addressDto.Settlement;
-            address.Street = addressDto.Street;
-            address.HouseNumber = addressDto.HouseNumber;
-            address.PostalCode = addressDto.PostalCode;
-            address.Note = addressDto.Note;
+            LogAndUpdateIfChanged("Region", address.Region, addressDto.Region, () => address.Region = addressDto.Region, farm.Id);
+            LogAndUpdateIfChanged("District", address.District, addressDto.District, () => address.District = addressDto.District, farm.Id);
+            LogAndUpdateIfChanged("Settlement", address.Settlement, addressDto.Settlement, () => address.Settlement = addressDto.Settlement, farm.Id);
+            LogAndUpdateIfChanged("Street", address.Street, addressDto.Street, () => address.Street = addressDto.Street, farm.Id);
+            LogAndUpdateIfChanged("HouseNumber", address.HouseNumber, addressDto.HouseNumber, () => address.HouseNumber = addressDto.HouseNumber, farm.Id);
+            LogAndUpdateIfChanged("PostalCode", address.PostalCode, addressDto.PostalCode, () => address.PostalCode = addressDto.PostalCode, farm.Id);
+            LogAndUpdateIfChanged("Note", address.Note, addressDto.Note, () => address.Note = addressDto.Note, farm.Id);
+
+            await DbContext.SaveChangesAsync();
         }
 
         public async Task<FarmVm> Get(Guid farmId)
@@ -213,15 +317,21 @@ namespace ProjectForFarmers.Application.Services.Business
                 .Include(f => f.Categories)
                 .Include(f => f.Subcategories)
                 .Include(f => f.PaymentData)
+                .Include(f => f.Logs)
                 .FirstOrDefaultAsync(f => f.Id == farmId);
             if (farm == null) 
             {
                 string message = $"Farm with Id {farmId} was not found.";
-                string userFacingMessage = CultureHelper.GetString("FarmWithIdNotFound", farmId.ToString());
+                string userFacingMessage = CultureHelper.Exception("FarmWithIdNotFound", farmId.ToString());
                 throw new NotFoundException(message, userFacingMessage);
             } 
 
             var vm = Mapper.Map<FarmVm>(farm);
+
+            foreach(var log in farm.Logs)
+            {
+                vm.Logs.Add(Mapper.Map<FarmLogVm>(log));
+            }
 
             return vm;
         }
@@ -245,7 +355,7 @@ namespace ProjectForFarmers.Application.Services.Business
             if (farm == null)
             {
                 string message = $"Farm with Id {updateFarmCategoriesAndSubcategoriesDto.FarmId} was not found.";
-                string userFacingMessage = CultureHelper.GetString("FarmWithIdNotFound", updateFarmCategoriesAndSubcategoriesDto.FarmId.ToString());
+                string userFacingMessage = CultureHelper.Exception("FarmWithIdNotFound", updateFarmCategoriesAndSubcategoriesDto.FarmId.ToString());
                 throw new NotFoundException(message, userFacingMessage);
             }
 
@@ -261,7 +371,7 @@ namespace ProjectForFarmers.Application.Services.Business
             if (farm == null)
             {
                 string message = $"Farm with Id {updateFarmSettingsDto.FarmId} was not found.";
-                string userFacingMessage = CultureHelper.GetString("FarmWithIdNotFound", updateFarmSettingsDto.FarmId.ToString());
+                string userFacingMessage = CultureHelper.Exception("FarmWithIdNotFound", updateFarmSettingsDto.FarmId.ToString());
                 throw new NotFoundException(message, userFacingMessage);
             }
 
@@ -283,11 +393,6 @@ namespace ProjectForFarmers.Application.Services.Business
             }
 
             await DbContext.SaveChangesAsync();
-        }
-
-        private async Task UpdatePaymentData(PaymentData paymentData, PaymentDataDto paymentDataDto)
-        {
-            
         }
     }
 }

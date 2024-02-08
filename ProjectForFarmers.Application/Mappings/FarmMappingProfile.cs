@@ -2,6 +2,7 @@
 using Geocoding;
 using ProjectForFarmers.Application.DataTransferObjects;
 using ProjectForFarmers.Application.DataTransferObjects.Farm;
+using ProjectForFarmers.Application.Helpers;
 using ProjectForFarmers.Application.ViewModels;
 using ProjectForFarmers.Application.ViewModels.Farm;
 using ProjectForFarmers.Domain;
@@ -25,6 +26,7 @@ namespace ProjectForFarmers.Application.Mappings
             MapScheduleToScheduleVm();
             MapAddressToAddressVm();
             MapPaymentDataToPaymentDataVm();
+            MapFarmLogToFarmLogVm();
             MapFarmToFarmVm();
         }
 
@@ -36,6 +38,35 @@ namespace ProjectForFarmers.Application.Mappings
                .ForMember(vm => vm.BankUSREOU, opt => opt.MapFrom(data => data.BankUSREOU))
                .ForMember(vm => vm.BIC, opt => opt.MapFrom(data => data.BIC))
                .ForMember(vm => vm.HolderFullName, opt => opt.MapFrom(data => data.HolderFullName));
+        }
+
+        private void MapFarmLogToFarmLogVm()
+        {
+            CreateMap<FarmLog, FarmLogVm>()
+               .ForMember(vm => vm.Message, opt => opt.MapFrom(log => GetMessage(log)))
+               .ForMember(vm => vm.Date, opt => opt.MapFrom(log => log.CreationDate));
+        }
+
+        private string GetMessage(FarmLog log)
+        {
+            string message = "";
+
+            if (log == null || log.Message == null) 
+            {
+                return "";
+            }
+            else if (log.PropertyName != null || log.PropertyName != "")
+            {
+                message += (CultureHelper.Property(log.PropertyName) + " ");
+            }
+
+            message += log.Message;
+            if(log.Parameters != null && log.Parameters.Count > 0)
+            {
+                message = string.Format(message, log.Parameters);
+            }
+
+            return message;
         }
 
         private void MapAddressToAddressVm()
@@ -86,7 +117,8 @@ namespace ProjectForFarmers.Application.Mappings
                 .ForMember(vm => vm.SocialPageUrl, opt => opt.MapFrom(farm => farm.SocialPageUrl))
                 .ForMember(vm => vm.ImagesNames, opt => opt.MapFrom(farm => farm.ImagesNames))
                 .ForMember(vm => vm.Categories, opt => opt.MapFrom(farm => farm.Categories))
-                .ForMember(vm => vm.Subcategories, opt => opt.MapFrom(farm => farm.Subcategories));
+                .ForMember(vm => vm.Subcategories, opt => opt.MapFrom(farm => farm.Subcategories))
+                .ForMember(vm => vm.Logs, opt => opt.MapFrom(farm => new List<FarmLogVm>()));
         }
 
         private void MapAddressDtoToAddress()

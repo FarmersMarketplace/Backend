@@ -36,7 +36,7 @@ namespace ProjectForFarmers.Application.Services.Business
             if (category != null)
             {
                 string message = $"Category with Id {categoryId} was not found.";
-                string userFacingMessage = CultureHelper.GetString("CategoryWithIdNotFound", categoryId.ToString());
+                string userFacingMessage = CultureHelper.Exception("CategoryWithIdNotFound", categoryId.ToString());
 
                 throw new NotFoundException(message, userFacingMessage);
             }
@@ -61,7 +61,7 @@ namespace ProjectForFarmers.Application.Services.Business
             if (category != null)
             {
                 string message = $"Category with Id {categoryId} was not found.";
-                string userFacingMessage = CultureHelper.GetString("CategoryWithIdNotFound", categoryId.ToString());
+                string userFacingMessage = CultureHelper.Exception("CategoryWithIdNotFound", categoryId.ToString());
 
                 throw new NotFoundException(message, userFacingMessage);
             }

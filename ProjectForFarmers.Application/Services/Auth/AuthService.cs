@@ -42,7 +42,7 @@ namespace ProjectForFarmers.Application.Services.Auth
             if (existingAccountWithSameEmail != null) 
             {
                 string message = $"Email {email} is already associated with another account.";
-                string userFacingMessage = CultureHelper.GetString("DuplicateEmail", email);
+                string userFacingMessage = CultureHelper.Exception("DuplicateEmail", email);
 
                 throw new DuplicateException(message, userFacingMessage);
             } 
@@ -52,7 +52,7 @@ namespace ProjectForFarmers.Application.Services.Auth
             if (account == null) 
             {
                 string message = $"Account with Id {accountId} was not found.";
-                string userFacingMessage = CultureHelper.GetString("AccountWithIdNotFound", accountId.ToString());
+                string userFacingMessage = CultureHelper.Exception("AccountWithIdNotFound", accountId.ToString());
 
                 throw new NotFoundException(message, userFacingMessage);
             } 
@@ -67,7 +67,7 @@ namespace ProjectForFarmers.Application.Services.Auth
             if (account == null) 
             {
                 string message = $"Account with email {loginDto.Email} was not found.";
-                string userFacingMessage = CultureHelper.GetString("AccountWithEmailNotFound", loginDto.Email);
+                string userFacingMessage = CultureHelper.Exception("AccountWithEmailNotFound", loginDto.Email);
 
                 throw new NotFoundException(message, userFacingMessage);
             } 
@@ -86,7 +86,7 @@ namespace ProjectForFarmers.Application.Services.Auth
             if (existingAccountWithSameEmail != null) 
             {
                 string message = $"Email {accountDto.Email} is already associated with another account.";
-                string userFacingMessage = CultureHelper.GetString("EmailIsAssociatedWithAnotherAccount", accountDto.Email);
+                string userFacingMessage = CultureHelper.Exception("EmailIsAssociatedWithAnotherAccount", accountDto.Email);
 
                 throw new DuplicateException(message, userFacingMessage);
             } 
@@ -109,7 +109,7 @@ namespace ProjectForFarmers.Application.Services.Auth
             if (account == null)
             {
                 string message = $"Account with Id {accountId} and email {email} was not found or email does not match the provided account.";
-                string userFacingMessage = CultureHelper.GetString("AccountWithIdEmailNotFound");
+                string userFacingMessage = CultureHelper.Exception("AccountWithIdEmailNotFound");
 
                 throw new NotFoundException(message, userFacingMessage);
             }
@@ -126,7 +126,7 @@ namespace ProjectForFarmers.Application.Services.Auth
             if (account == null)
             {
                 string message = $"Account with email {forgotPasswordDto.Email} was not found.";
-                string userFacingMessage = CultureHelper.GetString("AccountWithEmailNotFound", forgotPasswordDto.Email);
+                string userFacingMessage = CultureHelper.Exception("AccountWithEmailNotFound", forgotPasswordDto.Email);
 
                 throw new NotFoundException(message, userFacingMessage);
             }
@@ -141,7 +141,7 @@ namespace ProjectForFarmers.Application.Services.Auth
             if (farm == null)
             {
                 string message = $"Farm with Id {farmId} was not found.";
-                string userFacingMessage = CultureHelper.GetString("FarmWithIdNotFound", farmId.ToString());
+                string userFacingMessage = CultureHelper.Exception("FarmWithIdNotFound", farmId.ToString());
 
                 throw new NotFoundException(message, userFacingMessage);
             }
