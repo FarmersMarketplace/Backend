@@ -126,26 +126,11 @@
   <data name="AccountWithIdNotFound" xml:space="preserve">
     <value>Account with Id {0} was not found.</value>
   </data>
-  <data name="Amount" xml:space="preserve">
-    <value>Amount</value>
-  </data>
-  <data name="Cash" xml:space="preserve">
-    <value>Cash</value>
-  </data>
   <data name="CategoryWithIdNotFound" xml:space="preserve">
     <value>Category with Id {0} was not found.</value>
   </data>
-  <data name="Collected" xml:space="preserve">
-    <value>Collected</value>
-  </data>
-  <data name="Completed" xml:space="preserve">
-    <value>Completed</value>
-  </data>
-  <data name="CustomerEmail" xml:space="preserve">
-    <value>Customer email</value>
-  </data>
-  <data name="CustomerName" xml:space="preserve">
-    <value>Customer name</value>
+  <data name="CustomerWithNameNotFound" xml:space="preserve">
+    <value>Customer with name '{0}' was not found.</value>
   </data>
   <data name="DuplicateEmail" xml:space="preserve">
     <value>Email {0} is already associated with another account.</value>
@@ -162,38 +147,11 @@
   <data name="FileNotExist" xml:space="preserve">
     <value>File with name {0} does not exist in directory {1}.</value>
   </data>
-  <data name="Id" xml:space="preserve">
-    <value>Id</value>
-  </data>
-  <data name="InDelivery" xml:space="preserve">
-    <value>In delivery</value>
-  </data>
-  <data name="InProcessing" xml:space="preserve">
-    <value>In processing</value>
-  </data>
   <data name="InvalidImageFormat" xml:space="preserve">
     <value>Invalid format of image {0}. Acceptable formats: {1}.</value>
   </data>
-  <data name="New" xml:space="preserve">
-    <value>New</value>
-  </data>
-  <data name="Number" xml:space="preserve">
-    <value>Number</value>
-  </data>
-  <data name="Online" xml:space="preserve">
-    <value>Online</value>
-  </data>
-  <data name="OrderDate" xml:space="preserve">
-    <value>Order date</value>
-  </data>
   <data name="OrderWithIdNotExist" xml:space="preserve">
     <value>Order with id {0} was not found.</value>
-  </data>
-  <data name="PaymentType" xml:space="preserve">
-    <value>Payment type</value>
-  </data>
-  <data name="Phone" xml:space="preserve">
-    <value>Phone</value>
   </data>
   <data name="ProductCreationDateIsLaterThanReceiveDate" xml:space="preserve">
     <value>Creation date of product cannot be later than receive date.</value>
@@ -203,9 +161,6 @@
   </data>
   <data name="StatisticWithIdNotExist" xml:space="preserve">
     <value>Statistic for month with id {0} was not found.</value>
-  </data>
-  <data name="Status" xml:space="preserve">
-    <value>Status</value>
   </data>
   <data name="SubcategoryWithIdNotFound" xml:space="preserve">
     <value>Subcategory with Id {0} was not found.</value>

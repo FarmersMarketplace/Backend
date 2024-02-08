@@ -88,24 +88,6 @@ namespace ProjectForFarmers.Application.Resources.Exceptions {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Amount.
-        /// </summary>
-        internal static string Amount {
-            get {
-                return ResourceManager.GetString("Amount", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Cash.
-        /// </summary>
-        internal static string Cash {
-            get {
-                return ResourceManager.GetString("Cash", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Category with Id {0} was not found..
         /// </summary>
         internal static string CategoryWithIdNotFound {
@@ -115,38 +97,11 @@ namespace ProjectForFarmers.Application.Resources.Exceptions {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Collected.
+        ///   Looks up a localized string similar to Customer with name &apos;{0}&apos; was not found..
         /// </summary>
-        internal static string Collected {
+        internal static string CustomerWithNameNotFound {
             get {
-                return ResourceManager.GetString("Collected", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Completed.
-        /// </summary>
-        internal static string Completed {
-            get {
-                return ResourceManager.GetString("Completed", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Customer email.
-        /// </summary>
-        internal static string CustomerEmail {
-            get {
-                return ResourceManager.GetString("CustomerEmail", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Customer name.
-        /// </summary>
-        internal static string CustomerName {
-            get {
-                return ResourceManager.GetString("CustomerName", resourceCulture);
+                return ResourceManager.GetString("CustomerWithNameNotFound", resourceCulture);
             }
         }
         
@@ -196,33 +151,6 @@ namespace ProjectForFarmers.Application.Resources.Exceptions {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Id.
-        /// </summary>
-        internal static string Id {
-            get {
-                return ResourceManager.GetString("Id", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to In delivery.
-        /// </summary>
-        internal static string InDelivery {
-            get {
-                return ResourceManager.GetString("InDelivery", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to In processing.
-        /// </summary>
-        internal static string InProcessing {
-            get {
-                return ResourceManager.GetString("InProcessing", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Invalid format of image {0}. Acceptable formats: {1}..
         /// </summary>
         internal static string InvalidImageFormat {
@@ -232,65 +160,11 @@ namespace ProjectForFarmers.Application.Resources.Exceptions {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to New.
-        /// </summary>
-        internal static string New {
-            get {
-                return ResourceManager.GetString("New", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Number.
-        /// </summary>
-        internal static string Number {
-            get {
-                return ResourceManager.GetString("Number", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Online.
-        /// </summary>
-        internal static string Online {
-            get {
-                return ResourceManager.GetString("Online", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Order date.
-        /// </summary>
-        internal static string OrderDate {
-            get {
-                return ResourceManager.GetString("OrderDate", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Order with id {0} was not found..
         /// </summary>
         internal static string OrderWithIdNotExist {
             get {
                 return ResourceManager.GetString("OrderWithIdNotExist", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Payment type.
-        /// </summary>
-        internal static string PaymentType {
-            get {
-                return ResourceManager.GetString("PaymentType", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Phone.
-        /// </summary>
-        internal static string Phone {
-            get {
-                return ResourceManager.GetString("Phone", resourceCulture);
             }
         }
         
@@ -318,15 +192,6 @@ namespace ProjectForFarmers.Application.Resources.Exceptions {
         internal static string StatisticWithIdNotExist {
             get {
                 return ResourceManager.GetString("StatisticWithIdNotExist", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Status.
-        /// </summary>
-        internal static string Status {
-            get {
-                return ResourceManager.GetString("Status", resourceCulture);
             }
         }
         

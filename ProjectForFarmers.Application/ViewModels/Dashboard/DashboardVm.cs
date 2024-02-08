@@ -1,11 +1,6 @@
-﻿using ProjectForFarmers.Domain;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using ProjectForFarmers.Application.ViewModels.Order;
 
-namespace ProjectForFarmers.Application.ViewModels.Order
+namespace ProjectForFarmers.Application.ViewModels.Dashboard
 {
     public class DashboardVm
     {
@@ -16,9 +11,7 @@ namespace ProjectForFarmers.Application.ViewModels.Order
         public OrderGroupStatisticVm TotalActivity { get; set; }
         public decimal TotalRevenue { get; set; }
         public float TotalRevenueChangePercentage { get; set; }
-        public decimal HighestCustomerPayment { get; set; }
-        public float HighestCustomerPaymentPercentage { get; set; }
-        public string CustomerWithHighestPaymentName { get; set; }
+        public CustomerInfoVm CustomerInfo { get; set; }
     }
 
 }

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using ProjectForFarmers.Application.DataTransferObjects.Farm;
+using ProjectForFarmers.Application.ViewModels.Dashboard;
 using ProjectForFarmers.Application.ViewModels.Order;
 using ProjectForFarmers.Domain;
 using System;
@@ -30,9 +31,12 @@ namespace ProjectForFarmers.Application.Mappings
                 .ForMember(vm => vm.TotalActivity, opt => opt.MapFrom(statistic => statistic.TotalActivityStatistic))
                 .ForMember(vm => vm.TotalRevenue, opt => opt.MapFrom(statistic => statistic.TotalRevenue))
                 .ForMember(vm => vm.TotalRevenueChangePercentage, opt => opt.MapFrom(statistic => statistic.TotalRevenueChangePercentage))
-                .ForMember(vm => vm.HighestCustomerPayment, opt => opt.MapFrom(statistic => statistic.HighestCustomerPayment))
-                .ForMember(vm => vm.HighestCustomerPaymentPercentage, opt => opt.MapFrom(statistic => statistic.HighestCustomerPaymentPercentage))
-                .ForMember(vm => vm.CustomerWithHighestPaymentName, opt => opt.MapFrom(statistic => ""));
+                .ForMember(vm => vm.CustomerInfo, opt => opt.MapFrom(statistic => new CustomerInfoVm
+                {
+                    Payment = statistic.HighestCustomerPayment,
+                    PaymentPercentage = statistic.HighestCustomerPaymentPercentage,
+                    Name = ""
+                }));
         }
 
         private void MapOrderGroupStatisticToOrderGroupStatisticVm()

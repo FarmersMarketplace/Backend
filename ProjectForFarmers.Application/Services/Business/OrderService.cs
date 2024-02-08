@@ -62,15 +62,15 @@ namespace ProjectForFarmers.Application.Services.Business
                 var rows = new List<Row>();
                 var cells = new List<Cell>();
 
-                cells.Add(new Cell(1, CultureHelper.Exception("Id"))); //Id
-                cells.Add(new Cell(2, CultureHelper.Exception("Number"))); //Номер
-                cells.Add(new Cell(3, CultureHelper.Exception("OrderDate"))); //Дата замовлення
-                cells.Add(new Cell(4, CultureHelper.Exception("CustomerName"))); //Ім'я покупця
-                cells.Add(new Cell(5, CultureHelper.Exception("CustomerEmail"))); //Email покупця
-                cells.Add(new Cell(6, CultureHelper.Exception("Phone"))); //Телефон
-                cells.Add(new Cell(7, CultureHelper.Exception("Amount"))); //Сума
-                cells.Add(new Cell(8, CultureHelper.Exception("PaymentType"))); //Спосіб оплати
-                cells.Add(new Cell(9, CultureHelper.Exception("Status"))); //Статус
+                cells.Add(new Cell(1, CultureHelper.Property("Id"))); //Id
+                cells.Add(new Cell(2, CultureHelper.Property("Number"))); //Номер
+                cells.Add(new Cell(3, CultureHelper.Property("OrderDate"))); //Дата замовлення
+                cells.Add(new Cell(4, CultureHelper.Property("CustomerName"))); //Ім'я покупця
+                cells.Add(new Cell(5, CultureHelper.Property("CustomerEmail"))); //Email покупця
+                cells.Add(new Cell(6, CultureHelper.Property("Phone"))); //Телефон
+                cells.Add(new Cell(7, CultureHelper.Property("Amount"))); //Сума
+                cells.Add(new Cell(8, CultureHelper.Property("PaymentType"))); //Спосіб оплати
+                cells.Add(new Cell(9, CultureHelper.Property("Status"))); //Статус
 
                 rows.Add(new Row(1, cells));
 

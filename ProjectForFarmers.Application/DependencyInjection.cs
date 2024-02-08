@@ -3,13 +3,7 @@ using ProjectForFarmers.Application.Services.Auth;
 using ProjectForFarmers.Application.Services.Business;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using ProjectForFarmers.Application.Mappings;
-using AutoMapper;
 
 namespace ProjectForFarmers.Application
 {
@@ -23,6 +17,7 @@ namespace ProjectForFarmers.Application
             services.AddTransient<ICategoryService, CategoryService>();
             services.AddTransient<ISubcategoryService, SubcategoryService>();
             services.AddTransient<IProductService, ProductService>();
+            services.AddTransient<IDashboardService, DashboardService>();
 
             services.AddAutoMapper(config =>
             {

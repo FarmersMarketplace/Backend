@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ProjectForFarmers.Application.DataTransferObjects.Order;
-using ProjectForFarmers.Application.Filters;
 using ProjectForFarmers.Application.Services.Business;
+using ProjectForFarmers.Application.ViewModels.Dashboard;
 using ProjectForFarmers.Application.ViewModels.Order;
 using ProjectForFarmers.Domain;
 

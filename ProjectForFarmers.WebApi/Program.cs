@@ -34,9 +34,10 @@ namespace ProjectForFarmers.WebApi
             string connectionString = configuration.GetConnectionString("LocalConnection");
 
             services.AddPersistence(connectionString);
+            services.AddMemoryCache();
+
             Log.Logger = new LoggerConfiguration().WriteTo.PostgreSQL(connectionString, "Logs", needAutoCreateTable: true)
                .MinimumLevel.Information().CreateLogger();
-
             Log.Information("The program has started.");
 
             services.AddApplication(configuration);

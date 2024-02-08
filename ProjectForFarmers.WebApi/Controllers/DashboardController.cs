@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using ProjectForFarmers.Application.DataTransferObjects.Dashboard;
 using ProjectForFarmers.Application.Services.Business;
-using ProjectForFarmers.Application.ViewModels.Order;
+using ProjectForFarmers.Application.ViewModels.Dashboard;
 using ProjectForFarmers.Domain;
 
 namespace ProjectForFarmers.WebApi.Controllers
@@ -37,6 +38,23 @@ namespace ProjectForFarmers.WebApi.Controllers
         public async Task<IActionResult> GetCurrentMonth([FromRoute] Guid producerId, [FromRoute] Producer producer)
         {
             var vm = await DashboardService.GetCurrentMonth(producerId, producer);
+            return Ok(vm);
+        }
+
+        [HttpGet("{producer}/{producerId}/{query}/{count}")]
+        [ProducesResponseType(typeof(LoadDashboardVm), 200)]
+        public async Task<IActionResult> CustomerAutocomplete([FromRoute] Guid producerId, [FromRoute] Producer producer,
+            [FromRoute] string query, [FromRoute] int count)
+        {
+            var vm = await DashboardService.CustomerAutocomplete(producerId, producer, query, count);
+            return Ok(vm);
+        }
+
+        [HttpPost]
+        [ProducesResponseType(typeof(CustomerInfoVm), 200)]
+        public async Task<IActionResult> GetCustomer(GetCustomerDto getCustomerDto)
+        {
+            var vm = await DashboardService.GetCustomer(getCustomerDto);
             return Ok(vm);
         }
     }

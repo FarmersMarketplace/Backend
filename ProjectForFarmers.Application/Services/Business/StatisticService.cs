@@ -1,5 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using ProjectForFarmers.Application.DataTransferObjects.Dashboard;
+using ProjectForFarmers.Application.Exceptions;
+using ProjectForFarmers.Application.Helpers;
 using ProjectForFarmers.Application.Interfaces;
+using ProjectForFarmers.Application.ViewModels.Dashboard;
 using ProjectForFarmers.Domain;
 
 namespace ProjectForFarmers.Application.Services.Business
@@ -13,7 +17,7 @@ namespace ProjectForFarmers.Application.Services.Business
             DbContext = dbContext;
         }
 
-        public async Task UpdateAllStatistics(DateTimeOffset lastDateOfMonth)
+        public async Task UpdateAllStatistics(DateTime lastDateOfMonth)
         {
             var farms = DbContext.Farms.ToArray();
 
@@ -34,11 +38,11 @@ namespace ProjectForFarmers.Application.Services.Business
             await DbContext.SaveChangesAsync();
         }
 
-        public async Task<MonthStatistic> CalculateStatisticForMonth(Guid producerId, Producer producer, DateTimeOffset lastDateOfMonth)
+        public async Task<MonthStatistic> CalculateStatisticForMonth(Guid producerId, Producer producer, DateTime lastDateOfMonth)
         {
-            DateTimeOffset firstDayOfCurrentMonth = new DateTimeOffset(lastDateOfMonth.Year, lastDateOfMonth.Month, 1, 0, 0, 0, lastDateOfMonth.Offset);
-            DateTimeOffset lastDayOfPreviousMonth = firstDayOfCurrentMonth.AddDays(-1);
-            DateTimeOffset firstDayOfPreviousMonth = firstDayOfCurrentMonth.AddMonths(-1);
+            DateTime firstDayOfCurrentMonth = new DateTime(lastDateOfMonth.Year, lastDateOfMonth.Month, 1, 0, 0, 0);
+            DateTime lastDayOfPreviousMonth = firstDayOfCurrentMonth.AddDays(-1);
+            DateTime firstDayOfPreviousMonth = firstDayOfCurrentMonth.AddMonths(-1);
 
             var previousStatistic = await GetPreviousStatistic(producerId, producer, lastDayOfPreviousMonth);
 
@@ -62,7 +66,7 @@ namespace ProjectForFarmers.Application.Services.Business
             return await CalculateMonthStatisticForNotFirstMonth(producerId, producer, lastDateOfMonth, previousStatistic, lastDayOfPreviousMonth);
         }
 
-        private async Task<MonthStatistic> CalculateMonthStatisticForNotFirstMonth(Guid producerId, Producer producer, DateTimeOffset lastDateOfMonth, MonthStatistic previousStatistic, DateTimeOffset lastDayOfPreviousMonth)
+        private async Task<MonthStatistic> CalculateMonthStatisticForNotFirstMonth(Guid producerId, Producer producer, DateTime lastDateOfMonth, MonthStatistic previousStatistic, DateTime lastDayOfPreviousMonth)
         {
             var orders = DbContext.Orders.Where(o => o.Producer == producer
                 && o.ProducerId == producerId
@@ -293,6 +297,40 @@ namespace ProjectForFarmers.Application.Services.Business
                 && o.CreationDate.Day <= endDate.Day);
 
             return existsOrdersForPreviousMonth;
+        }
+
+        public async Task<CustomerInfoVm> GetCustomerInfo(GetCustomerDto getCustomerDto)
+        {
+            var customerIdsHashSet = new HashSet<Guid>(await DbContext.Orders
+                 .Where(o => o.ProducerId == getCustomerDto.ProducerId
+                 && o.Producer == getCustomerDto.Producer)
+                 .Select(o => o.CustomerId)
+                 .ToListAsync());
+
+            var customer = await DbContext.Accounts.FirstOrDefaultAsync(a => $"{a.Name} {a.Surname}" == getCustomerDto.CustomerName
+                && customerIdsHashSet.Contains(a.Id));
+
+            if (customer == null)
+            {
+                string message = $"Customer with name '{getCustomerDto.CustomerName}' was not found.";
+                string userFacingMessage = CultureHelper.Exception("CustomerWithNameNotFound", getCustomerDto.CustomerName);
+
+                throw new NotFoundException(message, userFacingMessage);
+            }
+
+            var customerInfoVm = new CustomerInfoVm();
+            customerInfoVm.Name = getCustomerDto.CustomerName;
+
+            customerInfoVm.Payment = DbContext.Orders.Where(o => o.CustomerId == customer.Id
+                && o.ProducerId == getCustomerDto.ProducerId
+                && o.CreationDate >= getCustomerDto.StartDate
+                && o.CreationDate <= getCustomerDto.EndDate)
+                .Select(o => o.TotalPayment)
+                .Sum();
+
+            customerInfoVm.PaymentPercentage = await CalculatePaymentPercentageChanges(customerInfoVm.Payment, getCustomerDto.TotalRevenue);
+
+            return customerInfoVm;
         }
     }
 

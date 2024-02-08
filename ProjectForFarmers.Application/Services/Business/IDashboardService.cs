@@ -1,18 +1,15 @@
-﻿using ProjectForFarmers.Application.ViewModels.Order;
+﻿using ProjectForFarmers.Application.DataTransferObjects.Dashboard;
+using ProjectForFarmers.Application.ViewModels.Dashboard;
 using ProjectForFarmers.Domain;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ProjectForFarmers.Application.Services.Business
 {
     public interface IDashboardService
     {
-        public Task<LoadDashboardVm> Load(Guid producerId, Producer producer);
-        public Task<DashboardVm> Get(Guid id);
-        public Task<DashboardVm> GetCurrentMonth(Guid producerId, Producer producer);
-
+        Task<LoadDashboardVm> Load(Guid producerId, Producer producer);
+        Task<DashboardVm> Get(Guid id);
+        Task<DashboardVm> GetCurrentMonth(Guid producerId, Producer producer);
+        Task<CustomerListVm> CustomerAutocomplete(Guid producerId, Producer producer, string query, int count);
+        Task<CustomerInfoVm> GetCustomer(GetCustomerDto getCustomerDto);
     }
 }
