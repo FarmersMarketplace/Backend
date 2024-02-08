@@ -22,17 +22,9 @@ namespace ProjectForFarmers.WebApi.Controllers
 
         [HttpGet("{orderId}")]
         [ProducesResponseType(typeof(OrderVm), 200)]
-        public async Task<IActionResult> LoadDashboard([FromRoute] Guid orderId)
+        public async Task<IActionResult> Get([FromRoute] Guid orderId)
         {
             var vm = await OrderService.Get(orderId);
-            return Ok(vm);
-        }
-
-        [HttpGet("{producerId}/{producer}")]
-        [ProducesResponseType(typeof(LoadDashboardVm), 200)]
-        public async Task<IActionResult> LoadDashboard([FromRoute] Guid producerId, [FromRoute] Producer producer)
-        {
-            var vm = await OrderService.LoadDashboard(producerId, producer);
             return Ok(vm);
         }
 
@@ -44,15 +36,7 @@ namespace ProjectForFarmers.WebApi.Controllers
             return Ok(vm);
         }
 
-        [HttpGet("{id}")]
-        [ProducesResponseType(typeof(DashboardVm), 200)]
-        public async Task<IActionResult> GetDashboard([FromRoute] Guid id)
-        {
-            var vm = await OrderService.GetDashboard(id);
-            return Ok(vm);
-        }
-
-        [HttpGet("{producerId}/{producer}")]
+        [HttpGet("{producer}/{producerId}")]
         [ProducesResponseType(typeof(DashboardVm), 200)]
         [Produces("application/octet-stream")]
         public async Task<IActionResult> ExportToExcel([FromRoute] Guid producerId, [FromRoute] Producer producer)
@@ -65,15 +49,6 @@ namespace ProjectForFarmers.WebApi.Controllers
             System.IO.File.Delete(filePath);
 
             return File(fileBytes, contentType, fileName);
-        }
-
-        [HttpGet("{producerId}/{producer}")]
-        [ProducesResponseType(typeof(DashboardVm), 200)]
-        public async Task<IActionResult> GetCurrentMonthDashboard([FromRoute] Guid producerId, [FromRoute] Producer producer) 
-        {
-            var vm = await OrderService.GetCurrentMonthDashboard(producerId, producer);
-
-            return Ok(vm);
         }
 
         [HttpPut]
