@@ -18,47 +18,8 @@ namespace ProjectForFarmers.Application.Services.Business
 {
     public class OrderService : Service, IOrderService
     {
-        private readonly StatisticService StatisticService;
-
         public OrderService(IMapper mapper, IApplicationDbContext dbContext, IConfiguration configuration) : base(mapper, dbContext, configuration)
         {
-            StatisticService = new StatisticService(dbContext);
-        }
-
-        public async Task<LoadDashboardVm> LoadDashboard(Guid producerId, Producer producer)
-        {
-            var statistics = DbContext.MonthesStatistics.Where(m => m.ProducerId == producerId
-                && m.Producer == producer).ToList();
-
-            var currentMonthStatistic = await StatisticService.CalculateStatisticForMonth(producerId, producer, DateTimeOffset.Now);
-            statistics.Add(currentMonthStatistic);
-
-            var statisticsVm = statistics.Select(s => new MonthStatisticLookupVm
-            {
-                Id = s.Id,
-                StartDate = s.StartDate,
-                EndDate = s.EndDate
-            }).ToList();
-
-            var currentMonthDashboardVm = Mapper.Map<DashboardVm>(currentMonthStatistic);
-            var customerWithHighestPayment = await DbContext.Accounts.FirstOrDefaultAsync(a => a.Id == currentMonthStatistic.CustomerWithHighestPaymentId);
-             
-            if (customerWithHighestPayment != null) 
-            {
-                currentMonthDashboardVm.CustomerWithHighestPaymentName = $"{customerWithHighestPayment.Surname} {customerWithHighestPayment.Name}";
-            }
-            else
-            {
-                currentMonthDashboardVm.CustomerWithHighestPaymentName = "Customer with highest payment was not found";
-            } 
-
-            var vm = new LoadDashboardVm
-            {
-                DateRanges = statisticsVm,
-                CurrentMonthDashboard = currentMonthDashboardVm
-            };
-
-            return vm;
         }
 
         public async Task<OrderListVm> GetAll(GetOrderListDto getOrderListDto)
@@ -81,23 +42,6 @@ namespace ProjectForFarmers.Application.Services.Business
                 Orders = Mapper.Map<List<OrderLookupVm>>(orders),
                 Count = await ordersQuery.CountAsync()
             };
-
-            return vm;
-        }
-
-        public async Task<DashboardVm> GetDashboard(Guid id)
-        {
-            var monthStatistic = await DbContext.MonthesStatistics.FirstOrDefaultAsync(s => s.Id == id);
-
-            if (monthStatistic == null)
-            {
-                string message = $"Statistic for month with id {id} was not found.";
-                string userFacingMessage = CultureHelper.Exception("StatisticWithIdNotExist", id.ToString());
-
-                throw new NotFoundException(message, userFacingMessage);
-            }
-
-            var vm = Mapper.Map<DashboardVm>(monthStatistic);
 
             return vm;
         }
@@ -180,32 +124,6 @@ namespace ProjectForFarmers.Application.Services.Business
             string fileName = producerName + "_" + DateTime.Now.ToString() + "_" + "orders.xlsx";
 
             return fileName;
-        }
-
-        public async Task<DashboardVm> GetCurrentMonthDashboard(Guid producerId, Producer producer)
-        {
-            var currentMonthStatistic = await StatisticService.CalculateStatisticForMonth(producerId, producer, DateTimeOffset.Now);
-
-            var currentMonthDashboardVm = Mapper.Map<DashboardVm>(currentMonthStatistic);
-
-            if(currentMonthStatistic.CustomerWithHighestPaymentId == null)
-            {
-                currentMonthDashboardVm.CustomerWithHighestPaymentName = "Customer with highest payment was not found";
-            }
-
-            var customerWithHighestPayment = await DbContext.Accounts.FirstOrDefaultAsync(a => a.Id == currentMonthStatistic.CustomerWithHighestPaymentId);
-            if (customerWithHighestPayment != null)
-            {
-                currentMonthDashboardVm.CustomerWithHighestPaymentName = $"{customerWithHighestPayment.Surname} {customerWithHighestPayment.Name}";
-            }
-            else
-            {
-                currentMonthDashboardVm.CustomerWithHighestPaymentName = "Customer with highest payment was not found";
-            }
-
-            currentMonthDashboardVm.CustomerWithHighestPaymentName = $"{customerWithHighestPayment.Surname} {customerWithHighestPayment.Name}";
-
-            return currentMonthDashboardVm;
         }
 
         public async Task Duplicate(OrderListDto orderListDto)
