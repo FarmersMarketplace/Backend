@@ -39,16 +39,16 @@ namespace ProjectForFarmers.WebApi.Controllers
             return NoContent();
         }
         
-        [HttpPut]
-        [ProducesResponseType(typeof(JwtVm), 200)]
-        public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
+        [HttpGet]
+        [ProducesResponseType(typeof(LoginVm), 200)]
+        public async Task<IActionResult> Login([FromQuery] LoginDto loginDto)
         {
             var response = await AuthService.Login(loginDto);
             return Ok(response);
         }
 
         [HttpPut]
-        [ProducesResponseType(typeof(JwtVm), 200)]
+        [ProducesResponseType(typeof(LoginVm), 200)]
         public async Task<IActionResult> AuthenticateWithGoogle([FromBody] AuthenticateWithGoogleDto authenticateWithGoogleDto)
         {
             var response = await AuthService.AuthenticateWithGoogle(authenticateWithGoogleDto);
@@ -72,6 +72,18 @@ namespace ProjectForFarmers.WebApi.Controllers
             var email = User.FindFirst(ClaimTypes.Email)?.Value;
             await AuthService.ResetPassword(accountId, email, resetPasswordDto);
 
+            return NoContent();
+        }
+
+        [HttpPut]
+        [Authorize]
+        [ProducesResponseType(204)]
+        public async Task<IActionResult> ConfirmFarmEmail()
+        {
+            var farmId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+            var email = User.FindFirst(ClaimTypes.Email)?.Value;
+
+            await AuthService.ConfirmFarmEmail(farmId, email);
             return NoContent();
         }
     }

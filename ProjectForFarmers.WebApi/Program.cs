@@ -9,7 +9,10 @@ using System.Reflection;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Models;
 using ProjectForFarmers.Persistence;
-using ProjectForFarmers.Persistence.DbContexts;
+using Hangfire;
+using Hangfire.PostgreSql;
+using ProjectForFarmers.Application.Helpers;
+using ProjectForFarmers.Application.Interfaces;
 
 namespace ProjectForFarmers.WebApi
 {
@@ -23,54 +26,50 @@ namespace ProjectForFarmers.WebApi
             var app = builder.Build();
             ConfigureApp(app);
 
-
-            app.MapGet("/", () => "Hello World!");
-
             app.Run();
-
         }
 
         private static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
         {
-            //var dbHost = Environment.GetEnvironmentVariable("DB_HOST");
-            //var dbName = Environment.GetEnvironmentVariable("DB_NAME");
-            //var userName = Environment.GetEnvironmentVariable("DB_USER");
-            //var dbPassword = Environment.GetEnvironmentVariable("DB_PASSWORD");
-            //string connectionString = $"Host={dbHost};Database={dbName};Username={userName};Password={dbPassword};";
-            string connectionString = configuration.GetConnectionString("RemoteConnection");
+            string connectionString = configuration.GetConnectionString("LocalConnection");
+
             services.AddPersistence(connectionString);
-            
-            Log.Logger = new LoggerConfiguration()
-                .ReadFrom.Configuration(configuration)
-                .CreateLogger();
+            services.AddMemoryCache();
+
+            Log.Logger = new LoggerConfiguration().WriteTo.PostgreSQL(connectionString, "Logs", needAutoCreateTable: true)
+               .MinimumLevel.Information().CreateLogger();
             Log.Information("The program has started.");
 
-            services.AddApplication();
+            services.AddApplication(configuration);
             services.AddControllers(options =>
             {
                 options.Filters.Add(new ProducesAttribute("application/json"));
             });
+
+            services.AddHangfire(config =>
+                config.UsePostgreSqlStorage(c =>
+                    c.UseNpgsqlConnection(connectionString)));
 
             services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             }).AddJwtBearer(options =>
-            {
-                var key = Encoding.UTF8.GetBytes(configuration["Auth:Secret"]);
-                options.SaveToken = true;
-                options.TokenValidationParameters = new TokenValidationParameters
                 {
-                    ValidateIssuerSigningKey = true,
-                    ValidIssuer = configuration["Auth:Issuer"],
-                    ValidAudience = configuration["Auth:Audience"],
-                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    var key = Encoding.UTF8.GetBytes(configuration["Auth:Secret"]);
+                    options.SaveToken = true;
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = configuration["Auth:Issuer"],
+                        ValidAudience = configuration["Auth:Audience"],
+                        IssuerSigningKey = new SymmetricSecurityKey(key),
 
-                    ValidateLifetime = true,
-                    ValidateIssuer = false,
-                    ValidateAudience = false,
-                };
-            });
+                        ValidateLifetime = true,
+                        ValidateIssuer = false,
+                        ValidateAudience = false,
+                    };
+                });
 
             services.AddSwaggerGen(config =>
             {
@@ -101,28 +100,21 @@ namespace ProjectForFarmers.WebApi
         {
             if (app.Environment.IsDevelopment()) app.UseDeveloperExceptionPage();
 
-            using (var scope = app.Services.CreateScope())
-            {
-                var services = scope.ServiceProvider;
+            app.UseHangfireServer();
+            app.UseHangfireDashboard();
 
-                var context = services.GetRequiredService<MainDbContext>();
-                if (context.Database.GetPendingMigrations().Any())
-                    context.Database.Migrate();
-            }
+            HangfireHelper.RegisterTasks(app.Services);
 
-            AppDomain.CurrentDomain.ProcessExit += (sender, e) =>
-            {
-                Log.Information("Program has exited successfully.");
-                Log.CloseAndFlush();
-            };
-
-
+            app.UseMiddleware<CultureMiddleware>();
             app.UseMiddleware<ExceptionHandlerMiddleware>();
             app.UseRouting();
             app.UseHttpsRedirection();
-            app.UseCors("AllowAll"); //change in future
+            app.UseStaticFiles();
+
+            app.UseCors("AllowAll");
             app.UseAuthentication();
             app.UseAuthorization();
+
             app.UseSwagger();
             app.UseSwaggerUI(options =>
             {

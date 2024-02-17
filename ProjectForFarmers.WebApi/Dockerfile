@@ -8,20 +8,20 @@ EXPOSE 443
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["Agroforum.WebApi/Agroforum.WebApi.csproj", "Agroforum.WebApi/"]
-COPY ["Agroforum.Application/Agroforum.Application.csproj", "Agroforum.Application/"]
-COPY ["Agroforum.Domain/Agroforum.Domain.csproj", "Agroforum.Domain/"]
-COPY ["Agroforum.Persistence/Agroforum.Persistence.csproj", "Agroforum.Persistence/"]
-RUN dotnet restore "./Agroforum.WebApi/./Agroforum.WebApi.csproj"
+COPY ["ProjectForFarmers.WebApi/ProjectForFarmers.WebApi.csproj", "ProjectForFarmers.WebApi/"]
+COPY ["ProjectForFarmers.Application/ProjectForFarmers.Application.csproj", "ProjectForFarmers.Application/"]
+COPY ["ProjectForFarmers.Domain/ProjectForFarmers.Domain.csproj", "ProjectForFarmers.Domain/"]
+COPY ["ProjectForFarmers.Persistence/ProjectForFarmers.Persistence.csproj", "ProjectForFarmers.Persistence/"]
+RUN dotnet restore "./ProjectForFarmers.WebApi/./ProjectForFarmers.WebApi.csproj"
 COPY . .
-WORKDIR "/src/Agroforum.WebApi"
-RUN dotnet build "./Agroforum.WebApi.csproj" -c $BUILD_CONFIGURATION -o /app/build
+WORKDIR "/src/ProjectForFarmers.WebApi"
+RUN dotnet build "./ProjectForFarmers.WebApi.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./Agroforum.WebApi.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "./ProjectForFarmers.WebApi.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "Agroforum.WebApi.dll"]
+ENTRYPOINT ["dotnet", "ProjectForFarmers.WebApi.dll"]

@@ -2,7 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-
 namespace ProjectForFarmers.Persistence.EntityTypeConfigurations
 {
     public class EmployeePermissionsConfigurations : IEntityTypeConfiguration<EmployeePermissions>

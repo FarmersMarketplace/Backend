@@ -1,11 +1,6 @@
 ﻿using ProjectForFarmers.Domain;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Principal;
-using System.Text;
-using System.Threading.Tasks;
+using DayOfWeek = ProjectForFarmers.Domain.DayOfWeek;
 
 namespace ProjectForFarmers.Application.Interfaces
 {
@@ -14,6 +9,16 @@ namespace ProjectForFarmers.Application.Interfaces
         DbSet<Account> Accounts { get; set; }
         DbSet<Address> Addresses { get; set; }
         DbSet<Farm> Farms { get; set; }
+        DbSet<Order> Orders { get; set; }
+        DbSet<DayOfWeek> DaysOfWeek { get; set; }
+        DbSet<Schedule> Schedules { get; set; }
+        DbSet<MonthStatistic> MonthesStatistics { get; set; }
+        DbSet<OrderItem> OrdersItems { get; set; }
+        DbSet<Category> Categories { get; set; }
+        DbSet<Subcategory> Subcategories { get; set; }
+        DbSet<Product> Products { get; set; }
+        DbSet<PaymentData> PaymentData { get; set; }
+        DbSet<FarmLog> FarmsLogs { get; set; }
         Task<int> SaveChangesAsync(CancellationToken token);
         Task<int> SaveChangesAsync();
     }

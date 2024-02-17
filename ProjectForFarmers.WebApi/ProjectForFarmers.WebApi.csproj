@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
@@ -12,6 +12,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Hangfire.AspNetCore" Version="1.8.9" />
+    <PackageReference Include="Hangfire.PostgreSql" Version="1.20.5" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="7.0.13" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.13" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.13">
@@ -23,7 +25,6 @@
     <PackageReference Include="Serilog.Settings.Configuration" Version="8.0.0" />
     <PackageReference Include="Serilog.Sinks.Console" Version="5.0.1" />
     <PackageReference Include="Serilog.Sinks.PostgreSQL" Version="2.3.0" />
-    <PackageReference Include="SixLabors.ImageSharp" Version="3.0.2" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
   </ItemGroup>
 
@@ -33,9 +34,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="Agroforum.Domain">
-      <HintPath>..\ProjectForFarmers.Application\bin\Debug\net7.0\Agroforum.Domain.dll</HintPath>
-    </Reference>
+    <Folder Include="wwwroot\images\farm\" />
+    <Folder Include="wwwroot\documents\" />
+    <Folder Include="wwwroot\images\account\" />
+    <Folder Include="wwwroot\images\product\" />
+    <Folder Include="wwwroot\temporary\" />
   </ItemGroup>
 
 </Project>

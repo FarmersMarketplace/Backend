@@ -12,9 +12,10 @@ namespace ProjectForFarmers.Application.Services
     {
         Task Register(RegisterDto accountDto);
         Task ConfirmEmail(Guid userId, string email);
-        Task<JwtVm> Login(LoginDto loginDto);
+        Task<LoginVm> Login(LoginDto loginDto);
         Task ResetPassword(Guid accountId, string? email, ResetPasswordDto resetPasswordDto);
         Task ForgotPassword(ForgotPasswordDto forgotPasswordDto);
-        Task<JwtVm> AuthenticateWithGoogle(AuthenticateWithGoogleDto authenticateWithGoogleDto);
+        Task<LoginVm> AuthenticateWithGoogle(AuthenticateWithGoogleDto authenticateWithGoogleDto);
+        Task ConfirmFarmEmail(Guid farmId, string email);
     }
 }

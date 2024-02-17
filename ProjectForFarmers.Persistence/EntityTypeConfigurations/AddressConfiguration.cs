@@ -12,11 +12,12 @@ namespace ProjectForFarmers.Persistence.EntityTypeConfigurations
             builder.ToTable("Addresses");
 
             builder.HasKey(address => address.Id);
-            builder.Property(address => address.Region).IsRequired();
-            builder.Property(address => address.Settlement).IsRequired();
-            builder.Property(address => address.Street).IsRequired();
-            builder.Property(address => address.HouseNumber).IsRequired();
-            builder.Property(address => address.PostalCode).IsRequired();
+            builder.Property(address => address.Region).HasMaxLength(30).IsRequired();
+            builder.Property(address => address.District).HasMaxLength(30).IsRequired();
+            builder.Property(address => address.Settlement).HasMaxLength(50).IsRequired();
+            builder.Property(address => address.Street).HasMaxLength(50).IsRequired();
+            builder.Property(address => address.HouseNumber).HasMaxLength(10).IsRequired();
+            builder.Property(address => address.PostalCode).HasMaxLength(5).IsRequired();
 
             builder.HasIndex(address => address.Id).IsUnique();
         }

@@ -9,37 +9,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AutoMapper;
+using Microsoft.Extensions.Configuration;
+using ProjectForFarmers.Application.DataTransferObjects.Farm;
+using ProjectForFarmers.Application.DataTransferObjects;
 
 namespace ProjectForFarmers.Application.Services.Business
 {
-    public class AccountService : IAccountService
+    public class AccountService : Service, IAccountService
     {
-        private readonly IApplicationDbContext DbContext;
-
-        public AccountService(IApplicationDbContext dbContext)
+        public AccountService(IMapper mapper, IApplicationDbContext dbContext, IConfiguration configuration) : base(mapper, dbContext, configuration)
         {
-            DbContext = dbContext;
-        }
-
-        public async Task Update(UpdateAccountDto updateAccountDto)
-        {
-            var account = await DbContext.Accounts.FirstOrDefaultAsync(a => a.Id == updateAccountDto.Id);
-            if (account == null) throw new NotFoundException($"Account with Id {updateAccountDto.Id} not found.");
-
-            account.Name = updateAccountDto.Name;
-            account.Surname = updateAccountDto.Surname;
-            
-            await DbContext.SaveChangesAsync();
-        }
-
-        public async Task UpdatePhoto(UpdateAccountPhotoDto updateAccountPhototDto)
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task<AccountVm> Get(Guid accountId)
-        {
-            throw new NotImplementedException("Photo");
         }
     }
 }

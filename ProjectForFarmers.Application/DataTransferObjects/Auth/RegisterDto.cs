@@ -1,4 +1,6 @@
-﻿using ProjectForFarmers.Domain;
+﻿using AutoMapper;
+using ProjectForFarmers.Application.Interfaces;
+using ProjectForFarmers.Domain;
 
 namespace ProjectForFarmers.Application.DataTransferObjects.Auth
 {
@@ -10,5 +12,7 @@ namespace ProjectForFarmers.Application.DataTransferObjects.Auth
         public string Password { get; set; }
         public string ConfirmPassword{ get; set; }
         public Role Role { get; set; }
+
+        
     }
 }
