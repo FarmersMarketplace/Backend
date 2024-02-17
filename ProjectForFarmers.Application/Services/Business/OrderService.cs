@@ -7,12 +7,13 @@ using Microsoft.Extensions.Configuration;
 using ProjectForFarmers.Application.DataTransferObjects.Farm;
 using ProjectForFarmers.Application.DataTransferObjects.Order;
 using ProjectForFarmers.Application.Exceptions;
-using ProjectForFarmers.Application.Filters;
 using ProjectForFarmers.Application.Interfaces;
 using ProjectForFarmers.Application.ViewModels.Order;
 using ProjectForFarmers.Domain;
 using ProjectForFarmers.Application.Helpers;
 using InvalidDataException = ProjectForFarmers.Application.Exceptions.InvalidDataException;
+using Microsoft.IdentityModel.Tokens;
+using Address = ProjectForFarmers.Domain.Address;
 
 namespace ProjectForFarmers.Application.Services.Business
 {
@@ -29,34 +30,54 @@ namespace ProjectForFarmers.Application.Services.Business
                 && o.Producer == getOrderListDto.Producer
                 && o.ProducerId == getOrderListDto.ProducerId);
 
+            if (!getOrderListDto.Query.IsNullOrEmpty())
+            {
+                ordersQuery = ordersQuery.Where(o => o.Number.ToString().Contains(getOrderListDto.Query, StringComparison.OrdinalIgnoreCase)
+                && (o.Customer.Name + " " + o.Customer.Surname).Contains(getOrderListDto.Query, StringComparison.OrdinalIgnoreCase));
+            }
 
             if (getOrderListDto.Filter != null)
+            {
                 ordersQuery = await getOrderListDto.Filter.ApplyFilter(ordersQuery);
-
+            }
+            
             var orders = await ordersQuery.OrderByDescending(order => order.CreationDate)
                 .Take(getOrderListDto.PageSize)
                 .ToListAsync();
 
             var vm = new OrderListVm
             {
-                Orders = Mapper.Map<List<OrderLookupVm>>(orders),
+                Orders = new List<OrderLookupVm>(),
                 Count = await ordersQuery.CountAsync()
             };
+
+            foreach(var order in orders)
+            {
+                vm.Orders.Add(Mapper.Map<OrderLookupVm>(order));
+            }
 
             return vm;
         }
 
-        public async Task<string> ExportToExcel(Guid producerId, Producer producer)
+        public async Task<(string fileName, byte[] bytes)> ExportToExcel(ExportOrdersDto exportOrdersDto)
         {
-            var orders = DbContext.Orders.Where(o => o.Producer == producer
-                && o.ProducerId == producerId).ToList();
+            var ordersQuery = DbContext.Orders.Include(o => o.Customer)
+                .Where(o => o.Producer == exportOrdersDto.Producer
+                && o.ProducerId == exportOrdersDto.ProducerId);
 
-            string fileName = await GetFileName(producerId, producer);
+            if(exportOrdersDto.Filter != null)
+            {
+                ordersQuery = await exportOrdersDto.Filter.ApplyFilter(ordersQuery);
+            }
 
-            string filePath = Path.Combine(Configuration["Files"], fileName);
-            using (FileStream fs = File.Create(filePath)) { }
+            var orders = ordersQuery.ToList();
+            List<Guid> ids = orders.Select(o => o.Id).ToList();
 
-            using (var fastExcel = new FastExcel.FastExcel(new FileInfo(filePath)))
+            string fileName = await GetFileName(exportOrdersDto.ProducerId, exportOrdersDto.Producer);
+            string filePath = Path.Combine(Configuration["File:Temporary"], fileName);
+            string templatePath = Path.Combine(Configuration["File:Temporary"], "template.xlsx");
+
+            using (var fastExcel = new FastExcel.FastExcel(new FileInfo(templatePath), new FileInfo(filePath)))
             {
                 var worksheet = new Worksheet();
                 var rows = new List<Row>();
@@ -77,31 +98,35 @@ namespace ProjectForFarmers.Application.Services.Business
                 for (int i = 0; i < orders.Count; i++)
                 {
                     cells = new List<Cell>();
-                    cells.Add(new Cell(1, orders[i].Id));
+
+                    cells.Add(new Cell(1, orders[i].Id.ToString()));
                     cells.Add(new Cell(2, orders[i].Number));
                     cells.Add(new Cell(3, orders[i].CreationDate));
                     cells.Add(new Cell(4, orders[i].Customer.Name + " " + orders[i].Customer.Surname));
                     cells.Add(new Cell(5, orders[i].Customer.Email));
-                    cells.Add(new Cell(6, orders[i].Customer.Phone));
+                    cells.Add(new Cell(6, orders[i].Customer.Phone == null ? "" : orders[i].Customer.Phone));
                     cells.Add(new Cell(7, orders[i].TotalPayment));
 
-                    if(orders[i].PaymentType == PaymentType.Online) cells.Add(new Cell(8, CultureHelper.Exception("Online"))); //Онлайн
-                    else if (orders[i].PaymentType == PaymentType.Cash) cells.Add(new Cell(8, "Cash")); //Готівка
+                    if (orders[i].PaymentType == PaymentType.Online) cells.Add(new Cell(8, CultureHelper.Property("Online"))); //Онлайн
+                    else if (orders[i].PaymentType == PaymentType.Cash) cells.Add(new Cell(8, CultureHelper.Property("Cash"))); //Готівка
 
                     if (orders[i].Status == OrderStatus.New) cells.Add(new Cell(9, "New")); //Нове
-                    else if (orders[i].Status == OrderStatus.Processing) cells.Add(new Cell(9, "InProcessing")); //В обробці
-                    else if (orders[i].Status == OrderStatus.Collected) cells.Add(new Cell(9, "Collected")); //Зібрано
-                    else if (orders[i].Status == OrderStatus.InDelivery) cells.Add(new Cell(9, "InDelivery")); //В доставці
-                    else if (orders[i].Status == OrderStatus.Completed) cells.Add(new Cell(9, "Completed")); //Виконано
+                    else if (orders[i].Status == OrderStatus.InProcessing) cells.Add(new Cell(9, CultureHelper.Property("InProcessing"))); //В обробці
+                    else if (orders[i].Status == OrderStatus.Collected) cells.Add(new Cell(9, CultureHelper.Property("Collected"))); //Зібрано
+                    else if (orders[i].Status == OrderStatus.InDelivery) cells.Add(new Cell(9, CultureHelper.Property("InDelivery"))); //В доставці
+                    else if (orders[i].Status == OrderStatus.Completed) cells.Add(new Cell(9, CultureHelper.Property("Completed"))); //Виконано
 
-                    rows.Add(new Row(i + 1, cells));
+                    rows.Add(new Row(i + 2, cells));
                 }
-                worksheet.Rows = rows;
 
-                fastExcel.Update(worksheet, 1);
+                worksheet.Rows = rows;
+                fastExcel.Write(worksheet, "sheet1");
             }
 
-            return fileName;
+            byte[] fileBytes = await System.IO.File.ReadAllBytesAsync(filePath);
+            System.IO.File.Delete(filePath);
+
+            return (fileName, fileBytes);
         }
 
         private async Task<string> GetFileName(Guid producerId, Producer producer)
@@ -113,20 +138,73 @@ namespace ProjectForFarmers.Application.Services.Business
                 var account = await DbContext.Accounts.FirstOrDefaultAsync(a => a.Id == producerId
                     && a.Role == Role.Seller);
 
+                if (account == null)
+                {
+                    string message = $"Account with Id {producerId} was not found.";
+                    string userFacingMessage = CultureHelper.Exception("AccountWithIdNotFound", producerId.ToString());
+
+                    throw new NotFoundException(message, userFacingMessage);
+                }
+
                 producerName = account.Name + " " + account.Surname;
             }
             else if (producer == Producer.Farm)
             {
                 var farm = await DbContext.Farms.FirstOrDefaultAsync(f => f.Id == producerId);
+
+                if (farm == null)
+                {
+                    string message = $"Farm with Id {producerId} was not found.";
+                    string userFacingMessage = CultureHelper.Exception("FarmWithIdNotFound", producerId.ToString());
+
+                    throw new NotFoundException(message, userFacingMessage);
+                }
+
                 producerName = farm.Name;
             }
 
-            string fileName = producerName + "_" + DateTime.Now.ToString() + "_" + "orders.xlsx";
+            string fileName = producerName.Replace(' ', '_') + "_" + DateTime.UtcNow.ToString("yyyy-MM-dd_HH-mm-ss") + "_" + "orders.xlsx";
 
             return fileName;
         }
 
-        public async Task Duplicate(OrderListDto orderListDto)
+        public void Validate(Guid accountId, Guid producerId, Producer producer)
+        {
+            if(producer == Producer.Seller)
+            {
+                if (producerId != accountId)
+                {
+                    string message = $"Access denied: Permission denied to modify data.";
+                    string userFacingMessage = CultureHelper.Exception("AccessDenied");
+
+                    throw new AuthorizationException(message, userFacingMessage);
+                }
+            }
+            else if(producer == Producer.Farm)
+            {
+                var farm = DbContext.Farms.FirstOrDefault(f => f.Id == producerId);
+                if (farm == null)
+                {
+                    string message = $"Farm with Id {producerId} was not found.";
+                    string userFacingMessage = CultureHelper.Exception("FarmWithIdNotFound", producerId.ToString());
+
+                    throw new NotFoundException(message, userFacingMessage);
+                }
+                if(farm.OwnerId != accountId)
+                {
+                    string message = $"Access denied: Permission denied to modify data.";
+                    string userFacingMessage = CultureHelper.Exception("AccessDenied");
+
+                    throw new AuthorizationException(message, userFacingMessage);
+                }
+            }
+            else
+            {
+                throw new Exception("Producer is not validated.");
+            }
+        }
+
+        public async Task Duplicate(OrderListDto orderListDto, Guid accountId)
         {
             foreach(var orderId in orderListDto.OrderIds)
             {
@@ -139,6 +217,7 @@ namespace ProjectForFarmers.Application.Services.Business
 
                     throw new NotFoundException(message, userFacingMessage);
                 }
+                Validate(accountId, order.ProducerId, order.Producer);
 
                 var newOrderId = Guid.NewGuid();
                 var items = new List<OrderItem>();
@@ -156,6 +235,22 @@ namespace ProjectForFarmers.Application.Services.Business
                     items.Add(newItem);
                 }
 
+                var deliveryPoint = new Address
+                {
+                    Id = Guid.NewGuid(),
+                    Region = order.DeliveryPoint.Region,
+                    Settlement = order.DeliveryPoint.Settlement,
+                    District = order.DeliveryPoint.District,
+                    Street = order.DeliveryPoint.Street,
+                    HouseNumber = order.DeliveryPoint.HouseNumber,
+                    PostalCode = order.DeliveryPoint.PostalCode,
+                    Note = order.DeliveryPoint.Note,
+                    Latitude = order.DeliveryPoint.Latitude,
+                    Longitude = order.DeliveryPoint.Longitude,
+                };
+
+                DbContext.Addresses.Add(deliveryPoint);
+
                 var newOrder = new Order
                 {
                     Id = newOrderId,
@@ -166,8 +261,8 @@ namespace ProjectForFarmers.Application.Services.Business
                     PaymentType = order.PaymentType,
                     PaymentStatus = order.PaymentStatus,
                     ReceivingType = order.ReceivingType,
-                    DeliveryPointId = order.DeliveryPointId,
-                    DeliveryPoint = order.DeliveryPoint,
+                    DeliveryPointId = deliveryPoint.Id,
+                    DeliveryPoint = deliveryPoint,
                     Producer = order.Producer,
                     Status = OrderStatus.New,
                     ProducerId = order.ProducerId,
@@ -182,7 +277,7 @@ namespace ProjectForFarmers.Application.Services.Business
             await DbContext.SaveChangesAsync();
         }
 
-        public async Task Delete(OrderListDto orderListDto)
+        public async Task Delete(OrderListDto orderListDto, Guid accountId)
         {
             foreach (var orderId in orderListDto.OrderIds)
             {
@@ -196,10 +291,7 @@ namespace ProjectForFarmers.Application.Services.Business
                     throw new NotFoundException(message, userFacingMessage);
                 }
 
-                foreach(var item in order.Items)
-                {
-                    DbContext.OrdersItems.Remove(item);
-                }
+                Validate(accountId, order.ProducerId, order.Producer);
 
                 DbContext.Orders.Remove(order);
             }
@@ -252,17 +344,19 @@ namespace ProjectForFarmers.Application.Services.Business
             return vm;
         }
 
-        public async Task Update(UpdateOrderDto updateOrderDto)
+        public async Task Update(UpdateOrderDto updateOrderDto, Guid accountId)
         {
-            var order = await DbContext.Orders.Include(o => o.Items).FirstOrDefaultAsync(o => o.Id == updateOrderDto.OrderId);
+            var order = await DbContext.Orders.Include(o => o.Items).FirstOrDefaultAsync(o => o.Id == updateOrderDto.Id);
 
             if (order == null)
             {
-                string message = $"Order with id {updateOrderDto.OrderId} was not found.";
-                string userFacingMessage = CultureHelper.Exception("OrderWithIdNotExist", updateOrderDto.OrderId.ToString());
+                string message = $"Order with id {updateOrderDto.Id} was not found.";
+                string userFacingMessage = CultureHelper.Exception("OrderWithIdNotExist", updateOrderDto.Id.ToString());
 
                 throw new NotFoundException(message, userFacingMessage);
             }
+
+            Validate(accountId, order.ProducerId, order.Producer);
 
             order.ReceiveDate = updateOrderDto.ReceiveDate;
             order.PaymentType = updateOrderDto.PaymentType;
@@ -318,7 +412,7 @@ namespace ProjectForFarmers.Application.Services.Business
             return coords;
         }
 
-        public async Task AddOrderItem(AddOrderItemDto addOrderItemDto)
+        public async Task AddOrderItem(AddOrderItemDto addOrderItemDto, Guid accountId)
         {
             var order = await DbContext.Orders.Include(o => o.Items).FirstOrDefaultAsync(o => o.Id == addOrderItemDto.OrderId);
 
@@ -329,6 +423,8 @@ namespace ProjectForFarmers.Application.Services.Business
 
                 throw new NotFoundException(message, userFacingMessage);
             }
+
+            Validate(accountId, order.ProducerId, order.Producer);
 
             var product = await DbContext.Products.FirstOrDefaultAsync(p => p.Id == addOrderItemDto.ProductId);
 

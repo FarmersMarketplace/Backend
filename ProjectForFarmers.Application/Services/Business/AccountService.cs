@@ -11,6 +11,8 @@ using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.Extensions.Configuration;
+using ProjectForFarmers.Application.DataTransferObjects.Farm;
+using ProjectForFarmers.Application.DataTransferObjects;
 
 namespace ProjectForFarmers.Application.Services.Business
 {

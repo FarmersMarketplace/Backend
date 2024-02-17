@@ -6,6 +6,7 @@ using ProjectForFarmers.Application.Exceptions;
 using ProjectForFarmers.Application.Helpers;
 using ProjectForFarmers.Application.Interfaces;
 using ProjectForFarmers.Application.ViewModels.Category;
+using ProjectForFarmers.Application.ViewModels.Subcategory;
 using ProjectForFarmers.Domain;
 
 namespace ProjectForFarmers.Application.Services.Business
@@ -33,7 +34,7 @@ namespace ProjectForFarmers.Application.Services.Business
         {
             var category = DbContext.Categories.FirstOrDefault(c => c.Id == categoryId);
 
-            if (category != null)
+            if (category == null)
             {
                 string message = $"Category with Id {categoryId} was not found.";
                 string userFacingMessage = CultureHelper.Exception("CategoryWithIdNotFound", categoryId.ToString());
@@ -49,7 +50,18 @@ namespace ProjectForFarmers.Application.Services.Business
         {
             var categories = DbContext.Categories.Include(c => c.Subcategories).ToList();
 
-            var vm = new CategoryListVm { Categories = categories };
+            var vm = new CategoryListVm();
+
+            foreach (var category in categories)
+            {
+                var categoryVm = Mapper.Map<CategoryVm>(category);
+                foreach (var subcategory in category.Subcategories)
+                {
+                    categoryVm.Subcategories.Add(Mapper.Map<SubcategoryVm>(subcategory));
+                }
+
+                vm.Categories.Add(categoryVm);
+            }
 
             return vm;
         }

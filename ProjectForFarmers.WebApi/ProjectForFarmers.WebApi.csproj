@@ -38,6 +38,7 @@
     <Folder Include="wwwroot\documents\" />
     <Folder Include="wwwroot\images\account\" />
     <Folder Include="wwwroot\images\product\" />
+    <Folder Include="wwwroot\temporary\" />
   </ItemGroup>
 
 </Project>

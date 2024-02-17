@@ -117,8 +117,29 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="AccountNumber" xml:space="preserve">
+    <value>Account number</value>
+  </data>
+  <data name="Amount" xml:space="preserve">
+    <value>Amount</value>
+  </data>
+  <data name="ArticleNumber" xml:space="preserve">
+    <value>Article</value>
+  </data>
+  <data name="BankUSREOU" xml:space="preserve">
+    <value>USREOU of bank</value>
+  </data>
+  <data name="BIC" xml:space="preserve">
+    <value>BIC</value>
+  </data>
+  <data name="CardNumber" xml:space="preserve">
+    <value>Card number</value>
+  </data>
   <data name="Cash" xml:space="preserve">
     <value>Cash</value>
+  </data>
+  <data name="Category" xml:space="preserve">
+    <value>Category</value>
   </data>
   <data name="Collected" xml:space="preserve">
     <value>Collected</value>
@@ -132,6 +153,15 @@
   <data name="ContactPhone" xml:space="preserve">
     <value>Contact phone</value>
   </data>
+  <data name="CreationDate" xml:space="preserve">
+    <value>Date of creation</value>
+  </data>
+  <data name="CustomerEmail" xml:space="preserve">
+    <value>Customer email</value>
+  </data>
+  <data name="CustomerName" xml:space="preserve">
+    <value>Customer name</value>
+  </data>
   <data name="Description" xml:space="preserve">
     <value>Description</value>
   </data>
@@ -141,6 +171,9 @@
   <data name="Friday" xml:space="preserve">
     <value>Friday</value>
   </data>
+  <data name="HolderFullName" xml:space="preserve">
+    <value>Holder's full name</value>
+  </data>
   <data name="HouseNumber" xml:space="preserve">
     <value>HouseNumber</value>
   </data>
@@ -148,7 +181,7 @@
     <value>Id</value>
   </data>
   <data name="InDelivery" xml:space="preserve">
-    <value>InDelivery</value>
+    <value>In delivery</value>
   </data>
   <data name="InProcessing" xml:space="preserve">
     <value>In processing</value>
@@ -180,14 +213,26 @@
   <data name="OrderDate" xml:space="preserve">
     <value>Order date</value>
   </data>
+  <data name="PaymentType" xml:space="preserve">
+    <value>PaymentType</value>
+  </data>
   <data name="Phone" xml:space="preserve">
     <value>Phone</value>
   </data>
   <data name="PostalCode" xml:space="preserve">
     <value>PostalCode</value>
   </data>
+  <data name="PricePerOne" xml:space="preserve">
+    <value>Price per one</value>
+  </data>
+  <data name="ReceivingMethods" xml:space="preserve">
+    <value>Methods of receiving</value>
+  </data>
   <data name="Region" xml:space="preserve">
     <value>Region</value>
+  </data>
+  <data name="Rest" xml:space="preserve">
+    <value>Rest</value>
   </data>
   <data name="Saturday" xml:space="preserve">
     <value>Saturday</value>
@@ -204,6 +249,9 @@
   <data name="Street" xml:space="preserve">
     <value>Street</value>
   </data>
+  <data name="Subcategory" xml:space="preserve">
+    <value>Subcategory</value>
+  </data>
   <data name="Sunday" xml:space="preserve">
     <value>Sunday</value>
   </data>
@@ -212,6 +260,9 @@
   </data>
   <data name="Tuesday" xml:space="preserve">
     <value>Tuesday</value>
+  </data>
+  <data name="UnitOfMeasurement" xml:space="preserve">
+    <value>Unit of measurement</value>
   </data>
   <data name="Wednesday" xml:space="preserve">
     <value>Wednesday</value>

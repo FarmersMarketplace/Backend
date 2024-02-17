@@ -27,17 +27,6 @@ namespace ProjectForFarmers.Application.Helpers
                 return builder.ToString();
             }
         }
-
-        public static string GenerateCacheKey<T>(T obj)
-        {
-            var typeName = typeof(T).FullName;
-            var serializedFilter = JsonSerializer.Serialize(obj);
-
-            ulong hash = CityHash.CityHash.CityHash64(serializedFilter+typeName);
-
-            return hash.ToString("X16"); 
-        }
-
     }
 
 }

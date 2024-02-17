@@ -13,6 +13,8 @@ using Address = ProjectForFarmers.Domain.Address;
 using ProjectForFarmers.Application.Services.Auth;
 using DayOfWeek = ProjectForFarmers.Domain.DayOfWeek;
 using Microsoft.AspNetCore.Http;
+using ProjectForFarmers.Application.ViewModels.Category;
+using ProjectForFarmers.Application.ViewModels.Subcategory;
 
 namespace ProjectForFarmers.Application.Services.Business
 {
@@ -25,7 +27,7 @@ namespace ProjectForFarmers.Application.Services.Business
 
         public FarmService(IMapper mapper, IApplicationDbContext dbContext, IConfiguration configuration) : base(mapper, dbContext, configuration)
         {
-            FarmsImageFolder = Configuration["Images:Farm"];
+            FarmsImageFolder = Configuration["File:Images:Farm"];
             FileHelper = new FileHelper();
             EmailHelper = new EmailHelper(configuration);
             JwtService = new JwtService(configuration);
@@ -53,22 +55,38 @@ namespace ProjectForFarmers.Application.Services.Business
 
             string message = EmailContentBuilder.FarmEmailConfirmationMessageBody(farm.Name, owner.Name, owner.Surname, farmDto.ContactEmail, token);
             await EmailHelper.SendEmail(message, farmDto.ContactEmail, "Farm Email Confirmation");
+            await DbContext.SaveChangesAsync();
 
-            AddLog(farm, "FarmCreated");
+            var farmLog = new FarmLog
+            {
+                Id = Guid.NewGuid(),
+                PropertyName = null,
+                Message = "FarmCreated",
+                Parameters = null,
+                CreationDate = DateTime.UtcNow,
+                FarmId = farm.Id
+            };
+
+            DbContext.FarmsLogs.Add(farmLog);
 
             await DbContext.Farms.AddAsync(farm);
             await DbContext.SaveChangesAsync();
         }
 
-        private static void AddLog(Farm farm, string message, List<string>? parameters = null)
+        public void Validate(Guid? accountId, Guid id)
         {
-            var log = new FarmLog(Guid.NewGuid(), farm.Id, message, parameters, DateTime.UtcNow);
-            farm.Logs.Add(log);
+            if (id != accountId)
+            {
+                string message = $"Access denied: Permission denied to modify data.";
+                string userFacingMessage = CultureHelper.Exception("AccessDenied");
+
+                throw new AuthorizationException(message, userFacingMessage);
+            }
         }
 
         public async Task Delete(Guid farmId, Guid ownerId)
         {
-            var farm = await DbContext.Farms.FirstOrDefaultAsync(f => f.Id == farmId && f.OwnerId == ownerId);
+            var farm = await DbContext.Farms.FirstOrDefaultAsync(f => f.Id == farmId);
             if (farm == null)
             {
                 string message = $"Farm with Id {farmId} was not found.";
@@ -77,7 +95,19 @@ namespace ProjectForFarmers.Application.Services.Business
                 throw new NotFoundException(message, userFacingMessage);
             }
 
-            AddLog(farm, "FarmDeleted");
+            Validate(ownerId, farm.OwnerId);
+
+            var farmLog = new FarmLog
+            {
+                Id = Guid.NewGuid(),
+                PropertyName = null,
+                Message = "FarmDeleted",
+                Parameters = null,
+                CreationDate = DateTime.UtcNow,
+                FarmId = farm.Id
+            };
+
+            DbContext.FarmsLogs.Add(farmLog);
 
             DbContext.Farms.Remove(farm);
             await FileHelper.DeleteFiles(farm.ImagesNames, FarmsImageFolder);
@@ -100,7 +130,7 @@ namespace ProjectForFarmers.Application.Services.Business
             return coords;
         }
 
-        public async Task Update(UpdateFarmDto updateFarmDto)
+        public async Task Update(UpdateFarmDto updateFarmDto, Guid ownerId)
         {
             var farm = await DbContext.Farms
                 .Include(f => f.Owner)
@@ -120,26 +150,59 @@ namespace ProjectForFarmers.Application.Services.Business
                     .ThenInclude(s => s.Saturday)
                 .Include(f => f.Schedule)
                     .ThenInclude(s => s.Sunday)
-                .FirstOrDefaultAsync(f => f.Id == updateFarmDto.FarmId);
+                .FirstOrDefaultAsync(f => f.Id == updateFarmDto.Id);
 
             if (farm == null)
             {
-                string message = $"Farm with Id {updateFarmDto.FarmId} was not found.";
-                string userFacingMessage = CultureHelper.Exception("FarmWithIdNotFound", updateFarmDto.FarmId.ToString());
+                string message = $"Farm with Id {updateFarmDto.Id} was not found.";
+                string userFacingMessage = CultureHelper.Exception("FarmWithIdNotFound", updateFarmDto.Id.ToString());
 
                 throw new NotFoundException(message, userFacingMessage);
             }
+
+            Validate(ownerId, farm.OwnerId);
 
             LogAndUpdateIfChanged("Name", farm.Name, updateFarmDto.Name, () => farm.Name = updateFarmDto.Name, farm.Id);
             LogAndUpdateIfChanged("Description", farm.Description, updateFarmDto.Description, () => farm.Description = updateFarmDto.Description, farm.Id);
             LogAndUpdateIfChanged("ContactEmail", farm.ContactEmail, updateFarmDto.ContactEmail, () => farm.ContactEmail = updateFarmDto.ContactEmail, farm.Id);
             LogAndUpdateIfChanged("ContactPhone", farm.ContactPhone, updateFarmDto.ContactPhone, () => farm.ContactPhone = updateFarmDto.ContactPhone, farm.Id);
             LogAndUpdateIfChanged("SocialPageUrl", farm.SocialPageUrl, updateFarmDto.SocialPageUrl, () => farm.SocialPageUrl = updateFarmDto.SocialPageUrl, farm.Id);
+            UpdateReceivingTypes(farm, updateFarmDto);
+            
             await DbContext.SaveChangesAsync();
 
             await UpdateAddress(farm, updateFarmDto.Address);
             await UpdateSchedule(farm, updateFarmDto.Schedule);
             await UpdateImages(farm, updateFarmDto.Images);
+
+            await DbContext.SaveChangesAsync();
+        }
+
+        private void UpdateReceivingTypes(Farm farm, UpdateFarmDto updateFarmDto)
+        {
+            farm.ReceivingMethods = farm.ReceivingMethods.OrderBy(x => x).ToList();
+            updateFarmDto.ReceivingMethods = updateFarmDto.ReceivingMethods.OrderBy(x => x).ToList();
+
+            if (!farm.ReceivingMethods.SequenceEqual(updateFarmDto.ReceivingMethods))
+            {
+                var farmLog = new FarmLog
+                {
+                    Id = Guid.NewGuid(),
+                    PropertyName = "ReceivingMethods",
+                    Message = "PropertyChanged",
+                    Parameters = new string[]
+                    {
+                        string.Join(", ", farm.ReceivingMethods),
+                        string.Join(", ", updateFarmDto.ReceivingMethods)
+                    },
+                    CreationDate = DateTime.UtcNow,
+                    FarmId = farm.Id
+                };
+
+                DbContext.FarmsLogs.Add(farmLog);
+
+                farm.ReceivingMethods = updateFarmDto.ReceivingMethods;
+            }
 
             
         }
@@ -154,7 +217,7 @@ namespace ProjectForFarmers.Application.Services.Business
                     Id = Guid.NewGuid(),
                     PropertyName = propertyName,
                     Message = "PropertyChanged",
-                    Parameters = new List<string> { oldValue, newValue },
+                    Parameters = new string[] { oldValue, newValue },
                     CreationDate = DateTime.UtcNow,
                     FarmId = farmId
                 };
@@ -177,7 +240,7 @@ namespace ProjectForFarmers.Application.Services.Business
                 {
                     if (!images.Any(file => file.FileName == imageName))
                     {
-                        FileHelper.DeleteFile(imageName, Configuration["Images:Farm"]);
+                        FileHelper.DeleteFile(imageName, FarmsImageFolder);
                         deletedImages.Add(imageName);
                     }
                 }
@@ -189,7 +252,7 @@ namespace ProjectForFarmers.Application.Services.Business
                 {
                     if (!farm.ImagesNames.Contains(newImage.FileName))
                     {
-                        string imageName = await FileHelper.SaveFile(newImage, Configuration["Images:Farm"]);
+                        string imageName = await FileHelper.SaveFile(newImage, FarmsImageFolder);
                         farm.ImagesNames.Add(imageName);
                         newImages.Add(imageName);
                     }
@@ -208,7 +271,7 @@ namespace ProjectForFarmers.Application.Services.Business
                     Id = Guid.NewGuid(),
                     PropertyName = null,
                     Message = "ImagesDeleted",
-                    Parameters = new List<string> { string.Join(", ", deletedImages)},
+                    Parameters = new string[] { string.Join(", ", deletedImages)},
                     CreationDate = DateTime.UtcNow,
                     FarmId = farm.Id
                 };
@@ -220,7 +283,7 @@ namespace ProjectForFarmers.Application.Services.Business
                     Id = Guid.NewGuid(),
                     PropertyName = null,
                     Message = "ImagesCreated",
-                    Parameters = new List<string> { string.Join(", ", newImages) },
+                    Parameters = new string[] { string.Join(", ", newImages) },
                     CreationDate = DateTime.UtcNow,
                     FarmId = farm.Id
                 };
@@ -266,7 +329,7 @@ namespace ProjectForFarmers.Application.Services.Business
                 Id = Guid.NewGuid(),
                 PropertyName = dayName,
                 Message = "DayScheduleChanged",
-                Parameters = new List<string> 
+                Parameters = new string[] 
                 {
                     dayOfWeekDto.IsOpened.ToString(),
                     dayOfWeekDto.StartHour.ToString(),
@@ -314,11 +377,23 @@ namespace ProjectForFarmers.Application.Services.Business
                 .Include(f => f.Owner)
                 .Include(f => f.Address)
                 .Include(f => f.Schedule)
-                .Include(f => f.Categories)
-                .Include(f => f.Subcategories)
+                    .ThenInclude(s => s.Monday)
+                .Include(f => f.Schedule)
+                    .ThenInclude(s => s.Tuesday)
+                .Include(f => f.Schedule)
+                    .ThenInclude(s => s.Wednesday)
+                .Include(f => f.Schedule)
+                    .ThenInclude(s => s.Thursday)
+                .Include(f => f.Schedule)
+                    .ThenInclude(s => s.Friday)
+                .Include(f => f.Schedule)
+                    .ThenInclude(s => s.Sunday)
+                .Include(f => f.Schedule)
+                    .ThenInclude(s => s.Saturday)
                 .Include(f => f.PaymentData)
                 .Include(f => f.Logs)
                 .FirstOrDefaultAsync(f => f.Id == farmId);
+
             if (farm == null) 
             {
                 string message = $"Farm with Id {farmId} was not found.";
@@ -330,10 +405,60 @@ namespace ProjectForFarmers.Application.Services.Business
 
             foreach(var log in farm.Logs)
             {
-                vm.Logs.Add(Mapper.Map<FarmLogVm>(log));
+                var logVm = new FarmLogVm(GetMessage(log), log.CreationDate);
+                vm.Logs.Add(logVm);
+            }
+
+            foreach(var categoryId in farm.Categories) 
+            {
+                var category = DbContext.Categories.FirstOrDefault(c => c.Id == categoryId);
+                if (category == null)
+                {
+                    string message = $"Category with Id {categoryId} was not found.";
+                    string userFacingMessage = CultureHelper.Exception("CategoryWithIdNotFound", categoryId.ToString());
+
+                    throw new NotFoundException(message, userFacingMessage);
+                }
+
+                vm.Categories.Add(new CategoryLookupVm(category.Id, category.Name));
+            }
+
+            foreach (var subcategoryId in farm.Subcategories)
+            {
+                var subcategory = DbContext.Subcategories.FirstOrDefault(c => c.Id == subcategoryId);
+                if (subcategory == null)
+                {
+                    string message = $"Subcategory with Id {subcategoryId} was not found.";
+                    string userFacingMessage = CultureHelper.Exception("SubcategoryWithIdNotFound", subcategoryId.ToString());
+                    throw new NotFoundException(message, userFacingMessage);
+                }
+
+                vm.Subcategories.Add(new SubcategoryVm(subcategory.Id, subcategory.Name, subcategory.CategoryId));
             }
 
             return vm;
+        }
+
+        private string GetMessage(FarmLog log)
+        {
+            string message = "";
+
+            if (log == null || log.Message == null)
+            {
+                return "";
+            }
+            else if (log.PropertyName != null && log.PropertyName != "")
+            {
+                message += (CultureHelper.Property(log.PropertyName) + " ");
+            }
+
+            message += CultureHelper.FarmLog(log.Message);
+            if (log.Parameters != null && log.Parameters.Length > 0)
+            {
+                message = string.Format(message, log.Parameters);
+            }
+
+            return message;
         }
 
         public async Task<FarmListVm> GetAll(Guid userId)
@@ -349,7 +474,7 @@ namespace ProjectForFarmers.Application.Services.Business
             return response;
         }
 
-        public async Task UpdateFarmCategoriesAndSubcategories(UpdateFarmCategoriesAndSubcategoriesDto updateFarmCategoriesAndSubcategoriesDto)
+        public async Task UpdateFarmCategoriesAndSubcategories(UpdateFarmCategoriesAndSubcategoriesDto updateFarmCategoriesAndSubcategoriesDto, Guid ownerId)
         {
             var farm = await DbContext.Farms.FirstOrDefaultAsync(f => f.Id == updateFarmCategoriesAndSubcategoriesDto.FarmId);
             if (farm == null)
@@ -359,13 +484,15 @@ namespace ProjectForFarmers.Application.Services.Business
                 throw new NotFoundException(message, userFacingMessage);
             }
 
+            Validate(ownerId, farm.OwnerId);
+
             farm.Categories = updateFarmCategoriesAndSubcategoriesDto.Categories;
             farm.Subcategories = updateFarmCategoriesAndSubcategoriesDto.Subcategories;
 
             await DbContext.SaveChangesAsync();
         }
 
-        public async Task UpdateSettings(UpdateFarmSettingsDto updateFarmSettingsDto)
+        public async Task UpdateSettings(UpdateFarmSettingsDto updateFarmSettingsDto, Guid ownerId)
         {
             var farm = await DbContext.Farms.FirstOrDefaultAsync(f => f.Id == updateFarmSettingsDto.FarmId);
             if (farm == null)
@@ -375,21 +502,50 @@ namespace ProjectForFarmers.Application.Services.Business
                 throw new NotFoundException(message, userFacingMessage);
             }
 
+            Validate(ownerId, farm.OwnerId);
+
+            if (farm.PaymentData == null)
+                farm.PaymentData = new PaymentData();
+
             if(updateFarmSettingsDto.PaymentData != null)
             {
-                farm.PaymentData.CardNumber = updateFarmSettingsDto.PaymentData.CardNumber;
-                farm.PaymentData.AccountNumber = updateFarmSettingsDto.PaymentData.AccountNumber;
-                farm.PaymentData.BankUSREOU = updateFarmSettingsDto.PaymentData.BankUSREOU;
-                farm.PaymentData.BIC = updateFarmSettingsDto.PaymentData.BIC;
-                farm.PaymentData.HolderFullName = updateFarmSettingsDto.PaymentData.HolderFullName;
+                LogAndUpdateIfChanged("CardNumber", farm.PaymentData.CardNumber, updateFarmSettingsDto.PaymentData.CardNumber, () => farm.PaymentData.CardNumber = updateFarmSettingsDto.PaymentData.CardNumber, farm.Id);
+                LogAndUpdateIfChanged("AccountNumber", farm.PaymentData.AccountNumber, updateFarmSettingsDto.PaymentData.AccountNumber, () => farm.PaymentData.AccountNumber = updateFarmSettingsDto.PaymentData.AccountNumber, farm.Id);
+                LogAndUpdateIfChanged("BankUSREOU", farm.PaymentData.BankUSREOU, updateFarmSettingsDto.PaymentData.BankUSREOU, () => farm.PaymentData.BankUSREOU = updateFarmSettingsDto.PaymentData.BankUSREOU, farm.Id);
+                LogAndUpdateIfChanged("BIC", farm.PaymentData.BIC, updateFarmSettingsDto.PaymentData.BIC, () => farm.PaymentData.BIC = updateFarmSettingsDto.PaymentData.BIC, farm.Id);
+                LogAndUpdateIfChanged("HolderFullName", farm.PaymentData.HolderFullName, updateFarmSettingsDto.PaymentData.HolderFullName, () => farm.PaymentData.HolderFullName = updateFarmSettingsDto.PaymentData.HolderFullName, farm.Id);
             }
-            if(updateFarmSettingsDto.ReceivingTypes != null)
+
+            if(farm.ReceivingMethods == null) 
+                farm.PaymentTypes = new List<PaymentType>() { PaymentType.Cash };  
+
+            if (updateFarmSettingsDto.HasDelivery 
+                && !farm.PaymentTypes.Contains(PaymentType.Online))
             {
-                farm.ReceivingTypes = updateFarmSettingsDto.ReceivingTypes;
+                farm.PaymentTypes.Add(PaymentType.Online);
+                var farmLog = new FarmLog
+                {
+                    Id = Guid.NewGuid(),
+                    PropertyName = null,
+                    Message = "AddedOnlinePayment",
+                    Parameters = null,
+                    CreationDate = DateTime.UtcNow,
+                    FarmId = farm.Id
+                };
             }
-            if(updateFarmSettingsDto.PaymentTypes != null)
+            else if (!updateFarmSettingsDto.HasDelivery
+                && farm.PaymentTypes.Contains(PaymentType.Online))
             {
-                farm.PaymentTypes = updateFarmSettingsDto.PaymentTypes;
+                farm.PaymentTypes.Remove(PaymentType.Online);
+                var farmLog = new FarmLog
+                {
+                    Id = Guid.NewGuid(),
+                    PropertyName = null,
+                    Message = "DeletedOnlinePayment",
+                    Parameters = null,
+                    CreationDate = DateTime.UtcNow,
+                    FarmId = farm.Id
+                };
             }
 
             await DbContext.SaveChangesAsync();

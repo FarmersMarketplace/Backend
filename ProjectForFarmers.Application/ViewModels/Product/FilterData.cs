@@ -8,7 +8,17 @@ namespace ProjectForFarmers.Application.ViewModels.Product
 {
     public class FilterData
     {
-        public List<string> UnitsOfMeasurement { get; set; }
+        public HashSet<string> UnitsOfMeasurement { get; set; }
+
+        public FilterData(HashSet<string> unitsOfMeasurement)
+        {
+            UnitsOfMeasurement = unitsOfMeasurement;
+        }
+
+        public FilterData()
+        {
+            UnitsOfMeasurement = new HashSet<string>();
+        }
     }
 
 }

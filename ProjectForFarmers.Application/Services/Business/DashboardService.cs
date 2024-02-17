@@ -23,17 +23,17 @@ namespace ProjectForFarmers.Application.Services.Business
             MemoryCache = memoryCache;
         }
 
-        public async Task<CustomerListVm> CustomerAutocomplete(Guid producerId, Producer producer, string query, int count)
+        public async Task<OptionListVm> CustomerAutocomplete(Guid producerId, Producer producer, string query, int count)
         {
-            var cacheKey = $"{producerId}-{producer}-customers";
-            var vm = new CustomerListVm();
+            var cacheKey = CacheHelper.GenerateCacheKey(producerId, producer, "customers");
+            var vm = new OptionListVm();
 
             if (MemoryCache.TryGetValue(cacheKey, out List<string> cachedCustomerNames))
             {
-                vm.Customers = cachedCustomerNames
+                vm.Options = new HashSet<string>(cachedCustomerNames
                    .Where(customer => customer.ToLower().Contains(query.ToLower()))
                    .Take(count)
-                   .ToList();
+                   .ToList());
 
                 return vm;
             }
@@ -50,12 +50,12 @@ namespace ProjectForFarmers.Application.Services.Business
                 .Distinct()
                 .ToListAsync();
 
-            MemoryCache.Set(cacheKey, customerNames, TimeSpan.FromMinutes(10));
+            MemoryCache.Set(cacheKey, customerNames, TimeSpan.FromMinutes(20));
 
-            vm.Customers = customerNames
+            vm.Options = new HashSet<string>(customerNames
                       .Where(customer => customer.ToLower().Contains(query.ToLower()))
                       .Take(count)
-                      .ToList();
+                      .ToList());
 
             return vm;
         }
@@ -101,7 +101,7 @@ namespace ProjectForFarmers.Application.Services.Business
             return currentMonthDashboardVm;
         }
 
-        public async Task<CustomerInfoVm> GetCustomer(GetCustomerDto getCustomerDto)
+        public async Task<CustomerInfoVm> SearchCustomer(GetCustomerDto getCustomerDto)
         {
             var vm = await StatisticService.GetCustomerInfo(getCustomerDto);
 

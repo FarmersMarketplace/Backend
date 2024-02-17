@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace ProjectForFarmers.Application.ViewModels.Dashboard
 {
-    public class CustomerListVm
+    public class AutocompleteOptionsListVm
     {
         public List<string> Customers {  get; set; }
 
-        public CustomerListVm()
+        public AutocompleteOptionsListVm()
         {
             Customers = new List<string>();
         }

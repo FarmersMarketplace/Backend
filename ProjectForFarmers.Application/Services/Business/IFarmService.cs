@@ -7,10 +7,10 @@ namespace ProjectForFarmers.Application.Services.Business
     {
         Task<FarmVm> Get(Guid farmId);
         Task Create(CreateFarmDto createFarmDto);
-        Task Update(UpdateFarmDto updateFarmDto);
-        Task UpdateSettings(UpdateFarmSettingsDto updateFarmSettingsDto);
+        Task Update(UpdateFarmDto updateFarmDto, Guid ownerId);
+        Task UpdateSettings(UpdateFarmSettingsDto updateFarmSettingsDto, Guid ownerId);
         Task Delete(Guid farmId, Guid ownerId);
         Task<FarmListVm> GetAll(Guid userId);
-        Task UpdateFarmCategoriesAndSubcategories(UpdateFarmCategoriesAndSubcategoriesDto updateFarmCategoriesAndSubcategoriesDto);
+        Task UpdateFarmCategoriesAndSubcategories(UpdateFarmCategoriesAndSubcategoriesDto updateFarmCategoriesAndSubcategoriesDto, Guid ownerId);
     }
 }

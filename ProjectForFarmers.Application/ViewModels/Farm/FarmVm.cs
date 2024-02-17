@@ -1,9 +1,6 @@
-﻿using ProjectForFarmers.Domain;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using ProjectForFarmers.Application.ViewModels.Category;
+using ProjectForFarmers.Application.ViewModels.Subcategory;
+using ProjectForFarmers.Domain;
 
 namespace ProjectForFarmers.Application.ViewModels.Farm
 {
@@ -17,10 +14,12 @@ namespace ProjectForFarmers.Application.ViewModels.Farm
         public AddressVm Address { get; set; }
         public ScheduleVm Schedule { get; set; }
         public PaymentDataVm PaymentData { get; set; }
+        public List<ReceivingMethod>? ReceivingMethods { get; set; }
+        public bool HasDelivery { get; set; }
         public string? SocialPageUrl { get; set; }
         public List<string> ImagesNames { get; set; }
-        public List<Guid>? Categories { get; set; }
-        public List<Guid>? Subcategories { get; set; }
+        public List<CategoryLookupVm>? Categories { get; set; }
+        public List<SubcategoryVm>? Subcategories { get; set; }
         public List<FarmLogVm> Logs { get; set; }
     }
 }

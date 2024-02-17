@@ -74,7 +74,7 @@ namespace ProjectForFarmers.Application.Services.Business
 
             var bookedOrders = orders.Where(o => o.Status != OrderStatus.Completed).ToArray();
             var completedOrders = orders.Where(o => o.Status == OrderStatus.Completed).ToArray();
-            var processingOrders = orders.Where(o => o.Status == OrderStatus.Processing).ToArray();
+            var processingOrders = orders.Where(o => o.Status == OrderStatus.InProcessing).ToArray();
             var newOrders = orders.Where(o => o.Status == OrderStatus.New).ToArray();
             var totalActivityOrders = orders;
 
@@ -170,7 +170,7 @@ namespace ProjectForFarmers.Application.Services.Business
 
             var bookedOrders = orders.Where(o => o.Status != OrderStatus.Completed).ToArray();
             var completedOrders = orders.Where(o => o.Status == OrderStatus.Completed).ToArray();
-            var processingOrders = orders.Where(o => o.Status == OrderStatus.Processing).ToArray();
+            var processingOrders = orders.Where(o => o.Status == OrderStatus.InProcessing).ToArray();
             var newOrders = orders.Where(o => o.Status == OrderStatus.New).ToArray();
             var totalActivityOrders = orders;
 

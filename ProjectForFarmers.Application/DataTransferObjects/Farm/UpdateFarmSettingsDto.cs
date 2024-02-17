@@ -11,8 +11,7 @@ namespace ProjectForFarmers.Application.DataTransferObjects.Farm
     {
         public Guid FarmId { get; set; }
         public PaymentDataDto PaymentData { get; set; }
-        public List<ReceivingType>? ReceivingTypes { get; set; }
-        public List<PaymentType>? PaymentTypes { get; set; }
+        public bool HasDelivery { get; set; }
     }
 
 }

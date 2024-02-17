@@ -9,7 +9,7 @@ namespace ProjectForFarmers.Domain
     public enum OrderStatus
     {
         New,
-        Processing,
+        InProcessing,
         Collected,
         InDelivery,
         Completed

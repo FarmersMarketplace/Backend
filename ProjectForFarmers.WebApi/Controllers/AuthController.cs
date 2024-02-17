@@ -39,9 +39,9 @@ namespace ProjectForFarmers.WebApi.Controllers
             return NoContent();
         }
         
-        [HttpPut]
+        [HttpGet]
         [ProducesResponseType(typeof(LoginVm), 200)]
-        public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
+        public async Task<IActionResult> Login([FromQuery] LoginDto loginDto)
         {
             var response = await AuthService.Login(loginDto);
             return Ok(response);

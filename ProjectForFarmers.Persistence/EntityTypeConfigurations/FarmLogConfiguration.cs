@@ -13,9 +13,6 @@ namespace ProjectForFarmers.Persistence.EntityTypeConfigurations
             builder.HasKey(log => log.Id);
             builder.Property(log => log.Message).IsRequired();
             builder.Property(log => log.CreationDate).IsRequired();
-            builder.HasOne<Farm>()
-                .WithMany()
-                .HasForeignKey(log => log.FarmId);
 
             builder.HasIndex(log => log.Id).IsUnique();
         }

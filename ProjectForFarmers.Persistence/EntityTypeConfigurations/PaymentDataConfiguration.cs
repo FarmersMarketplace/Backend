@@ -13,7 +13,7 @@ namespace ProjectForFarmers.Persistence.EntityTypeConfigurations
     {
         public void Configure(EntityTypeBuilder<PaymentData> builder)
         {
-            builder.ToTable("PaymantData");
+            builder.ToTable("PaymentData");
 
             builder.HasKey(data => data.Id);
             builder.Property(data => data.CardNumber).IsRequired();

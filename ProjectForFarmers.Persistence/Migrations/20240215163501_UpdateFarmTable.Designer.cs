@@ -13,8 +13,8 @@ using ProjectForFarmers.Persistence.DbContexts;
 namespace ProjectForFarmers.Persistence.Migrations
 {
     [DbContext(typeof(MainDbContext))]
-    [Migration("20240131150945_RenameMonthStatisticProperties")]
-    partial class RenameMonthStatisticProperties
+    [Migration("20240215163501_UpdateFarmTable")]
+    partial class UpdateFarmTable
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -44,6 +44,9 @@ namespace ProjectForFarmers.Persistence.Migrations
                         .IsRequired()
                         .HasMaxLength(64)
                         .HasColumnType("character varying(64)");
+
+                    b.Property<string>("Phone")
+                        .HasColumnType("text");
 
                     b.Property<int>("Role")
                         .HasColumnType("integer");
@@ -80,7 +83,7 @@ namespace ProjectForFarmers.Persistence.Migrations
                     b.Property<double>("Latitude")
                         .HasColumnType("double precision");
 
-                    b.Property<double>("Longtitude")
+                    b.Property<double>("Longitude")
                         .HasColumnType("double precision");
 
                     b.Property<string>("Note")
@@ -113,6 +116,24 @@ namespace ProjectForFarmers.Persistence.Migrations
                         .IsUnique();
 
                     b.ToTable("Addresses", (string)null);
+                });
+
+            modelBuilder.Entity("ProjectForFarmers.Domain.Category", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Id")
+                        .IsUnique();
+
+                    b.ToTable("Categories", (string)null);
                 });
 
             modelBuilder.Entity("ProjectForFarmers.Domain.DayOfWeek", b =>
@@ -153,6 +174,9 @@ namespace ProjectForFarmers.Persistence.Migrations
                     b.Property<Guid>("AddressId")
                         .HasColumnType("uuid");
 
+                    b.Property<List<Guid>>("Categories")
+                        .HasColumnType("uuid[]");
+
                     b.Property<string>("ContactEmail")
                         .IsRequired()
                         .HasColumnType("text");
@@ -180,11 +204,23 @@ namespace ProjectForFarmers.Persistence.Migrations
                     b.Property<Guid>("OwnerId")
                         .HasColumnType("uuid");
 
+                    b.Property<Guid?>("PaymentDataId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int[]>("PaymentTypes")
+                        .HasColumnType("integer[]");
+
+                    b.Property<int[]>("ReceivingMethods")
+                        .HasColumnType("integer[]");
+
                     b.Property<Guid>("ScheduleId")
                         .HasColumnType("uuid");
 
                     b.Property<string>("SocialPageUrl")
                         .HasColumnType("text");
+
+                    b.Property<List<Guid>>("Subcategories")
+                        .HasColumnType("uuid[]");
 
                     b.HasKey("Id");
 
@@ -196,10 +232,44 @@ namespace ProjectForFarmers.Persistence.Migrations
 
                     b.HasIndex("OwnerId");
 
+                    b.HasIndex("PaymentDataId");
+
                     b.HasIndex("ScheduleId")
                         .IsUnique();
 
                     b.ToTable("Farms", (string)null);
+                });
+
+            modelBuilder.Entity("ProjectForFarmers.Domain.FarmLog", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreationDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("FarmId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<List<string>>("Parameters")
+                        .HasColumnType("text[]");
+
+                    b.Property<string>("PropertyName")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FarmId");
+
+                    b.HasIndex("Id")
+                        .IsUnique();
+
+                    b.ToTable("FarmsLogs", (string)null);
                 });
 
             modelBuilder.Entity("ProjectForFarmers.Domain.MonthStatistic", b =>
@@ -287,20 +357,11 @@ namespace ProjectForFarmers.Persistence.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("CustomerEmail")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<Guid>("CustomerId")
                         .HasColumnType("uuid");
 
-                    b.Property<string>("CustomerName")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("CustomerPhone")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<Guid?>("DeliveryPointId")
+                        .HasColumnType("uuid");
 
                     b.Property<long>("Number")
                         .ValueGeneratedOnAdd()
@@ -308,6 +369,9 @@ namespace ProjectForFarmers.Persistence.Migrations
                         .HasColumnType("bigint");
 
                     NpgsqlPropertyBuilderExtensions.UseSerialColumn(b.Property<long>("Number"));
+
+                    b.Property<int>("PaymentStatus")
+                        .HasColumnType("integer");
 
                     b.Property<int>("PaymentType")
                         .HasColumnType("integer");
@@ -318,6 +382,12 @@ namespace ProjectForFarmers.Persistence.Migrations
                     b.Property<Guid>("ProducerId")
                         .HasColumnType("uuid");
 
+                    b.Property<DateTime>("ReceiveDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("ReceivingType")
+                        .HasColumnType("integer");
+
                     b.Property<int>("Status")
                         .HasColumnType("integer");
 
@@ -326,7 +396,12 @@ namespace ProjectForFarmers.Persistence.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CreationDate")
+                        .IsDescending();
+
                     b.HasIndex("CustomerId");
+
+                    b.HasIndex("DeliveryPointId");
 
                     b.HasIndex("Id")
                         .IsUnique();
@@ -349,6 +424,139 @@ namespace ProjectForFarmers.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("OrderGroupStatistic");
+                });
+
+            modelBuilder.Entity("ProjectForFarmers.Domain.OrderItem", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<long>("Count")
+                        .HasColumnType("bigint");
+
+                    b.Property<Guid>("OrderId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("uuid");
+
+                    b.Property<decimal>("TotalPrice")
+                        .HasColumnType("numeric");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrderId")
+                        .IsUnique();
+
+                    b.ToTable("OrdersItems", (string)null);
+                });
+
+            modelBuilder.Entity("ProjectForFarmers.Domain.PaymentData", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("AccountNumber")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("BIC")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("BankUSREOU")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("CardNumber")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("HolderFullName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Id")
+                        .IsUnique();
+
+                    b.ToTable("PaymentData", (string)null);
+                });
+
+            modelBuilder.Entity("ProjectForFarmers.Domain.Product", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ArticleNumber")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("CategoryId")
+                        .HasColumnType("uuid");
+
+                    b.Property<long>("Count")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreationDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<List<string>>("DocumentsNames")
+                        .IsRequired()
+                        .HasColumnType("text[]");
+
+                    b.Property<DateTime>("ExpirationDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<List<string>>("ImagesNames")
+                        .IsRequired()
+                        .HasColumnType("text[]");
+
+                    b.Property<long>("MinPurchaseQuantity")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("PackagingType")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<decimal>("PricePerOne")
+                        .HasColumnType("numeric");
+
+                    b.Property<int>("Producer")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("ProducerId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("SubcategoryId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("UnitOfMeasurement")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CategoryId");
+
+                    b.HasIndex("SubcategoryId");
+
+                    b.ToTable("Products");
                 });
 
             modelBuilder.Entity("ProjectForFarmers.Domain.Schedule", b =>
@@ -407,6 +615,26 @@ namespace ProjectForFarmers.Persistence.Migrations
                     b.ToTable("Schedules", (string)null);
                 });
 
+            modelBuilder.Entity("ProjectForFarmers.Domain.Subcategory", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CategoryId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CategoryId");
+
+                    b.ToTable("Subcategories", (string)null);
+                });
+
             modelBuilder.Entity("ProjectForFarmers.Domain.Farm", b =>
                 {
                     b.HasOne("ProjectForFarmers.Domain.Address", "Address")
@@ -421,6 +649,11 @@ namespace ProjectForFarmers.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("ProjectForFarmers.Domain.PaymentData", "PaymentData")
+                        .WithMany()
+                        .HasForeignKey("PaymentDataId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
                     b.HasOne("ProjectForFarmers.Domain.Schedule", "Schedule")
                         .WithOne()
                         .HasForeignKey("ProjectForFarmers.Domain.Farm", "ScheduleId")
@@ -431,7 +664,18 @@ namespace ProjectForFarmers.Persistence.Migrations
 
                     b.Navigation("Owner");
 
+                    b.Navigation("PaymentData");
+
                     b.Navigation("Schedule");
+                });
+
+            modelBuilder.Entity("ProjectForFarmers.Domain.FarmLog", b =>
+                {
+                    b.HasOne("ProjectForFarmers.Domain.Farm", null)
+                        .WithMany("Logs")
+                        .HasForeignKey("FarmId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("ProjectForFarmers.Domain.MonthStatistic", b =>
@@ -449,7 +693,7 @@ namespace ProjectForFarmers.Persistence.Migrations
                         .IsRequired();
 
                     b.HasOne("ProjectForFarmers.Domain.Farm", null)
-                        .WithMany("Dashboard")
+                        .WithMany("Statistics")
                         .HasForeignKey("FarmId");
 
                     b.HasOne("ProjectForFarmers.Domain.OrderGroupStatistic", "NewOrdersStatistic")
@@ -489,7 +733,41 @@ namespace ProjectForFarmers.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("ProjectForFarmers.Domain.Address", "DeliveryPoint")
+                        .WithMany()
+                        .HasForeignKey("DeliveryPointId");
+
                     b.Navigation("Customer");
+
+                    b.Navigation("DeliveryPoint");
+                });
+
+            modelBuilder.Entity("ProjectForFarmers.Domain.OrderItem", b =>
+                {
+                    b.HasOne("ProjectForFarmers.Domain.Order", null)
+                        .WithMany("Items")
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("ProjectForFarmers.Domain.Product", b =>
+                {
+                    b.HasOne("ProjectForFarmers.Domain.Category", "Category")
+                        .WithMany()
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ProjectForFarmers.Domain.Subcategory", "Subcategory")
+                        .WithMany()
+                        .HasForeignKey("SubcategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Category");
+
+                    b.Navigation("Subcategory");
                 });
 
             modelBuilder.Entity("ProjectForFarmers.Domain.Schedule", b =>
@@ -551,9 +829,32 @@ namespace ProjectForFarmers.Persistence.Migrations
                     b.Navigation("Wednesday");
                 });
 
+            modelBuilder.Entity("ProjectForFarmers.Domain.Subcategory", b =>
+                {
+                    b.HasOne("ProjectForFarmers.Domain.Category", "Category")
+                        .WithMany("Subcategories")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Category");
+                });
+
+            modelBuilder.Entity("ProjectForFarmers.Domain.Category", b =>
+                {
+                    b.Navigation("Subcategories");
+                });
+
             modelBuilder.Entity("ProjectForFarmers.Domain.Farm", b =>
                 {
-                    b.Navigation("Dashboard");
+                    b.Navigation("Logs");
+
+                    b.Navigation("Statistics");
+                });
+
+            modelBuilder.Entity("ProjectForFarmers.Domain.Order", b =>
+                {
+                    b.Navigation("Items");
                 });
 #pragma warning restore 612, 618
         }

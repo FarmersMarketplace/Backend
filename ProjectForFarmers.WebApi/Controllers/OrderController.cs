@@ -3,7 +3,7 @@ using ProjectForFarmers.Application.DataTransferObjects.Order;
 using ProjectForFarmers.Application.Services.Business;
 using ProjectForFarmers.Application.ViewModels.Dashboard;
 using ProjectForFarmers.Application.ViewModels.Order;
-using ProjectForFarmers.Domain;
+using System.Security.Claims;
 
 namespace ProjectForFarmers.WebApi.Controllers
 {
@@ -12,12 +12,11 @@ namespace ProjectForFarmers.WebApi.Controllers
     public class OrderController : ControllerBase
     {
         private readonly IOrderService OrderService;
-        private readonly IConfiguration Configuration;
+        private Guid AccountId => Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
 
         public OrderController(IOrderService orderService, IConfiguration configuration)
         {
             OrderService = orderService;
-            Configuration = configuration;
         }
 
         [HttpGet("{orderId}")]
@@ -30,32 +29,29 @@ namespace ProjectForFarmers.WebApi.Controllers
 
         [HttpGet]
         [ProducesResponseType(typeof(OrderListVm), 200)]
-        public async Task<IActionResult> GetAll([FromBody] GetOrderListDto getOrderListDto)
+        public async Task<IActionResult> GetAll([FromQuery] GetOrderListDto getOrderListDto)
         {
             var vm = await OrderService.GetAll(getOrderListDto);
             return Ok(vm);
         }
 
-        [HttpGet("{producer}/{producerId}")]
+        [HttpGet]
         [ProducesResponseType(typeof(DashboardVm), 200)]
         [Produces("application/octet-stream")]
-        public async Task<IActionResult> ExportToExcel([FromRoute] Guid producerId, [FromRoute] Producer producer)
+        public async Task<IActionResult> ExportToExcel([FromQuery] ExportOrdersDto exportOrdersDto)
         {
-            string fileName = await OrderService.ExportToExcel(producerId, producer);
-            string filePath = Configuration["Files"] + "\\fileName";
             string contentType = "application/octet-stream";
 
-            byte[] fileBytes = await System.IO.File.ReadAllBytesAsync(filePath);
-            System.IO.File.Delete(filePath);
+            (string fileName ,byte[] bytes) file = await OrderService.ExportToExcel(exportOrdersDto);
 
-            return File(fileBytes, contentType, fileName);
+            return File(file.bytes, contentType, file.fileName);
         }
 
         [HttpPut]
         [ProducesResponseType(204)]
         public async Task<IActionResult> Duplicate([FromBody] OrderListDto orderListDto)
         {
-            await OrderService.Duplicate(orderListDto);
+            await OrderService.Duplicate(orderListDto, AccountId);
 
             return NoContent();
         }
@@ -64,7 +60,7 @@ namespace ProjectForFarmers.WebApi.Controllers
         [ProducesResponseType(204)]
         public async Task<IActionResult> Delete([FromBody] OrderListDto orderListDto)
         {
-            await OrderService.Delete(orderListDto);
+            await OrderService.Delete(orderListDto, AccountId);
 
             return NoContent();
         }
@@ -73,7 +69,7 @@ namespace ProjectForFarmers.WebApi.Controllers
         [ProducesResponseType(204)]
         public async Task<IActionResult> Update([FromBody] UpdateOrderDto updateOrderDto)
         {
-            await OrderService.Update(updateOrderDto);
+            await OrderService.Update(updateOrderDto, AccountId);
 
             return NoContent();
         }
@@ -82,7 +78,7 @@ namespace ProjectForFarmers.WebApi.Controllers
         [ProducesResponseType(204)]
         public async Task<IActionResult> AddOrderItem([FromBody] AddOrderItemDto addOrderItemDto)
         {
-            await OrderService.AddOrderItem(addOrderItemDto);
+            await OrderService.AddOrderItem(addOrderItemDto, AccountId);
 
             return NoContent();
         }

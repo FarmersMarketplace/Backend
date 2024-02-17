@@ -12,10 +12,10 @@ namespace ProjectForFarmers.Domain
         public Guid FarmId { get; set; }
         public string Message { get; set; }
         public string? PropertyName { get; set; }
-        public List<string>? Parameters { get; set; }
+        public string[]? Parameters { get; set; }
         public DateTime CreationDate { get; set; }
 
-        public FarmLog(Guid id, Guid farmId, string message, List<string>? parameters, DateTime creationDate)
+        public FarmLog(Guid id, Guid farmId, string message, string[]? parameters, DateTime creationDate)
         {
             Id = id;
             FarmId = farmId;

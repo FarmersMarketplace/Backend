@@ -61,7 +61,16 @@ namespace ProjectForFarmers.Application.Resources.FarmLogs {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to schedule has been updated:
+        ///   Looks up a localized string similar to Payment online was allowed..
+        /// </summary>
+        internal static string AddedOnlinePayment {
+            get {
+                return ResourceManager.GetString("AddedOnlinePayment", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Schedule has been updated:
         ///Opened: {0}
         ///Start time: {1}:{2}
         ///End time: {3}:{4}.
@@ -69,6 +78,15 @@ namespace ProjectForFarmers.Application.Resources.FarmLogs {
         internal static string DayScheduleChanged {
             get {
                 return ResourceManager.GetString("DayScheduleChanged", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Payment online was prohibited..
+        /// </summary>
+        internal static string DeletedDelivery {
+            get {
+                return ResourceManager.GetString("DeletedDelivery", resourceCulture);
             }
         }
         
@@ -91,7 +109,7 @@ namespace ProjectForFarmers.Application.Resources.FarmLogs {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Images {0} were added..
+        ///   Looks up a localized string similar to Image(s) {0} were added..
         /// </summary>
         internal static string ImagesCreated {
             get {
@@ -100,7 +118,7 @@ namespace ProjectForFarmers.Application.Resources.FarmLogs {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Images {0} were deleted..
+        ///   Looks up a localized string similar to Image(s) {0} were deleted..
         /// </summary>
         internal static string ImagesDeleted {
             get {
@@ -109,7 +127,7 @@ namespace ProjectForFarmers.Application.Resources.FarmLogs {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to was changed from {0} to {1}..
+        ///   Looks up a localized string similar to was changed from &apos;{0}&apos; to &apos;{1}&apos;..
         /// </summary>
         internal static string PropertyChanged {
             get {

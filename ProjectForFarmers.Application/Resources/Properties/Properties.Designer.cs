@@ -61,11 +61,74 @@ namespace ProjectForFarmers.Application.Resources.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Account number.
+        /// </summary>
+        internal static string AccountNumber {
+            get {
+                return ResourceManager.GetString("AccountNumber", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Amount.
+        /// </summary>
+        internal static string Amount {
+            get {
+                return ResourceManager.GetString("Amount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Article.
+        /// </summary>
+        internal static string ArticleNumber {
+            get {
+                return ResourceManager.GetString("ArticleNumber", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to USREOU of bank.
+        /// </summary>
+        internal static string BankUSREOU {
+            get {
+                return ResourceManager.GetString("BankUSREOU", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to BIC.
+        /// </summary>
+        internal static string BIC {
+            get {
+                return ResourceManager.GetString("BIC", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Card number.
+        /// </summary>
+        internal static string CardNumber {
+            get {
+                return ResourceManager.GetString("CardNumber", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cash.
         /// </summary>
         internal static string Cash {
             get {
                 return ResourceManager.GetString("Cash", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Category.
+        /// </summary>
+        internal static string Category {
+            get {
+                return ResourceManager.GetString("Category", resourceCulture);
             }
         }
         
@@ -106,6 +169,33 @@ namespace ProjectForFarmers.Application.Resources.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Date of creation.
+        /// </summary>
+        internal static string CreationDate {
+            get {
+                return ResourceManager.GetString("CreationDate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Customer email.
+        /// </summary>
+        internal static string CustomerEmail {
+            get {
+                return ResourceManager.GetString("CustomerEmail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Customer name.
+        /// </summary>
+        internal static string CustomerName {
+            get {
+                return ResourceManager.GetString("CustomerName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Description.
         /// </summary>
         internal static string Description {
@@ -133,6 +223,15 @@ namespace ProjectForFarmers.Application.Resources.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Holder&apos;s full name.
+        /// </summary>
+        internal static string HolderFullName {
+            get {
+                return ResourceManager.GetString("HolderFullName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to HouseNumber.
         /// </summary>
         internal static string HouseNumber {
@@ -151,7 +250,7 @@ namespace ProjectForFarmers.Application.Resources.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to InDelivery.
+        ///   Looks up a localized string similar to In delivery.
         /// </summary>
         internal static string InDelivery {
             get {
@@ -250,6 +349,15 @@ namespace ProjectForFarmers.Application.Resources.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to PaymentType.
+        /// </summary>
+        internal static string PaymentType {
+            get {
+                return ResourceManager.GetString("PaymentType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Phone.
         /// </summary>
         internal static string Phone {
@@ -268,11 +376,38 @@ namespace ProjectForFarmers.Application.Resources.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Price per one.
+        /// </summary>
+        internal static string PricePerOne {
+            get {
+                return ResourceManager.GetString("PricePerOne", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Methods of receiving.
+        /// </summary>
+        internal static string ReceivingMethods {
+            get {
+                return ResourceManager.GetString("ReceivingMethods", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Region.
         /// </summary>
         internal static string Region {
             get {
                 return ResourceManager.GetString("Region", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Rest.
+        /// </summary>
+        internal static string Rest {
+            get {
+                return ResourceManager.GetString("Rest", resourceCulture);
             }
         }
         
@@ -322,6 +457,15 @@ namespace ProjectForFarmers.Application.Resources.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Subcategory.
+        /// </summary>
+        internal static string Subcategory {
+            get {
+                return ResourceManager.GetString("Subcategory", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Sunday.
         /// </summary>
         internal static string Sunday {
@@ -345,6 +489,15 @@ namespace ProjectForFarmers.Application.Resources.Properties {
         internal static string Tuesday {
             get {
                 return ResourceManager.GetString("Tuesday", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unit of measurement.
+        /// </summary>
+        internal static string UnitOfMeasurement {
+            get {
+                return ResourceManager.GetString("UnitOfMeasurement", resourceCulture);
             }
         }
         

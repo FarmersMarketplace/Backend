@@ -16,7 +16,7 @@ namespace ProjectForFarmers.Application.ViewModels.Order
         public decimal TotalPayment { get; set; }
         public PaymentType PaymentType { get; set; }
         public PaymentStatus PaymentStatus { get; set; }
-        public ReceivingType ReceivingType { get; set; }
+        public ReceivingMethod ReceivingType { get; set; }
         public AddressVm? DeliveryPoint { get; set; }
         public OrderStatus Status { get; set; }
         public Guid CustomerId { get; set; }

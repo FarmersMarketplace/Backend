@@ -10,6 +10,12 @@ namespace ProjectForFarmers.Application.ViewModels.Farm
     {
         public string Message { get; set; }
         public DateTime Date { get; set; }
+
+        public FarmLogVm(string message, DateTime date)
+        {
+            Message = message;
+            Date = date;
+        }
     }
 
 }

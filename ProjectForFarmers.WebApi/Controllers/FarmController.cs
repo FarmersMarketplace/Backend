@@ -12,6 +12,7 @@ namespace ProjectForFarmers.WebApi.Controllers
     public class FarmController : ControllerBase
     {
         private readonly IFarmService FarmService;
+        private Guid AccountId => Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
 
         public FarmController(IFarmService farmService)
         {
@@ -31,9 +32,9 @@ namespace ProjectForFarmers.WebApi.Controllers
         [ProducesResponseType(typeof(FarmListVm), 200)]
         public async Task<IActionResult> GetAll()
         {
-            var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
-            var request = await FarmService.GetAll(userId);
-            return Ok(request);
+            var userId = AccountId;
+            var vm = await FarmService.GetAll(userId);
+            return Ok(vm);
         }
 
         [HttpPost]
@@ -41,7 +42,7 @@ namespace ProjectForFarmers.WebApi.Controllers
         [ProducesResponseType(204)]
         public async Task<IActionResult> Create([FromForm] CreateFarmDto createFarmDto)
         {
-            createFarmDto.OwnerId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+            createFarmDto.OwnerId = AccountId;
             await FarmService.Create(createFarmDto);
             return NoContent();
         }
@@ -51,16 +52,15 @@ namespace ProjectForFarmers.WebApi.Controllers
         [ProducesResponseType(204)]
         public async Task<IActionResult> Delete([FromRoute] Guid farmId)
         {
-            var ownerId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
-            await FarmService.Delete(farmId, ownerId);
+            await FarmService.Delete(farmId, AccountId);
             return NoContent();
         }
 
         [HttpPut]
         [Authorize(Roles = "FarmOwner")]
-        public async Task<IActionResult> Update([FromBody] UpdateFarmDto updateFarmDto)
+        public async Task<IActionResult> Update([FromForm] UpdateFarmDto updateFarmDto)
         {
-            await FarmService.Update(updateFarmDto);
+            await FarmService.Update(updateFarmDto, AccountId);
             return NoContent();
         }
 
@@ -69,7 +69,7 @@ namespace ProjectForFarmers.WebApi.Controllers
         [ProducesResponseType(204)]
         public async Task<IActionResult> UpdateFarmCategoriesAndSubcategories([FromBody] UpdateFarmCategoriesAndSubcategoriesDto updateFarmCategoriesAndSubcategoriesDto)
         {
-            await FarmService.UpdateFarmCategoriesAndSubcategories(updateFarmCategoriesAndSubcategoriesDto);
+            await FarmService.UpdateFarmCategoriesAndSubcategories(updateFarmCategoriesAndSubcategoriesDto, AccountId);
             return NoContent();
         }
 
@@ -78,7 +78,7 @@ namespace ProjectForFarmers.WebApi.Controllers
         [ProducesResponseType(204)]
         public async Task<IActionResult> UpdateSettings([FromBody] UpdateFarmSettingsDto updateFarmSettingsDto)
         {
-            await FarmService.UpdateSettings(updateFarmSettingsDto);
+            await FarmService.UpdateSettings(updateFarmSettingsDto, AccountId);
             return NoContent();
         }
     }

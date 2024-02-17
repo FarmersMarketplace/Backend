@@ -24,6 +24,8 @@ namespace ProjectForFarmers.Application.Helpers
 
         public async Task<List<string>> SaveImages(List<IFormFile> images, string directoryPath)
         {
+            if(images == null) return new List<string>();
+
             foreach (var image in images)
             {
                 if (!IsValidImage(image))
@@ -40,8 +42,39 @@ namespace ProjectForFarmers.Application.Helpers
             return imagePaths;
         }
 
+        public async Task<string> CopyFile(string sourceFilePath, string destinationDirectory)
+        {
+            if (!File.Exists(sourceFilePath))
+            {
+                string fileName = Path.GetFileName(sourceFilePath);
+                string message = $"Source file with path {sourceFilePath} was not found.";
+                string userFacingMessage = CultureHelper.Exception("SourceFileNotFound", fileName);
+
+                throw new NotFoundException(message, userFacingMessage);
+            }
+
+            if (!Directory.Exists(destinationDirectory))
+            {
+                string fileName = Path.GetFileName(sourceFilePath);
+                string message = $"Directory with path {sourceFilePath} was not found.";
+                string userFacingMessage = CultureHelper.Exception("An error occurred while creating the file.");
+
+                throw new NotFoundException(message, userFacingMessage);
+            }
+
+            string fileExtension = Path.GetExtension(sourceFilePath);
+            string newFileName = $"{Guid.NewGuid()}.{fileExtension}";
+            string destinationFilePath = Path.Combine(destinationDirectory, newFileName);
+
+            File.Copy(sourceFilePath, destinationFilePath);
+
+            return newFileName;
+        }
+
         public async Task<List<string>> SaveFiles(List<IFormFile> files, string directoryPath)
         {
+            if (files == null) return new List<string>();
+
             var filesNames = new List<string>();
 
             foreach (var file in files)

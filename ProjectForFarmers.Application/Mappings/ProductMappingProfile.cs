@@ -14,7 +14,7 @@ namespace ProjectForFarmers.Application.Mappings
     {
         public ProductMappingProfile()
         {
-            MapProductDtoToProduct();
+            MapCreateProductDtoToProduct();
             MapProductToProductVm();
             MapProductToProductLookupVm();
         }
@@ -44,7 +44,7 @@ namespace ProjectForFarmers.Application.Mappings
                 .ForMember(vm => vm.DocumentsNames, opt => opt.MapFrom(product => product.DocumentsNames));
         }
 
-        private void MapProductDtoToProduct()
+        private void MapCreateProductDtoToProduct()
         {
             CreateMap<CreateProductDto, Product>()
                 .ForMember(product => product.Id, opt => opt.MapFrom(dto => Guid.NewGuid()))
@@ -60,7 +60,7 @@ namespace ProjectForFarmers.Application.Mappings
                 .ForMember(product => product.MinPurchaseQuantity, opt => opt.MapFrom(dto => dto.MinPurchaseQuantity))
                 .ForMember(product => product.Count, opt => opt.MapFrom(dto => dto.Count))
                 .ForMember(product => product.Status, opt => opt.MapFrom(dto => dto.Status))
-                .ForMember(product => product.CreationDate, opt => opt.MapFrom(dto => dto.CreationDate))
+                .ForMember(product => product.CreationDate, opt => opt.MapFrom(dto => DateTime.UtcNow))
                 .ForMember(product => product.ExpirationDate, opt => opt.MapFrom(dto => dto.ExpirationDate));
         }
 

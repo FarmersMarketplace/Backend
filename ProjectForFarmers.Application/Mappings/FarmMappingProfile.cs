@@ -4,7 +4,9 @@ using ProjectForFarmers.Application.DataTransferObjects;
 using ProjectForFarmers.Application.DataTransferObjects.Farm;
 using ProjectForFarmers.Application.Helpers;
 using ProjectForFarmers.Application.ViewModels;
+using ProjectForFarmers.Application.ViewModels.Category;
 using ProjectForFarmers.Application.ViewModels.Farm;
+using ProjectForFarmers.Application.ViewModels.Subcategory;
 using ProjectForFarmers.Domain;
 using System.Net;
 using Address = ProjectForFarmers.Domain.Address;
@@ -26,7 +28,6 @@ namespace ProjectForFarmers.Application.Mappings
             MapScheduleToScheduleVm();
             MapAddressToAddressVm();
             MapPaymentDataToPaymentDataVm();
-            MapFarmLogToFarmLogVm();
             MapFarmToFarmVm();
         }
 
@@ -38,35 +39,6 @@ namespace ProjectForFarmers.Application.Mappings
                .ForMember(vm => vm.BankUSREOU, opt => opt.MapFrom(data => data.BankUSREOU))
                .ForMember(vm => vm.BIC, opt => opt.MapFrom(data => data.BIC))
                .ForMember(vm => vm.HolderFullName, opt => opt.MapFrom(data => data.HolderFullName));
-        }
-
-        private void MapFarmLogToFarmLogVm()
-        {
-            CreateMap<FarmLog, FarmLogVm>()
-               .ForMember(vm => vm.Message, opt => opt.MapFrom(log => GetMessage(log)))
-               .ForMember(vm => vm.Date, opt => opt.MapFrom(log => log.CreationDate));
-        }
-
-        private string GetMessage(FarmLog log)
-        {
-            string message = "";
-
-            if (log == null || log.Message == null) 
-            {
-                return "";
-            }
-            else if (log.PropertyName != null || log.PropertyName != "")
-            {
-                message += (CultureHelper.Property(log.PropertyName) + " ");
-            }
-
-            message += log.Message;
-            if(log.Parameters != null && log.Parameters.Count > 0)
-            {
-                message = string.Format(message, log.Parameters);
-            }
-
-            return message;
         }
 
         private void MapAddressToAddressVm()
@@ -114,10 +86,12 @@ namespace ProjectForFarmers.Application.Mappings
                 .ForMember(vm => vm.Address, opt => opt.MapFrom(farm => farm.Address))
                 .ForMember(vm => vm.Schedule, opt => opt.MapFrom(farm => farm.Schedule))
                 .ForMember(vm => vm.PaymentData, opt => opt.MapFrom(farm => farm.PaymentData))
+                .ForMember(vm => vm.ReceivingMethods, opt => opt.MapFrom(farm => farm.ReceivingMethods))
+                .ForMember(vm => vm.HasDelivery, opt => opt.MapFrom(farm => farm.PaymentTypes != null && farm.PaymentTypes.Contains(PaymentType.Online)))
                 .ForMember(vm => vm.SocialPageUrl, opt => opt.MapFrom(farm => farm.SocialPageUrl))
                 .ForMember(vm => vm.ImagesNames, opt => opt.MapFrom(farm => farm.ImagesNames))
-                .ForMember(vm => vm.Categories, opt => opt.MapFrom(farm => farm.Categories))
-                .ForMember(vm => vm.Subcategories, opt => opt.MapFrom(farm => farm.Subcategories))
+                .ForMember(vm => vm.Categories, opt => opt.MapFrom(farm => new List<CategoryLookupVm>()))
+                .ForMember(vm => vm.Subcategories, opt => opt.MapFrom(farm => new List<SubcategoryVm>()))
                 .ForMember(vm => vm.Logs, opt => opt.MapFrom(farm => new List<FarmLogVm>()));
         }
 
@@ -182,7 +156,12 @@ namespace ProjectForFarmers.Application.Mappings
                 .ForMember(farm => farm.SocialPageUrl, opt => opt.MapFrom(dto => dto.SocialPageUrl))
                 .ForMember(farm => farm.Address, opt => opt.MapFrom(dto => dto.Address))
                 .ForMember(farm => farm.ImagesNames, opt => opt.MapFrom(dto => new List<string>()))
-                .ForMember(farm => farm.Schedule, opt => opt.MapFrom(dto => dto.Schedule));
+                .ForMember(farm => farm.Logs, opt => opt.MapFrom(dto => new List<FarmLog>()))
+                .ForMember(farm => farm.Categories, opt => opt.MapFrom(dto => new List<Guid>()))
+                .ForMember(farm => farm.Subcategories, opt => opt.MapFrom(dto => new List<Guid>()))
+                .ForMember(farm => farm.Schedule, opt => opt.MapFrom(dto => dto.Schedule))
+                .ForMember(farm => farm.ReceivingMethods, opt => opt.MapFrom(dto => new List<ReceivingMethod>()))
+                .ForMember(farm => farm.PaymentTypes, opt => opt.MapFrom(dto => new List<PaymentType>() { PaymentType.Cash }));
         }
 
         private void MapFarmToFarmLookupVm()

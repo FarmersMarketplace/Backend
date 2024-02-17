@@ -61,6 +61,15 @@ namespace ProjectForFarmers.Application.Resources.Exceptions {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Access denied: Permission denied to modify data..
+        /// </summary>
+        internal static string AccessDenied {
+            get {
+                return ResourceManager.GetString("AccessDenied", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Account with email {0} was not found..
         /// </summary>
         internal static string AccountWithEmailNotFound {
@@ -126,18 +135,18 @@ namespace ProjectForFarmers.Application.Resources.Exceptions {
         /// <summary>
         ///   Looks up a localized string similar to Farm with Id {0} was not found..
         /// </summary>
-        internal static string FarmWithIdNotExist {
+        internal static string FarmWithIdNotFound {
             get {
-                return ResourceManager.GetString("FarmWithIdNotExist", resourceCulture);
+                return ResourceManager.GetString("FarmWithIdNotFound", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Farm with Id {0} was not found..
+        ///   Looks up a localized string similar to An error occurred while creating the file..
         /// </summary>
-        internal static string FarmWithIdNotFound {
+        internal static string FileCreatingError {
             get {
-                return ResourceManager.GetString("FarmWithIdNotFound", resourceCulture);
+                return ResourceManager.GetString("FileCreatingError", resourceCulture);
             }
         }
         
@@ -187,11 +196,38 @@ namespace ProjectForFarmers.Application.Resources.Exceptions {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Source file with name {0} was not found..
+        /// </summary>
+        internal static string SourceFileNotFound {
+            get {
+                return ResourceManager.GetString("SourceFileNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Statistic for month with id {0} was not found..
         /// </summary>
         internal static string StatisticWithIdNotExist {
             get {
                 return ResourceManager.GetString("StatisticWithIdNotExist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Subcategory does not belong to the category..
+        /// </summary>
+        internal static string SubcategoryNotBelongsToCategory {
+            get {
+                return ResourceManager.GetString("SubcategoryNotBelongsToCategory", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Subcategory with Id {0} was not found..
+        /// </summary>
+        internal static string SubcategoryWithIdAndSubcategoryNotFound {
+            get {
+                return ResourceManager.GetString("SubcategoryWithIdAndSubcategoryNotFound", resourceCulture);
             }
         }
         

@@ -11,14 +11,14 @@ namespace ProjectForFarmers.Application.DataTransferObjects.Order
 {
     public class UpdateOrderDto
     {
-        public Guid OrderId { get; set; }
+        public Guid Id { get; set; }
         public DateTime ReceiveDate { get; set; }
         public PaymentType PaymentType { get; set; }
         public PaymentStatus PaymentStatus { get; set; }
-        public ReceivingType ReceivingType { get; set; }
+        public ReceivingMethod ReceivingType { get; set; }
         public OrderStatus Status { get; set; }
-        public AddressDto DeliveryAddress { get; set; }
-        public List<OrderItemDto> Items { get; set; }
+        public AddressDto? DeliveryAddress { get; set; }
+        public List<OrderItemDto>? Items { get; set; }
     }
 
 }

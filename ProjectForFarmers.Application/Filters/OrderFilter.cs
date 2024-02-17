@@ -18,8 +18,8 @@ namespace ProjectForFarmers.Application.Filters
         {
             return query.Where(o =>
                 (Statuses == null || !Statuses.Any() || Statuses.Contains(o.Status)) &&
-                (!StartDate.HasValue || o.CreationDate >= StartDate.GetValueOrDefault(DateTime.MinValue)) &&
-                (!EndDate.HasValue || o.CreationDate <= EndDate.GetValueOrDefault(DateTime.MaxValue)) &&
+                (!StartDate.HasValue || o.CreationDate >= StartDate) &&
+                (!EndDate.HasValue || o.CreationDate <= EndDate) &&
                 (PaymentTypes == null || !PaymentTypes.Any() || PaymentTypes.Contains(o.PaymentType)));
         }
     }

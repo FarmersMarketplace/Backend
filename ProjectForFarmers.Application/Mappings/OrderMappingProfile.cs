@@ -56,7 +56,7 @@ namespace ProjectForFarmers.Application.Mappings
                 .ForMember(vm => vm.CustomerPhone, opt => opt.MapFrom(order => order.Customer.Phone))
                 .ForMember(vm => vm.CustomerEmail, opt => opt.MapFrom(order => order.Customer.Email))
                 .ForMember(vm => vm.TotalPayment, opt => opt.MapFrom(order => order.TotalPayment))
-                .ForMember(vm => vm.PaymentType, opt => opt.MapFrom(order => order.TotalPayment))
+                .ForMember(vm => vm.PaymentType, opt => opt.MapFrom(order => order.PaymentType))
                 .ForMember(vm => vm.Status, opt => opt.MapFrom(order => order.Status));
         }
 

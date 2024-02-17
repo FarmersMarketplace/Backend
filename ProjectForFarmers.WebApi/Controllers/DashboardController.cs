@@ -50,11 +50,11 @@ namespace ProjectForFarmers.WebApi.Controllers
             return Ok(vm);
         }
 
-        [HttpPost]
+        [HttpGet]
         [ProducesResponseType(typeof(CustomerInfoVm), 200)]
-        public async Task<IActionResult> GetCustomer(GetCustomerDto getCustomerDto)
+        public async Task<IActionResult> GetCustomer([FromQuery] GetCustomerDto getCustomerDto)
         {
-            var vm = await DashboardService.GetCustomer(getCustomerDto);
+            var vm = await DashboardService.SearchCustomer(getCustomerDto);
             return Ok(vm);
         }
     }

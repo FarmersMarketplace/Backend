@@ -8,7 +8,12 @@ namespace ProjectForFarmers.Application.ViewModels.Category
 {
     public class CategoryListVm
     {
-        public List<Domain.Category> Categories { get; set; }
+        public List<CategoryVm> Categories { get; set; }
+
+        public CategoryListVm()
+        {
+            Categories = new List<CategoryVm>();
+        }
     }
 
 }

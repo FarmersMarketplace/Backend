@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ProjectForFarmers.Domain
 {
-    public enum ReceivingType
+    public enum ReceivingMethod
     {
         Delivery,
         SelfPickUp

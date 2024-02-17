@@ -21,10 +21,6 @@ namespace ProjectForFarmers.Persistence.EntityTypeConfigurations
             builder.Property(item => item.Count).IsRequired();
             builder.Property(item => item.TotalPrice).IsRequired();
 
-            builder.HasOne<Order>()
-                .WithMany()
-                .HasForeignKey(item => item.OrderId);
-
 
             builder.HasIndex(item => item.OrderId).IsUnique();
         }

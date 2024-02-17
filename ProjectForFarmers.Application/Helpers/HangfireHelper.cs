@@ -8,10 +8,9 @@ namespace ProjectForFarmers.Application.Helpers
 {
     public static class HangfireHelper
     {
-        public static DateTimeOffset LastDayOfCurrentMonth => new DateTimeOffset(DateTimeOffset.UtcNow.Year,
-                DateTimeOffset.UtcNow.Month,
-                1, 0, 0, 0,
-                DateTimeOffset.UtcNow.Offset)
+        public static DateTime LastDayOfCurrentMonth => new DateTime(DateTimeOffset.UtcNow.Year,
+                DateTime.UtcNow.Month,
+                1, 0, 0, 0)
                     .AddMonths(1)
                     .AddSeconds(-1);
         public static IApplicationDbContext DbContext { get; set; }
@@ -44,7 +43,6 @@ namespace ProjectForFarmers.Application.Helpers
             StatisticService = new StatisticService(DbContext);
 
             BackgroundJob.Schedule(() => UpdateStatistics(), LastDayOfCurrentMonth);
-
         }
     }
 

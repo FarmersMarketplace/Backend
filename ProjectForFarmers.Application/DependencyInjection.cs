@@ -24,6 +24,8 @@ namespace ProjectForFarmers.Application
                 config.AddProfile(new AuthMappingProfile());
                 config.AddProfile(new FarmMappingProfile());
                 config.AddProfile(new OrderMappingProfile());
+                config.AddProfile(new CategoryMappingProfile());
+                config.AddProfile(new ProductMappingProfile());
             });
 
             return services;

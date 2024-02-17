@@ -16,14 +16,14 @@ namespace ProjectForFarmers.Application.Filters
         public async Task<IQueryable<Product>> ApplyFilter(IQueryable<Product> query)
         {
             return query
-                .Where(p =>
-                    (IsCategoryValid(p.CategoryId)) &&
-                    (IsSubcategoryValid(p.SubcategoryId)) &&
-                    (IsStartDateValid(p.CreationDate)) &&
-                    (IsEndDateValid(p.CreationDate)) &&
-                    (IsUnitsOfMeasurementValid(p.UnitOfMeasurement)) &&
-                    (IsMinRestValid(p.Count)) &&
-                    (IsMaxRestValid(p.Count)));
+                    .Where(p =>
+                        (CategoryIds == null || !CategoryIds.Any() || CategoryIds.Contains(p.CategoryId)) &&
+                        (SubcategoryIds == null || !SubcategoryIds.Any() || SubcategoryIds.Contains(p.SubcategoryId)) &&
+                        (!StartDate.HasValue || p.CreationDate >= StartDate) &&
+                        (!EndDate.HasValue || p.CreationDate <= EndDate) &&
+                        (UnitsOfMeasurement == null || !UnitsOfMeasurement.Any() || UnitsOfMeasurement.Contains(p.UnitOfMeasurement)) &&
+                        (!MinRest.HasValue || p.Count >= MinRest) &&
+                        (!MaxRest.HasValue || p.Count <= MaxRest));
         }
 
         private bool IsCategoryValid(Guid productCategoryId) => CategoryIds == null || !CategoryIds.Any() || CategoryIds.Contains(productCategoryId);
