@@ -1,8 +1,6 @@
 ﻿using AutoMapper;
-using Geocoding;
 using ProjectForFarmers.Application.DataTransferObjects;
 using ProjectForFarmers.Application.DataTransferObjects.Farm;
-using ProjectForFarmers.Application.Helpers;
 using ProjectForFarmers.Application.ViewModels;
 using ProjectForFarmers.Application.ViewModels.Category;
 using ProjectForFarmers.Application.ViewModels.Farm;
@@ -88,7 +86,8 @@ namespace ProjectForFarmers.Application.Mappings
                 .ForMember(vm => vm.PaymentData, opt => opt.MapFrom(farm => farm.PaymentData))
                 .ForMember(vm => vm.ReceivingMethods, opt => opt.MapFrom(farm => farm.ReceivingMethods))
                 .ForMember(vm => vm.HasDelivery, opt => opt.MapFrom(farm => farm.PaymentTypes != null && farm.PaymentTypes.Contains(PaymentType.Online)))
-                .ForMember(vm => vm.SocialPageUrl, opt => opt.MapFrom(farm => farm.SocialPageUrl))
+                .ForMember(vm => vm.FirstSocialPageUrl, opt => opt.MapFrom(farm => farm.FirstSocialPageUrl))
+                .ForMember(vm => vm.SecondSocialPageUrl, opt => opt.MapFrom(farm => farm.SecondSocialPageUrl))
                 .ForMember(vm => vm.ImagesNames, opt => opt.MapFrom(farm => farm.ImagesNames))
                 .ForMember(vm => vm.Categories, opt => opt.MapFrom(farm => new List<CategoryLookupVm>()))
                 .ForMember(vm => vm.Subcategories, opt => opt.MapFrom(farm => new List<SubcategoryVm>()))
@@ -153,7 +152,8 @@ namespace ProjectForFarmers.Application.Mappings
                 .ForMember(farm => farm.ContactPhone, opt => opt.MapFrom(dto => dto.ContactPhone))
                 .ForMember(farm => farm.CreationDate, opt => opt.MapFrom(dto => DateTime.UtcNow))
                 .ForMember(farm => farm.OwnerId, opt => opt.MapFrom(dto => dto.OwnerId))
-                .ForMember(farm => farm.SocialPageUrl, opt => opt.MapFrom(dto => dto.SocialPageUrl))
+                .ForMember(farm => farm.FirstSocialPageUrl, opt => opt.MapFrom(dto => dto.FirstSocialPageUrl))
+                .ForMember(farm => farm.SecondSocialPageUrl, opt => opt.MapFrom(dto => dto.SecondSocialPageUrl))
                 .ForMember(farm => farm.Address, opt => opt.MapFrom(dto => dto.Address))
                 .ForMember(farm => farm.ImagesNames, opt => opt.MapFrom(dto => new List<string>()))
                 .ForMember(farm => farm.Logs, opt => opt.MapFrom(dto => new List<FarmLog>()))

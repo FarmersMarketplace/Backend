@@ -15,7 +15,6 @@ using DayOfWeek = ProjectForFarmers.Domain.DayOfWeek;
 using Microsoft.AspNetCore.Http;
 using ProjectForFarmers.Application.ViewModels.Category;
 using ProjectForFarmers.Application.ViewModels.Subcategory;
-using Newtonsoft.Json.Linq;
 
 namespace ProjectForFarmers.Application.Services.Business
 {
@@ -172,7 +171,8 @@ namespace ProjectForFarmers.Application.Services.Business
                 await EmailHelper.SendEmail(message, updateFarmDto.ContactEmail, "Farm Email Confirmation");
             }, farm.Id);
             LogAndUpdateIfChanged("ContactPhone", farm.ContactPhone, updateFarmDto.ContactPhone, () => farm.ContactPhone = updateFarmDto.ContactPhone, farm.Id);
-            LogAndUpdateIfChanged("SocialPageUrl", farm.SocialPageUrl, updateFarmDto.SocialPageUrl, () => farm.SocialPageUrl = updateFarmDto.SocialPageUrl, farm.Id);
+            LogAndUpdateIfChanged("SocialPageUrl", farm.FirstSocialPageUrl, updateFarmDto.FirstSocialPageUrl, () => farm.FirstSocialPageUrl = updateFarmDto.FirstSocialPageUrl, farm.Id);
+            LogAndUpdateIfChanged("SocialPageUrl", farm.SecondSocialPageUrl, updateFarmDto.SecondSocialPageUrl, () => farm.SecondSocialPageUrl = updateFarmDto.SecondSocialPageUrl, farm.Id);
             UpdateReceivingTypes(farm, updateFarmDto);
             
             await DbContext.SaveChangesAsync();
@@ -525,7 +525,7 @@ namespace ProjectForFarmers.Application.Services.Business
             if(farm.ReceivingMethods == null) 
                 farm.PaymentTypes = new List<PaymentType>() { PaymentType.Cash };  
 
-            if (updateFarmSettingsDto.HasDelivery 
+            if (updateFarmSettingsDto.HasOnlinePayment 
                 && !farm.PaymentTypes.Contains(PaymentType.Online))
             {
                 farm.PaymentTypes.Add(PaymentType.Online);
@@ -539,7 +539,7 @@ namespace ProjectForFarmers.Application.Services.Business
                     FarmId = farm.Id
                 };
             }
-            else if (!updateFarmSettingsDto.HasDelivery
+            else if (!updateFarmSettingsDto.HasOnlinePayment
                 && farm.PaymentTypes.Contains(PaymentType.Online))
             {
                 farm.PaymentTypes.Remove(PaymentType.Online);
