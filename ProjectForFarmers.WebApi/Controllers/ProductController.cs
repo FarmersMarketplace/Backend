@@ -1,13 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using ProjectForFarmers.Application.DataTransferObjects.Order;
 using ProjectForFarmers.Application.DataTransferObjects.Product;
 using ProjectForFarmers.Application.Services.Business;
 using ProjectForFarmers.Application.ViewModels.Dashboard;
 using ProjectForFarmers.Application.ViewModels.Product;
 using ProjectForFarmers.Domain;
 using System.Security.Claims;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace ProjectForFarmers.WebApi.Controllers
 {

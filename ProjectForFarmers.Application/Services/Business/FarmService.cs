@@ -15,6 +15,7 @@ using DayOfWeek = ProjectForFarmers.Domain.DayOfWeek;
 using Microsoft.AspNetCore.Http;
 using ProjectForFarmers.Application.ViewModels.Category;
 using ProjectForFarmers.Application.ViewModels.Subcategory;
+using Newtonsoft.Json.Linq;
 
 namespace ProjectForFarmers.Application.Services.Business
 {
@@ -164,7 +165,12 @@ namespace ProjectForFarmers.Application.Services.Business
 
             LogAndUpdateIfChanged("Name", farm.Name, updateFarmDto.Name, () => farm.Name = updateFarmDto.Name, farm.Id);
             LogAndUpdateIfChanged("Description", farm.Description, updateFarmDto.Description, () => farm.Description = updateFarmDto.Description, farm.Id);
-            LogAndUpdateIfChanged("ContactEmail", farm.ContactEmail, updateFarmDto.ContactEmail, () => farm.ContactEmail = updateFarmDto.ContactEmail, farm.Id);
+            LogAndUpdateIfChanged("ContactEmail", farm.ContactEmail, updateFarmDto.ContactEmail, async () => 
+            {
+                string token = await JwtService.EmailConfirmationToken(farm.Id, updateFarmDto.ContactEmail);
+                string message = EmailContentBuilder.FarmEmailConfirmationMessageBody(farm.Name, farm.Owner.Name, farm.Owner.Surname, updateFarmDto.ContactEmail, token);
+                await EmailHelper.SendEmail(message, updateFarmDto.ContactEmail, "Farm Email Confirmation");
+            }, farm.Id);
             LogAndUpdateIfChanged("ContactPhone", farm.ContactPhone, updateFarmDto.ContactPhone, () => farm.ContactPhone = updateFarmDto.ContactPhone, farm.Id);
             LogAndUpdateIfChanged("SocialPageUrl", farm.SocialPageUrl, updateFarmDto.SocialPageUrl, () => farm.SocialPageUrl = updateFarmDto.SocialPageUrl, farm.Id);
             UpdateReceivingTypes(farm, updateFarmDto);

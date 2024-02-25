@@ -6,5 +6,6 @@ namespace ProjectForFarmers.Application.Services.Business
 {
     public interface IAccountService
     {
+        public Task Update(UpdateAccountDto updateAccountDto);
     }
 }
