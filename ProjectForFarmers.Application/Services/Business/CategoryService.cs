@@ -1,15 +1,15 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using ProjectForFarmers.Application.DataTransferObjects.Catefory;
-using ProjectForFarmers.Application.Exceptions;
-using ProjectForFarmers.Application.Helpers;
-using ProjectForFarmers.Application.Interfaces;
-using ProjectForFarmers.Application.ViewModels.Category;
-using ProjectForFarmers.Application.ViewModels.Subcategory;
-using ProjectForFarmers.Domain;
+using FarmersMarketplace.Application.DataTransferObjects.Catefory;
+using FarmersMarketplace.Application.Exceptions;
+using FarmersMarketplace.Application.Helpers;
+using FarmersMarketplace.Application.Interfaces;
+using FarmersMarketplace.Application.ViewModels.Category;
+using FarmersMarketplace.Application.ViewModels.Subcategory;
+using FarmersMarketplace.Domain;
 
-namespace ProjectForFarmers.Application.Services.Business
+namespace FarmersMarketplace.Application.Services.Business
 {
     public class CategoryService : Service, ICategoryService
     {

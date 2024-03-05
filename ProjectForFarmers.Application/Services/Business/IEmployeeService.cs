@@ -1,12 +1,12 @@
-﻿using ProjectForFarmers.Application.DataTransferObjects.Employee;
-using ProjectForFarmers.Application.ViewModels.Employee;
+﻿using FarmersMarketplace.Application.DataTransferObjects.Employee;
+using FarmersMarketplace.Application.ViewModels.Employee;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ProjectForFarmers.Application.Services.Business
+namespace FarmersMarketplace.Application.Services.Business
 {
     public interface IEmployeeService
     {

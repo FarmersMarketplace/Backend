@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ProjectForFarmers.Application.Exceptions
+namespace FarmersMarketplace.Application.Exceptions
 {
     public class InvalidDataException : ApplicationException
     {

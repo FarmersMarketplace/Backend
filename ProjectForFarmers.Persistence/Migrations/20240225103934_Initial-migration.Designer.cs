@@ -6,15 +6,15 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
-using ProjectForFarmers.Persistence.DbContexts;
+using FarmersMarketplace.Persistence.DbContexts;
 
 #nullable disable
 
-namespace ProjectForFarmers.Persistence.Migrations
+namespace FarmersMarketplace.Persistence.Migrations
 {
     [DbContext(typeof(MainDbContext))]
-    [Migration("20240215163501_UpdateFarmTable")]
-    partial class UpdateFarmTable
+    [Migration("20240225103934_Initial-migration")]
+    partial class Initialmigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -32,6 +32,9 @@ namespace ProjectForFarmers.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<string>("AvatarName")
+                        .HasColumnType("text");
+
                     b.Property<string>("Email")
                         .HasColumnType("text");
 
@@ -41,7 +44,6 @@ namespace ProjectForFarmers.Persistence.Migrations
                         .HasColumnType("character varying(30)");
 
                     b.Property<string>("Password")
-                        .IsRequired()
                         .HasMaxLength(64)
                         .HasColumnType("character varying(64)");
 
@@ -192,6 +194,9 @@ namespace ProjectForFarmers.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("FirstSocialPageUrl")
+                        .HasColumnType("text");
+
                     b.Property<List<string>>("ImagesNames")
                         .IsRequired()
                         .HasColumnType("text[]");
@@ -216,7 +221,7 @@ namespace ProjectForFarmers.Persistence.Migrations
                     b.Property<Guid>("ScheduleId")
                         .HasColumnType("uuid");
 
-                    b.Property<string>("SocialPageUrl")
+                    b.Property<string>("SecondSocialPageUrl")
                         .HasColumnType("text");
 
                     b.Property<List<Guid>>("Subcategories")
@@ -256,7 +261,7 @@ namespace ProjectForFarmers.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<List<string>>("Parameters")
+                    b.Property<string[]>("Parameters")
                         .HasColumnType("text[]");
 
                     b.Property<string>("PropertyName")

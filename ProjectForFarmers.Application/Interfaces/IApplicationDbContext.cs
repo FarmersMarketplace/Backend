@@ -1,8 +1,8 @@
-﻿using ProjectForFarmers.Domain;
+﻿using FarmersMarketplace.Domain;
 using Microsoft.EntityFrameworkCore;
-using DayOfWeek = ProjectForFarmers.Domain.DayOfWeek;
+using DayOfWeek = FarmersMarketplace.Domain.DayOfWeek;
 
-namespace ProjectForFarmers.Application.Interfaces
+namespace FarmersMarketplace.Application.Interfaces
 {
     public interface IApplicationDbContext
     {

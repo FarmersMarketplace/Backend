@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ProjectForFarmers.Domain
+namespace FarmersMarketplace.Domain
 {
     public class OrderItem
     {

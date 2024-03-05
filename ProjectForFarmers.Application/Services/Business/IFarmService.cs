@@ -1,7 +1,7 @@
-﻿using ProjectForFarmers.Application.DataTransferObjects.Farm;
-using ProjectForFarmers.Application.ViewModels.Farm;
+﻿using FarmersMarketplace.Application.DataTransferObjects.Farm;
+using FarmersMarketplace.Application.ViewModels.Farm;
 
-namespace ProjectForFarmers.Application.Services.Business
+namespace FarmersMarketplace.Application.Services.Business
 {
     public interface IFarmService
     {

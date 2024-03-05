@@ -1,15 +1,15 @@
 ﻿using AutoMapper;
-using ProjectForFarmers.Application.DataTransferObjects.Farm;
-using ProjectForFarmers.Application.ViewModels.Dashboard;
-using ProjectForFarmers.Application.ViewModels.Order;
-using ProjectForFarmers.Domain;
+using FarmersMarketplace.Application.DataTransferObjects.Farm;
+using FarmersMarketplace.Application.ViewModels.Dashboard;
+using FarmersMarketplace.Application.ViewModels.Order;
+using FarmersMarketplace.Domain;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ProjectForFarmers.Application.Mappings
+namespace FarmersMarketplace.Application.Mappings
 {
     public class OrderMappingProfile : Profile
     {

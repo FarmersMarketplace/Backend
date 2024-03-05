@@ -1,11 +1,11 @@
-﻿using ProjectForFarmers.Domain;
+﻿using FarmersMarketplace.Domain;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ProjectForFarmers.Application.Filters
+namespace FarmersMarketplace.Application.Filters
 {
     public class OrderFilter : IFilter<Order>
     {

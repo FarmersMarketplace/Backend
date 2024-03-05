@@ -4,18 +4,18 @@ using Geocoding.Google;
 using Geocoding;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using ProjectForFarmers.Application.DataTransferObjects.Farm;
-using ProjectForFarmers.Application.DataTransferObjects.Order;
-using ProjectForFarmers.Application.Exceptions;
-using ProjectForFarmers.Application.Interfaces;
-using ProjectForFarmers.Application.ViewModels.Order;
-using ProjectForFarmers.Domain;
-using ProjectForFarmers.Application.Helpers;
-using InvalidDataException = ProjectForFarmers.Application.Exceptions.InvalidDataException;
+using FarmersMarketplace.Application.DataTransferObjects.Farm;
+using FarmersMarketplace.Application.DataTransferObjects.Order;
+using FarmersMarketplace.Application.Exceptions;
+using FarmersMarketplace.Application.Interfaces;
+using FarmersMarketplace.Application.ViewModels.Order;
+using FarmersMarketplace.Domain;
+using FarmersMarketplace.Application.Helpers;
+using InvalidDataException = FarmersMarketplace.Application.Exceptions.InvalidDataException;
 using Microsoft.IdentityModel.Tokens;
-using Address = ProjectForFarmers.Domain.Address;
+using Address = FarmersMarketplace.Domain.Address;
 
-namespace ProjectForFarmers.Application.Services.Business
+namespace FarmersMarketplace.Application.Services.Business
 {
     public class OrderService : Service, IOrderService
     {

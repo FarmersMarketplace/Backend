@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
-using ProjectForFarmers.Domain;
+using FarmersMarketplace.Domain;
 
-namespace ProjectForFarmers.Application.DataTransferObjects.Farm
+namespace FarmersMarketplace.Application.DataTransferObjects.Farm
 {
     public class UpdateFarmDto
     {

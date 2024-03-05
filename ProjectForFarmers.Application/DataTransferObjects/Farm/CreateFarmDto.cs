@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 
-namespace ProjectForFarmers.Application.DataTransferObjects.Farm
+namespace FarmersMarketplace.Application.DataTransferObjects.Farm
 {
     public class CreateFarmDto
     {

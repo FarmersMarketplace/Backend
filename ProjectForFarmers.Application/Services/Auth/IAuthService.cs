@@ -1,12 +1,12 @@
-﻿using ProjectForFarmers.Application.DataTransferObjects.Auth;
-using ProjectForFarmers.Application.ViewModels.Auth;
+﻿using FarmersMarketplace.Application.DataTransferObjects.Auth;
+using FarmersMarketplace.Application.ViewModels.Auth;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ProjectForFarmers.Application.Services
+namespace FarmersMarketplace.Application.Services
 {
     public interface IAuthService
     {

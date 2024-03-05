@@ -1,10 +1,10 @@
 ﻿using Hangfire;
 using Microsoft.Extensions.DependencyInjection;
-using ProjectForFarmers.Application.Interfaces;
-using ProjectForFarmers.Application.Services.Business;
+using FarmersMarketplace.Application.Interfaces;
+using FarmersMarketplace.Application.Services.Business;
 using Serilog;
 
-namespace ProjectForFarmers.Application.Helpers
+namespace FarmersMarketplace.Application.Helpers
 {
     public static class HangfireHelper
     {

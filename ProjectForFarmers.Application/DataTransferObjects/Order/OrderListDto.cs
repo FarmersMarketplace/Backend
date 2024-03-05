@@ -1,6 +1,6 @@
-﻿using ProjectForFarmers.Domain;
+﻿using FarmersMarketplace.Domain;
 
-namespace ProjectForFarmers.Application.DataTransferObjects.Order
+namespace FarmersMarketplace.Application.DataTransferObjects.Order
 {
     public class OrderListDto
     {

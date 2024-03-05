@@ -1,8 +1,8 @@
-﻿using ProjectForFarmers.Application.DataTransferObjects.Account;
-using ProjectForFarmers.Application.Exceptions;
-using ProjectForFarmers.Application.Interfaces;
-using ProjectForFarmers.Application.ViewModels;
-using ProjectForFarmers.Domain;
+﻿using FarmersMarketplace.Application.DataTransferObjects.Account;
+using FarmersMarketplace.Application.Exceptions;
+using FarmersMarketplace.Application.Interfaces;
+using FarmersMarketplace.Application.ViewModels;
+using FarmersMarketplace.Domain;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -11,10 +11,10 @@ using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.Extensions.Configuration;
-using ProjectForFarmers.Application.DataTransferObjects.Farm;
-using ProjectForFarmers.Application.DataTransferObjects;
+using FarmersMarketplace.Application.DataTransferObjects.Farm;
+using FarmersMarketplace.Application.DataTransferObjects;
 
-namespace ProjectForFarmers.Application.Services.Business
+namespace FarmersMarketplace.Application.Services.Business
 {
     public class AccountService : Service, IAccountService
     {

@@ -1,14 +1,14 @@
 ﻿using AutoMapper;
-using ProjectForFarmers.Application.DataTransferObjects.Product;
-using ProjectForFarmers.Application.ViewModels.Product;
-using ProjectForFarmers.Domain;
+using FarmersMarketplace.Application.DataTransferObjects.Product;
+using FarmersMarketplace.Application.ViewModels.Product;
+using FarmersMarketplace.Domain;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ProjectForFarmers.Application.Mappings
+namespace FarmersMarketplace.Application.Mappings
 {
     public class ProductMappingProfile : Profile
     {

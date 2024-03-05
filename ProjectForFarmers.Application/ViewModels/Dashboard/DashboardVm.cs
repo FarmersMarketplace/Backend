@@ -1,6 +1,6 @@
-﻿using ProjectForFarmers.Application.ViewModels.Order;
+﻿using FarmersMarketplace.Application.ViewModels.Order;
 
-namespace ProjectForFarmers.Application.ViewModels.Dashboard
+namespace FarmersMarketplace.Application.ViewModels.Dashboard
 {
     public class DashboardVm
     {

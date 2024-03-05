@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using ProjectForFarmers.Application.DataTransferObjects.Subcategory;
-using ProjectForFarmers.Application.Services.Business;
+using FarmersMarketplace.Application.DataTransferObjects.Subcategory;
+using FarmersMarketplace.Application.Services.Business;
 
-namespace ProjectForFarmers.WebApi.Controllers
+namespace FarmersMarketplace.WebApi.Controllers
 {
     [ApiController]
     [Route("api/[controller]/[action]")]

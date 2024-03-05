@@ -5,10 +5,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace ProjectForFarmers.Persistence.Migrations
+namespace FarmersMarketplace.Persistence.Migrations
 {
     /// <inheritdoc />
-    public partial class CreatedProductAndFarmLogTable : Migration
+    public partial class Initialmigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -20,9 +20,10 @@ namespace ProjectForFarmers.Persistence.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "character varying(30)", maxLength: 30, nullable: false),
                     Surname = table.Column<string>(type: "character varying(30)", maxLength: 30, nullable: false),
+                    AvatarName = table.Column<string>(type: "text", nullable: true),
                     Email = table.Column<string>(type: "text", nullable: true),
                     Phone = table.Column<string>(type: "text", nullable: true),
-                    Password = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
+                    Password = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: true),
                     Role = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
@@ -92,7 +93,7 @@ namespace ProjectForFarmers.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "PaymantData",
+                name: "PaymentData",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -104,7 +105,7 @@ namespace ProjectForFarmers.Persistence.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_PaymantData", x => x.Id);
+                    table.PrimaryKey("PK_PaymentData", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -291,7 +292,8 @@ namespace ProjectForFarmers.Persistence.Migrations
                     Description = table.Column<string>(type: "text", nullable: false),
                     ContactEmail = table.Column<string>(type: "text", nullable: false),
                     ContactPhone = table.Column<string>(type: "text", nullable: false),
-                    SocialPageUrl = table.Column<string>(type: "text", nullable: true),
+                    FirstSocialPageUrl = table.Column<string>(type: "text", nullable: true),
+                    SecondSocialPageUrl = table.Column<string>(type: "text", nullable: true),
                     ImagesNames = table.Column<List<string>>(type: "text[]", nullable: false),
                     CreationDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     OwnerId = table.Column<Guid>(type: "uuid", nullable: false),
@@ -299,9 +301,9 @@ namespace ProjectForFarmers.Persistence.Migrations
                     ScheduleId = table.Column<Guid>(type: "uuid", nullable: false),
                     Categories = table.Column<List<Guid>>(type: "uuid[]", nullable: true),
                     Subcategories = table.Column<List<Guid>>(type: "uuid[]", nullable: true),
-                    ReceivingTypes = table.Column<int[]>(type: "integer[]", nullable: true),
+                    ReceivingMethods = table.Column<int[]>(type: "integer[]", nullable: true),
                     PaymentTypes = table.Column<int[]>(type: "integer[]", nullable: true),
-                    PaymentDataId = table.Column<Guid>(type: "uuid", nullable: false)
+                    PaymentDataId = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -319,9 +321,9 @@ namespace ProjectForFarmers.Persistence.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Farms_PaymantData_PaymentDataId",
+                        name: "FK_Farms_PaymentData_PaymentDataId",
                         column: x => x.PaymentDataId,
-                        principalTable: "PaymantData",
+                        principalTable: "PaymentData",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
@@ -340,7 +342,7 @@ namespace ProjectForFarmers.Persistence.Migrations
                     FarmId = table.Column<Guid>(type: "uuid", nullable: false),
                     Message = table.Column<string>(type: "text", nullable: false),
                     PropertyName = table.Column<string>(type: "text", nullable: true),
-                    Parameters = table.Column<List<string>>(type: "text[]", nullable: true),
+                    Parameters = table.Column<string[]>(type: "text[]", nullable: true),
                     CreationDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
@@ -548,8 +550,8 @@ namespace ProjectForFarmers.Persistence.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_PaymantData_Id",
-                table: "PaymantData",
+                name: "IX_PaymentData_Id",
+                table: "PaymentData",
                 column: "Id",
                 unique: true);
 
@@ -645,7 +647,7 @@ namespace ProjectForFarmers.Persistence.Migrations
                 name: "Subcategories");
 
             migrationBuilder.DropTable(
-                name: "PaymantData");
+                name: "PaymentData");
 
             migrationBuilder.DropTable(
                 name: "Schedules");

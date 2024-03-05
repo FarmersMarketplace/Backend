@@ -2,7 +2,7 @@
 using System.Reflection;
 using System.Resources;
 
-namespace ProjectForFarmers.Application.Helpers
+namespace FarmersMarketplace.Application.Helpers
 {
     public static class CultureHelper
     {

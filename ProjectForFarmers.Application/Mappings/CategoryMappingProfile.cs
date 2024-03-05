@@ -1,15 +1,15 @@
 ﻿using AutoMapper;
-using ProjectForFarmers.Application.ViewModels;
-using ProjectForFarmers.Application.ViewModels.Category;
-using ProjectForFarmers.Application.ViewModels.Subcategory;
-using ProjectForFarmers.Domain;
+using FarmersMarketplace.Application.ViewModels;
+using FarmersMarketplace.Application.ViewModels.Category;
+using FarmersMarketplace.Application.ViewModels.Subcategory;
+using FarmersMarketplace.Domain;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ProjectForFarmers.Application.Mappings
+namespace FarmersMarketplace.Application.Mappings
 {
     public class CategoryMappingProfile : Profile
     {

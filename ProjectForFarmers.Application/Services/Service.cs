@@ -1,13 +1,13 @@
 ﻿using AutoMapper;
 using Microsoft.Extensions.Configuration;
-using ProjectForFarmers.Application.Interfaces;
+using FarmersMarketplace.Application.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ProjectForFarmers.Application.Services
+namespace FarmersMarketplace.Application.Services
 {
     public abstract class Service
     {

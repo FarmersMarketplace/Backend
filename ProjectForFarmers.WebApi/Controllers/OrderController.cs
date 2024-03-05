@@ -1,11 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using ProjectForFarmers.Application.DataTransferObjects.Order;
-using ProjectForFarmers.Application.Services.Business;
-using ProjectForFarmers.Application.ViewModels.Dashboard;
-using ProjectForFarmers.Application.ViewModels.Order;
+using FarmersMarketplace.Application.DataTransferObjects.Order;
+using FarmersMarketplace.Application.Services.Business;
+using FarmersMarketplace.Application.ViewModels.Dashboard;
+using FarmersMarketplace.Application.ViewModels.Order;
 using System.Security.Claims;
 
-namespace ProjectForFarmers.WebApi.Controllers
+namespace FarmersMarketplace.WebApi.Controllers
 {
     [ApiController]
     [Route("api/[controller]/[action]")]

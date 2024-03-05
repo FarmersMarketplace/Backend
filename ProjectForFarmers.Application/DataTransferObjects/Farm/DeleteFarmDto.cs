@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ProjectForFarmers.Application.DataTransferObjects.Farm
+namespace FarmersMarketplace.Application.DataTransferObjects.Farm
 {
     public class DeleteFarmDto
     {

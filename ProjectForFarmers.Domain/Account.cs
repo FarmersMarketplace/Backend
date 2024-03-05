@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ProjectForFarmers.Domain
+namespace FarmersMarketplace.Domain
 {
     public class Account
     {
@@ -16,5 +16,6 @@ namespace ProjectForFarmers.Domain
         public string? Email { get; set; }
         public string? Phone { get; set; }
         public string? Password { get; set; }
+        public Role Role { get; set; }
     }
 }

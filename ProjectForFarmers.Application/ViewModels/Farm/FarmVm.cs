@@ -1,8 +1,8 @@
-﻿using ProjectForFarmers.Application.ViewModels.Category;
-using ProjectForFarmers.Application.ViewModels.Subcategory;
-using ProjectForFarmers.Domain;
+﻿using FarmersMarketplace.Application.ViewModels.Category;
+using FarmersMarketplace.Application.ViewModels.Subcategory;
+using FarmersMarketplace.Domain;
 
-namespace ProjectForFarmers.Application.ViewModels.Farm
+namespace FarmersMarketplace.Application.ViewModels.Farm
 {
     public class FarmVm
     {

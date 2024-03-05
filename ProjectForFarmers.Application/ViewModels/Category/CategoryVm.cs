@@ -1,12 +1,12 @@
-﻿using ProjectForFarmers.Application.ViewModels.Subcategory;
-using ProjectForFarmers.Domain;
+﻿using FarmersMarketplace.Application.ViewModels.Subcategory;
+using FarmersMarketplace.Domain;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ProjectForFarmers.Application.ViewModels.Category
+namespace FarmersMarketplace.Application.ViewModels.Category
 {
     public class CategoryVm
     {

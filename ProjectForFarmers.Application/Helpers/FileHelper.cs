@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
-using ProjectForFarmers.Application.Exceptions;
+using FarmersMarketplace.Application.Exceptions;
 
-namespace ProjectForFarmers.Application.Helpers
+namespace FarmersMarketplace.Application.Helpers
 {
     public class FileHelper
     {

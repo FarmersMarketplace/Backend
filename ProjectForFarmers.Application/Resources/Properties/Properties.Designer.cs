@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace ProjectForFarmers.Application.Resources.Properties {
+namespace FarmersMarketplace.Application.Resources.Properties {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace ProjectForFarmers.Application.Resources.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("ProjectForFarmers.Application.Resources.Properties.Properties", typeof(Properties).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("FarmersMarketplace.Application.Resources.Properties.Properties", typeof(Properties).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;

@@ -1,9 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using ProjectForFarmers.Domain;
-using DayOfWeek = ProjectForFarmers.Domain.DayOfWeek;
+using FarmersMarketplace.Domain;
+using DayOfWeek = FarmersMarketplace.Domain.DayOfWeek;
 
-namespace ProjectForFarmers.Persistence.EntityTypeConfigurations
+namespace FarmersMarketplace.Persistence.EntityTypeConfigurations
 {
     public class DayOfWeekConfiguration : IEntityTypeConfiguration<DayOfWeek>
     {

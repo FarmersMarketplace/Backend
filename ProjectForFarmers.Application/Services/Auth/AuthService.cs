@@ -1,19 +1,19 @@
-﻿using ProjectForFarmers.Application.DataTransferObjects.Auth;
-using ProjectForFarmers.Application.Exceptions;
-using ProjectForFarmers.Application.Interfaces;
-using ProjectForFarmers.Application.ViewModels.Auth;
-using ProjectForFarmers.Domain;
+﻿using FarmersMarketplace.Application.DataTransferObjects.Auth;
+using FarmersMarketplace.Application.Exceptions;
+using FarmersMarketplace.Application.Interfaces;
+using FarmersMarketplace.Application.ViewModels.Auth;
+using FarmersMarketplace.Domain;
 using Google.Apis.Auth;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System.ComponentModel.DataAnnotations;
 using static Google.Apis.Auth.GoogleJsonWebSignature;
-using ProjectForFarmers.Application.Helpers;
+using FarmersMarketplace.Application.Helpers;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
-using ProjectForFarmers.Application.ViewModels;
+using FarmersMarketplace.Application.ViewModels;
 
-namespace ProjectForFarmers.Application.Services.Auth
+namespace FarmersMarketplace.Application.Services.Auth
 {
     public class AuthService : Service, IAuthService
     {

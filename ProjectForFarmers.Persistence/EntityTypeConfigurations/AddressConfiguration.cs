@@ -1,9 +1,9 @@
-﻿using ProjectForFarmers.Domain;
+﻿using FarmersMarketplace.Domain;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore;
 
 
-namespace ProjectForFarmers.Persistence.EntityTypeConfigurations
+namespace FarmersMarketplace.Persistence.EntityTypeConfigurations
 {
     public class AddressConfiguration : IEntityTypeConfiguration<Address>
     {

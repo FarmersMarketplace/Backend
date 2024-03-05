@@ -1,8 +1,8 @@
-﻿using ProjectForFarmers.Application.DataTransferObjects.Dashboard;
-using ProjectForFarmers.Application.ViewModels.Dashboard;
-using ProjectForFarmers.Domain;
+﻿using FarmersMarketplace.Application.DataTransferObjects.Dashboard;
+using FarmersMarketplace.Application.ViewModels.Dashboard;
+using FarmersMarketplace.Domain;
 
-namespace ProjectForFarmers.Application.Services.Business
+namespace FarmersMarketplace.Application.Services.Business
 {
     public interface IDashboardService
     {

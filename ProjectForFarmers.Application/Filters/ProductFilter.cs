@@ -1,7 +1,7 @@
-﻿using ProjectForFarmers.Application.ViewModels.Product;
-using ProjectForFarmers.Domain;
+﻿using FarmersMarketplace.Application.ViewModels.Product;
+using FarmersMarketplace.Domain;
 
-namespace ProjectForFarmers.Application.Filters
+namespace FarmersMarketplace.Application.Filters
 {
     public class ProductFilter : IFilter<Product>
     {

@@ -1,14 +1,14 @@
 ﻿using AutoMapper;
-using ProjectForFarmers.Application.Interfaces;
-using ProjectForFarmers.Domain;
+using FarmersMarketplace.Application.Interfaces;
+using FarmersMarketplace.Domain;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using DayOfWeek = ProjectForFarmers.Domain.DayOfWeek;
+using DayOfWeek = FarmersMarketplace.Domain.DayOfWeek;
 
-namespace ProjectForFarmers.Application.DataTransferObjects.Farm
+namespace FarmersMarketplace.Application.DataTransferObjects.Farm
 {
     public class DayOfWeekDto
     {

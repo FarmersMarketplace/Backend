@@ -5,18 +5,18 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using ProjectForFarmers.Application.DataTransferObjects.Product;
-using ProjectForFarmers.Application.Exceptions;
-using ProjectForFarmers.Application.Filters;
-using ProjectForFarmers.Application.Helpers;
-using ProjectForFarmers.Application.Interfaces;
-using ProjectForFarmers.Application.ViewModels.Dashboard;
-using ProjectForFarmers.Application.ViewModels.Product;
-using ProjectForFarmers.Domain;
+using FarmersMarketplace.Application.DataTransferObjects.Product;
+using FarmersMarketplace.Application.Exceptions;
+using FarmersMarketplace.Application.Filters;
+using FarmersMarketplace.Application.Helpers;
+using FarmersMarketplace.Application.Interfaces;
+using FarmersMarketplace.Application.ViewModels.Dashboard;
+using FarmersMarketplace.Application.ViewModels.Product;
+using FarmersMarketplace.Domain;
 using System.Data;
-using InvalidDataException = ProjectForFarmers.Application.Exceptions.InvalidDataException;
+using InvalidDataException = FarmersMarketplace.Application.Exceptions.InvalidDataException;
 
-namespace ProjectForFarmers.Application.Services.Business
+namespace FarmersMarketplace.Application.Services.Business
 {
     public class ProductService : Service, IProductService
     {

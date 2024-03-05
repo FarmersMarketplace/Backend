@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore;
-using ProjectForFarmers.Domain;
+using FarmersMarketplace.Domain;
 
-namespace ProjectForFarmers.Persistence.EntityTypeConfigurations
+namespace FarmersMarketplace.Persistence.EntityTypeConfigurations
 {
     public class ProductConfiguration : IEntityTypeConfiguration<Product>
     {

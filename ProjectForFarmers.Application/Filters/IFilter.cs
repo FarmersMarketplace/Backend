@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ProjectForFarmers.Application.Filters
+namespace FarmersMarketplace.Application.Filters
 {
     internal interface IFilter<T>
     {

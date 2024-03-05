@@ -1,12 +1,12 @@
 ﻿using AutoMapper;
-using ProjectForFarmers.Application.DataTransferObjects.Auth;
+using FarmersMarketplace.Application.DataTransferObjects.Auth;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ProjectForFarmers.Application.Mappings
+namespace FarmersMarketplace.Application.Mappings
 {
     public class AuthMappingProfile : Profile
     {

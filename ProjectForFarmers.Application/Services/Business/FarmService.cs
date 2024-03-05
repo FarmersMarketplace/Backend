@@ -1,22 +1,22 @@
-﻿using ProjectForFarmers.Application.DataTransferObjects.Farm;
-using ProjectForFarmers.Application.Exceptions;
-using ProjectForFarmers.Application.Interfaces;
-using ProjectForFarmers.Application.ViewModels.Farm;
-using ProjectForFarmers.Domain;
+﻿using FarmersMarketplace.Application.DataTransferObjects.Farm;
+using FarmersMarketplace.Application.Exceptions;
+using FarmersMarketplace.Application.Interfaces;
+using FarmersMarketplace.Application.ViewModels.Farm;
+using FarmersMarketplace.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Geocoding;
-using ProjectForFarmers.Application.Helpers;
+using FarmersMarketplace.Application.Helpers;
 using AutoMapper;
 using Geocoding.Google;
-using Address = ProjectForFarmers.Domain.Address;
-using ProjectForFarmers.Application.Services.Auth;
-using DayOfWeek = ProjectForFarmers.Domain.DayOfWeek;
+using Address = FarmersMarketplace.Domain.Address;
+using FarmersMarketplace.Application.Services.Auth;
+using DayOfWeek = FarmersMarketplace.Domain.DayOfWeek;
 using Microsoft.AspNetCore.Http;
-using ProjectForFarmers.Application.ViewModels.Category;
-using ProjectForFarmers.Application.ViewModels.Subcategory;
+using FarmersMarketplace.Application.ViewModels.Category;
+using FarmersMarketplace.Application.ViewModels.Subcategory;
 
-namespace ProjectForFarmers.Application.Services.Business
+namespace FarmersMarketplace.Application.Services.Business
 {
     public class FarmService : Service, IFarmService
     {

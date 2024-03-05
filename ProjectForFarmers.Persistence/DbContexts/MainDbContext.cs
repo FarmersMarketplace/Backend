@@ -1,10 +1,10 @@
-﻿using ProjectForFarmers.Application.Interfaces;
-using ProjectForFarmers.Domain;
-using ProjectForFarmers.Persistence.EntityTypeConfigurations;
+﻿using FarmersMarketplace.Application.Interfaces;
+using FarmersMarketplace.Domain;
+using FarmersMarketplace.Persistence.EntityTypeConfigurations;
 using Microsoft.EntityFrameworkCore;
-using DayOfWeek = ProjectForFarmers.Domain.DayOfWeek;
+using DayOfWeek = FarmersMarketplace.Domain.DayOfWeek;
 
-namespace ProjectForFarmers.Persistence.DbContexts
+namespace FarmersMarketplace.Persistence.DbContexts
 {
     public class MainDbContext : DbContext, IApplicationDbContext
     {

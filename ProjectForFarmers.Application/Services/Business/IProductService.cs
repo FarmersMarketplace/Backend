@@ -1,9 +1,9 @@
-﻿using ProjectForFarmers.Application.DataTransferObjects.Product;
-using ProjectForFarmers.Application.ViewModels.Dashboard;
-using ProjectForFarmers.Application.ViewModels.Product;
-using ProjectForFarmers.Domain;
+﻿using FarmersMarketplace.Application.DataTransferObjects.Product;
+using FarmersMarketplace.Application.ViewModels.Dashboard;
+using FarmersMarketplace.Application.ViewModels.Product;
+using FarmersMarketplace.Domain;
 
-namespace ProjectForFarmers.Application.Services.Business
+namespace FarmersMarketplace.Application.Services.Business
 {
     public interface IProductService
     {

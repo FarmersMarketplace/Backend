@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ProjectForFarmers.Application.ViewModels.Dashboard
+namespace FarmersMarketplace.Application.ViewModels.Dashboard
 {
     public class OptionListVm
     {

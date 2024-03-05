@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ProjectForFarmers.Application.ViewModels.Employee
+namespace FarmersMarketplace.Application.ViewModels.Employee
 {
     public class PermissionsVm
     {

@@ -1,6 +1,6 @@
 ﻿using System.Globalization;
 
-namespace ProjectForFarmers.WebApi.Middlewares
+namespace FarmersMarketplace.WebApi.Middlewares
 {
     public class CultureMiddleware
     {

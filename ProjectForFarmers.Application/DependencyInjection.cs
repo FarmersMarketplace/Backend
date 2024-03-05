@@ -1,11 +1,11 @@
-﻿using ProjectForFarmers.Application.Services;
-using ProjectForFarmers.Application.Services.Auth;
-using ProjectForFarmers.Application.Services.Business;
+﻿using FarmersMarketplace.Application.Services;
+using FarmersMarketplace.Application.Services.Auth;
+using FarmersMarketplace.Application.Services.Business;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using ProjectForFarmers.Application.Mappings;
+using FarmersMarketplace.Application.Mappings;
 
-namespace ProjectForFarmers.Application
+namespace FarmersMarketplace.Application
 {
     public static class DependencyInjection
     {

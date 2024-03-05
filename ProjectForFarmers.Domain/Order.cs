@@ -1,4 +1,4 @@
-﻿namespace ProjectForFarmers.Domain
+﻿namespace FarmersMarketplace.Domain
 {
     public class Order
     {

@@ -1,7 +1,7 @@
-﻿using ProjectForFarmers.Application.DataTransferObjects.Order;
-using ProjectForFarmers.Application.ViewModels.Order;
+﻿using FarmersMarketplace.Application.DataTransferObjects.Order;
+using FarmersMarketplace.Application.ViewModels.Order;
 
-namespace ProjectForFarmers.Application.Services.Business
+namespace FarmersMarketplace.Application.Services.Business
 {
     public interface IOrderService
     {

@@ -1,16 +1,16 @@
 ﻿using AutoMapper;
-using ProjectForFarmers.Application.DataTransferObjects;
-using ProjectForFarmers.Application.DataTransferObjects.Farm;
-using ProjectForFarmers.Application.ViewModels;
-using ProjectForFarmers.Application.ViewModels.Category;
-using ProjectForFarmers.Application.ViewModels.Farm;
-using ProjectForFarmers.Application.ViewModels.Subcategory;
-using ProjectForFarmers.Domain;
+using FarmersMarketplace.Application.DataTransferObjects;
+using FarmersMarketplace.Application.DataTransferObjects.Farm;
+using FarmersMarketplace.Application.ViewModels;
+using FarmersMarketplace.Application.ViewModels.Category;
+using FarmersMarketplace.Application.ViewModels.Farm;
+using FarmersMarketplace.Application.ViewModels.Subcategory;
+using FarmersMarketplace.Domain;
 using System.Net;
-using Address = ProjectForFarmers.Domain.Address;
-using DayOfWeek = ProjectForFarmers.Domain.DayOfWeek;
+using Address = FarmersMarketplace.Domain.Address;
+using DayOfWeek = FarmersMarketplace.Domain.DayOfWeek;
 
-namespace ProjectForFarmers.Application.Mappings
+namespace FarmersMarketplace.Application.Mappings
 {
     public class FarmMappingProfile : Profile
     {

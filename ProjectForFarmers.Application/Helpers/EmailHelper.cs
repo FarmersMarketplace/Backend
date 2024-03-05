@@ -1,9 +1,9 @@
 ﻿using System.Net.Mail;
 using System.Net;
-using ProjectForFarmers.Application.DataTransferObjects.Auth;
+using FarmersMarketplace.Application.DataTransferObjects.Auth;
 using Microsoft.Extensions.Configuration;
 
-namespace ProjectForFarmers.Application.Helpers
+namespace FarmersMarketplace.Application.Helpers
 {
     public class EmailHelper
     {

@@ -1,5 +1,5 @@
-﻿using ProjectForFarmers.Application.ViewModels.Auth;
-using ProjectForFarmers.Domain;
+﻿using FarmersMarketplace.Application.ViewModels.Auth;
+using FarmersMarketplace.Domain;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -11,7 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Data;
 
-namespace ProjectForFarmers.Application.Services.Auth
+namespace FarmersMarketplace.Application.Services.Auth
 {
     public class JwtService
     {

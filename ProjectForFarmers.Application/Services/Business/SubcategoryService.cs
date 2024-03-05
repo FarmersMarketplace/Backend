@@ -1,12 +1,12 @@
 ﻿using AutoMapper;
 using Microsoft.Extensions.Configuration;
-using ProjectForFarmers.Application.DataTransferObjects.Subcategory;
-using ProjectForFarmers.Application.Exceptions;
-using ProjectForFarmers.Application.Helpers;
-using ProjectForFarmers.Application.Interfaces;
-using ProjectForFarmers.Domain;
+using FarmersMarketplace.Application.DataTransferObjects.Subcategory;
+using FarmersMarketplace.Application.Exceptions;
+using FarmersMarketplace.Application.Helpers;
+using FarmersMarketplace.Application.Interfaces;
+using FarmersMarketplace.Domain;
 
-namespace ProjectForFarmers.Application.Services.Business
+namespace FarmersMarketplace.Application.Services.Business
 {
     public class SubcategoryService : Service, ISubcategoryService
     {

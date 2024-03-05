@@ -1,5 +1,5 @@
-﻿using ProjectForFarmers.Application.Interfaces;
-using ProjectForFarmers.Persistence.DbContexts;
+﻿using FarmersMarketplace.Application.Interfaces;
+using FarmersMarketplace.Persistence.DbContexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ProjectForFarmers.Persistence
+namespace FarmersMarketplace.Persistence
 {
     public static class DependencyInjection
     {

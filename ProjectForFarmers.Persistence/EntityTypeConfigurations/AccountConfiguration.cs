@@ -1,4 +1,4 @@
-﻿using ProjectForFarmers.Domain;
+﻿using FarmersMarketplace.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -11,7 +11,7 @@ using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ProjectForFarmers.Persistence.EntityTypeConfigurations
+namespace FarmersMarketplace.Persistence.EntityTypeConfigurations
 {
     public class AccountConfiguration : IEntityTypeConfiguration<Account>
     {

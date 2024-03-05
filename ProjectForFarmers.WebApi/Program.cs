@@ -1,20 +1,19 @@
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
-using ProjectForFarmers.Application;
+using FarmersMarketplace.Application;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
-using ProjectForFarmers.WebApi.Middlewares;
+using FarmersMarketplace.WebApi.Middlewares;
 using System.Reflection;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Models;
-using ProjectForFarmers.Persistence;
+using FarmersMarketplace.Persistence;
 using Hangfire;
 using Hangfire.PostgreSql;
-using ProjectForFarmers.Application.Helpers;
-using ProjectForFarmers.Application.Interfaces;
+using FarmersMarketplace.Application.Helpers;
 
-namespace ProjectForFarmers.WebApi
+namespace FarmersMarketplace.WebApi
 {
     public class Program
     {
@@ -31,7 +30,7 @@ namespace ProjectForFarmers.WebApi
 
         private static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
         {
-            string connectionString = configuration.GetConnectionString("LocalConnection");
+            string connectionString = configuration.GetConnectionString("RemoteConnection");
 
             services.AddPersistence(connectionString);
             services.AddMemoryCache();
@@ -68,6 +67,7 @@ namespace ProjectForFarmers.WebApi
                         ValidateLifetime = true,
                         ValidateIssuer = false,
                         ValidateAudience = false,
+                        
                     };
                 });
 
@@ -105,13 +105,13 @@ namespace ProjectForFarmers.WebApi
 
             HangfireHelper.RegisterTasks(app.Services);
 
+            app.UseCors("AllowAll");
             app.UseMiddleware<CultureMiddleware>();
             app.UseMiddleware<ExceptionHandlerMiddleware>();
             app.UseRouting();
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-
-            app.UseCors("AllowAll");
+            
             app.UseAuthentication();
             app.UseAuthorization();
 

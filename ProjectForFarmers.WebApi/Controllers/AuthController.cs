@@ -1,12 +1,12 @@
-﻿using ProjectForFarmers.Application.DataTransferObjects.Auth;
-using ProjectForFarmers.Application.Services;
-using ProjectForFarmers.Application.ViewModels;
-using ProjectForFarmers.Application.ViewModels.Auth;
+﻿using FarmersMarketplace.Application.DataTransferObjects.Auth;
+using FarmersMarketplace.Application.Services;
+using FarmersMarketplace.Application.ViewModels;
+using FarmersMarketplace.Application.ViewModels.Auth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
-namespace ProjectForFarmers.WebApi.Controllers
+namespace FarmersMarketplace.WebApi.Controllers
 {
     [ApiController]
     [Route("api/[controller]/[action]")]
@@ -25,6 +25,13 @@ namespace ProjectForFarmers.WebApi.Controllers
         {
             await AuthService.Register(accountDto);
             return NoContent();
+        }
+
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> Test()
+        {
+            return Ok("");
         }
 
         [HttpPut]

@@ -1,11 +1,11 @@
-﻿using ProjectForFarmers.Domain;
+﻿using FarmersMarketplace.Domain;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ProjectForFarmers.Application.DataTransferObjects.Auth
+namespace FarmersMarketplace.Application.DataTransferObjects.Auth
 {
     public class AuthenticateWithGoogleDto
     {
