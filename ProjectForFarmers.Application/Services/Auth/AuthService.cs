@@ -32,7 +32,7 @@ namespace FarmersMarketplace.Application.Services.Auth
 
             await CreateAccount(id, accountDto);
             string message = EmailContentBuilder.ConfirmationMessageBody(accountDto.Name, accountDto.Surname, accountDto.Email, await JwtService.EmailConfirmationToken(id, accountDto.Email));
-            await EmailHelper.SendEmail(message, accountDto.Email, "[ServiceName] Registration Confirmation");
+            await EmailHelper.SendEmail(message, accountDto.Email, "Farmers marketplace Registration Confirmation");
             await DbContext.SaveChangesAsync();
         }
 
@@ -52,7 +52,7 @@ namespace FarmersMarketplace.Application.Services.Auth
             if (account == null) 
             {
                 string message = $"Account with Id {accountId} was not found.";
-                string userFacingMessage = CultureHelper.Exception("AccountWithIdNotFound", accountId.ToString());
+                string userFacingMessage = CultureHelper.Exception("AccountNotFound");
 
                 throw new NotFoundException(message, userFacingMessage);
             } 
@@ -141,7 +141,7 @@ namespace FarmersMarketplace.Application.Services.Auth
             if (farm == null)
             {
                 string message = $"Farm with Id {farmId} was not found.";
-                string userFacingMessage = CultureHelper.Exception("FarmWithIdNotFound", farmId.ToString());
+                string userFacingMessage = CultureHelper.Exception("FarmNotFound");
 
                 throw new NotFoundException(message, userFacingMessage);
             }

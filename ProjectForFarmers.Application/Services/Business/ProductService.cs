@@ -24,6 +24,7 @@ namespace FarmersMarketplace.Application.Services.Business
         private readonly IMemoryCache MemoryCache;
         private readonly string ProductsImagesFolder;
         private readonly string DocumentsFolder;
+        private readonly ValidateService Validator;
 
         public ProductService(IMapper mapper, IApplicationDbContext dbContext, IConfiguration configuration, IMemoryCache memoryCache) : base(mapper, dbContext, configuration)
         {
@@ -31,6 +32,7 @@ namespace FarmersMarketplace.Application.Services.Business
             MemoryCache = memoryCache;
             ProductsImagesFolder = Configuration["File:Images:Product"];
             DocumentsFolder = Configuration["File:Documents"];
+            Validator = new ValidateService(DbContext);
         }
 
         public async Task<OptionListVm> Autocomplete(ProductAutocompleteDto productAutocompleteDto)
@@ -83,7 +85,7 @@ namespace FarmersMarketplace.Application.Services.Business
             if (category == null)
             {
                 string message = $"Category with Id {product.CategoryId} was not found.";
-                string userFacingMessage = CultureHelper.Exception("CategoryWithIdNotFound", product.CategoryId.ToString());
+                string userFacingMessage = CultureHelper.Exception("CategoryNotFound", product.CategoryId.ToString());
 
                 throw new NotFoundException(message, userFacingMessage);
             }
@@ -92,7 +94,7 @@ namespace FarmersMarketplace.Application.Services.Business
             if (subcategory == null)
             {
                 string message = $"Subcategory with Id {product.SubcategoryId} was not found.";
-                string userFacingMessage = CultureHelper.Exception("SubcategoryWithIdNotFound", product.SubcategoryId.ToString());
+                string userFacingMessage = CultureHelper.Exception("SubcategoryNotFound", product.SubcategoryId.ToString());
 
                 throw new NotFoundException(message, userFacingMessage);
             }
@@ -112,42 +114,6 @@ namespace FarmersMarketplace.Application.Services.Business
             await DbContext.SaveChangesAsync();
         }
 
-        public void Validate(Guid accountId, Guid producerId, Producer producer)
-        {
-            if (producer == Producer.Seller)
-            {
-                if (producerId != accountId)
-                {
-                    string message = $"Access denied: Permission denied to modify data.";
-                    string userFacingMessage = CultureHelper.Exception("AccessDenied");
-
-                    throw new AuthorizationException(message, userFacingMessage);
-                }
-            }
-            else if (producer == Producer.Farm)
-            {
-                var farm = DbContext.Farms.FirstOrDefault(f => f.Id == producerId);
-                if (farm == null)
-                {
-                    string message = $"Farm with Id {producerId} was not found.";
-                    string userFacingMessage = CultureHelper.Exception("FarmWithIdNotFound", producerId.ToString());
-
-                    throw new NotFoundException(message, userFacingMessage);
-                }
-                if (farm.OwnerId != accountId)
-                {
-                    string message = $"Access denied: Permission denied to modify data.";
-                    string userFacingMessage = CultureHelper.Exception("AccessDenied");
-
-                    throw new AuthorizationException(message, userFacingMessage);
-                }
-            }
-            else
-            {
-                throw new Exception("Producer is not validated.");
-            }
-        }
-
         public async Task Delete(ProductListDto productListDto, Guid accountId)
         {
             foreach (var productId in productListDto.Products)
@@ -157,18 +123,18 @@ namespace FarmersMarketplace.Application.Services.Business
                 if (product == null)
                 {
                     string message = $"Product with Id {productId} was not found.";
-                    string userFacingMessage = CultureHelper.Exception("ProductWithIdNotFound", productId.ToString());
+                    string userFacingMessage = CultureHelper.Exception("ProductNotFound");
 
                     throw new NotFoundException(message, userFacingMessage);
                 }
-                Validate(accountId, product.ProducerId, product.Producer);
+                Validator.Validate(accountId, product.ProducerId, product.Producer);
 
                 bool hasOrdersWithProduct = await DbContext.OrdersItems.AnyAsync(oi => oi.ProductId == productId);
 
                 if (hasOrdersWithProduct)
                 {
                     string message = $"Product with Id {productId} is used in existing orders.";
-                    string userFacingMessage = CultureHelper.Exception("ProductIsUsed", productId.ToString());
+                    string userFacingMessage = CultureHelper.Exception("ProductIsUsed");
 
                     throw new NotFoundException(message, userFacingMessage);
                 }
@@ -207,7 +173,7 @@ namespace FarmersMarketplace.Application.Services.Business
             if (product == null)
             {
                 string message = $"Product with Id {productId} was not found.";
-                string userFacingMessage = CultureHelper.Exception("ProductWithIdNotFound", productId.ToString());
+                string userFacingMessage = CultureHelper.Exception("ProductNotFound");
 
                 throw new NotFoundException(message, userFacingMessage);
             }
@@ -265,7 +231,7 @@ namespace FarmersMarketplace.Application.Services.Business
             if (category == null)
             {
                 string message = $"Category with Id {updateProductDto.CategoryId} was not found.";
-                string userFacingMessage = CultureHelper.Exception("CategoryWithIdNotFound", updateProductDto.CategoryId.ToString());
+                string userFacingMessage = CultureHelper.Exception("CategoryNotFound");
 
                 throw new NotFoundException(message, userFacingMessage);
             }
@@ -274,14 +240,14 @@ namespace FarmersMarketplace.Application.Services.Business
             if (subcategory == null)
             {
                 string message = $"Subcategory with Id {updateProductDto.SubcategoryId} was not found.";
-                string userFacingMessage = CultureHelper.Exception("SubcategoryWithIdNotFound", updateProductDto.SubcategoryId.ToString());
+                string userFacingMessage = CultureHelper.Exception("SubcategoryNotFound");
 
                 throw new NotFoundException(message, userFacingMessage);
             }
             else if (subcategory.CategoryId != category.Id)
             {
-                string message = $"Subcategory does not belong to the category.";
-                string userFacingMessage = CultureHelper.Exception("SubcategoryNotBelongsToCategory", updateProductDto.SubcategoryId.ToString(), updateProductDto.CategoryId.ToString());
+                string message = $"Subcategory with Id {updateProductDto.SubcategoryId} does not belong to the category with Id {updateProductDto.CategoryId}.";
+                string userFacingMessage = CultureHelper.Exception("SubcategoryNotBelongsToCategory");
 
                 throw new InvalidDataException(message, userFacingMessage);
             }
@@ -291,20 +257,11 @@ namespace FarmersMarketplace.Application.Services.Business
             if (product == null)
             {
                 string message = $"Product with Id {updateProductDto.Id} was not found.";
-                string userFacingMessage = CultureHelper.Exception("ProductWithIdNotFound", updateProductDto.Id.ToString());
+                string userFacingMessage = CultureHelper.Exception("ProductNotFound");
 
                 throw new NotFoundException(message, userFacingMessage);
             }
-            Validate(accountId, product.ProducerId, product.Producer);
-
-            if (product.Producer != updateProductDto.Producer 
-                || product.ProducerId != updateProductDto.ProducerId)
-            {
-                string message = $"Access denied: Permission denied to modify data.";
-                string userFacingMessage = CultureHelper.Exception("AccessDenied");
-
-                throw new AuthorizationException(message, userFacingMessage);
-            }
+            Validator.Validate(accountId, product.ProducerId, product.Producer);
 
             product.Name = updateProductDto.Name;
             product.Description = updateProductDto.Description;
@@ -373,11 +330,11 @@ namespace FarmersMarketplace.Application.Services.Business
                 if (product == null)
                 {
                     string message = $"Product with Id {productId} was not found.";
-                    string userFacingMessage = CultureHelper.Exception("ProductWithIdNotFound", productId.ToString());
+                    string userFacingMessage = CultureHelper.Exception("ProductNotFound");
 
                     throw new NotFoundException(message, userFacingMessage);
                 }
-                Validate(accountId, product.ProducerId, product.Producer);
+                Validator.Validate(accountId, product.ProducerId, product.Producer);
 
                 var newProduct = new Product
                 {
@@ -507,7 +464,7 @@ namespace FarmersMarketplace.Application.Services.Business
                 if (account == null)
                 {
                     string message = $"Account with Id {producerId} was not found.";
-                    string userFacingMessage = CultureHelper.Exception("AccountWithIdNotFound", producerId.ToString());
+                    string userFacingMessage = CultureHelper.Exception("AccountNotFound");
 
                     throw new NotFoundException(message, userFacingMessage);
                 }
@@ -521,7 +478,7 @@ namespace FarmersMarketplace.Application.Services.Business
                 if (farm == null)
                 {
                     string message = $"Farm with Id {producerId} was not found.";
-                    string userFacingMessage = CultureHelper.Exception("FarmWithIdNotFound", producerId.ToString());
+                    string userFacingMessage = CultureHelper.Exception("FarmNotFound");
 
                     throw new NotFoundException(message, userFacingMessage);
                 }

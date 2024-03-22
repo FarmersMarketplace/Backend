@@ -120,14 +120,17 @@
   <data name="AccessDenied" xml:space="preserve">
     <value>Access denied: Permission denied to modify data.</value>
   </data>
+  <data name="AccountNotFound" xml:space="preserve">
+    <value>Account was not found.</value>
+  </data>
   <data name="AccountWithEmailNotFound" xml:space="preserve">
     <value>Account with email {0} was not found.</value>
   </data>
   <data name="AccountWithIdEmailNotFound" xml:space="preserve">
     <value>Account was not found or email does not match the provided account.</value>
   </data>
-  <data name="AccountWithIdNotFound" xml:space="preserve">
-    <value>Account with Id {0} was not found.</value>
+  <data name="CategoryNotFound" xml:space="preserve">
+    <value>Category was not found.</value>
   </data>
   <data name="CategoryWithIdNotFound" xml:space="preserve">
     <value>Category with Id {0} was not found.</value>
@@ -141,8 +144,8 @@
   <data name="EmailIsAssociatedWithAnotherAccount" xml:space="preserve">
     <value>Email {0} is already associated with another account.</value>
   </data>
-  <data name="FarmWithIdNotFound" xml:space="preserve">
-    <value>Farm with Id {0} was not found.</value>
+  <data name="FarmNotFound" xml:space="preserve">
+    <value>Farm was not found.</value>
   </data>
   <data name="FileCreatingError" xml:space="preserve">
     <value>An error occurred while creating the file.</value>
@@ -153,14 +156,17 @@
   <data name="InvalidImageFormat" xml:space="preserve">
     <value>Invalid format of image {0}. Acceptable formats: {1}.</value>
   </data>
-  <data name="OrderWithIdNotExist" xml:space="preserve">
-    <value>Order with id {0} was not found.</value>
+  <data name="OrderNotExist" xml:space="preserve">
+    <value>Order was not found.</value>
   </data>
   <data name="ProductCreationDateIsLaterThanReceiveDate" xml:space="preserve">
     <value>Creation date of product cannot be later than receive date.</value>
   </data>
-  <data name="ProductWithIdNotFound" xml:space="preserve">
-    <value>Product with id {0} was not found.</value>
+  <data name="ProductIsUsed" xml:space="preserve">
+    <value>Product is used in existing orders.</value>
+  </data>
+  <data name="ProductNotFound" xml:space="preserve">
+    <value>Product was not found.</value>
   </data>
   <data name="SourceFileNotFound" xml:space="preserve">
     <value>Source file with name {0} was not found.</value>
@@ -170,6 +176,9 @@
   </data>
   <data name="SubcategoryNotBelongsToCategory" xml:space="preserve">
     <value>Subcategory does not belong to the category.</value>
+  </data>
+  <data name="SubcategoryNotFound" xml:space="preserve">
+    <value>Subcategory was not found.</value>
   </data>
   <data name="SubcategoryWithIdAndSubcategoryNotFound" xml:space="preserve">
     <value>Subcategory with Id {0} was not found.</value>

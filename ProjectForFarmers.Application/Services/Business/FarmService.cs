@@ -90,7 +90,7 @@ namespace FarmersMarketplace.Application.Services.Business
             if (farm == null)
             {
                 string message = $"Farm with Id {farmId} was not found.";
-                string userFacingMessage = CultureHelper.Exception("FarmWithIdNotFound", farmId.ToString());
+                string userFacingMessage = CultureHelper.Exception("FarmNotFound");
 
                 throw new NotFoundException(message, userFacingMessage);
             }
@@ -155,7 +155,7 @@ namespace FarmersMarketplace.Application.Services.Business
             if (farm == null)
             {
                 string message = $"Farm with Id {updateFarmDto.Id} was not found.";
-                string userFacingMessage = CultureHelper.Exception("FarmWithIdNotFound", updateFarmDto.Id.ToString());
+                string userFacingMessage = CultureHelper.Exception("FarmNotFound");
 
                 throw new NotFoundException(message, userFacingMessage);
             }
@@ -403,7 +403,7 @@ namespace FarmersMarketplace.Application.Services.Business
             if (farm == null) 
             {
                 string message = $"Farm with Id {farmId} was not found.";
-                string userFacingMessage = CultureHelper.Exception("FarmWithIdNotFound", farmId.ToString());
+                string userFacingMessage = CultureHelper.Exception("FarmNotFound");
                 throw new NotFoundException(message, userFacingMessage);
             } 
 
@@ -421,7 +421,7 @@ namespace FarmersMarketplace.Application.Services.Business
                 if (category == null)
                 {
                     string message = $"Category with Id {categoryId} was not found.";
-                    string userFacingMessage = CultureHelper.Exception("CategoryWithIdNotFound", categoryId.ToString());
+                    string userFacingMessage = CultureHelper.Exception("CategoryNotFound");
 
                     throw new NotFoundException(message, userFacingMessage);
                 }
@@ -435,7 +435,7 @@ namespace FarmersMarketplace.Application.Services.Business
                 if (subcategory == null)
                 {
                     string message = $"Subcategory with Id {subcategoryId} was not found.";
-                    string userFacingMessage = CultureHelper.Exception("SubcategoryWithIdNotFound", subcategoryId.ToString());
+                    string userFacingMessage = CultureHelper.Exception("SubcategoryNotFound");
                     throw new NotFoundException(message, userFacingMessage);
                 }
 
@@ -486,7 +486,7 @@ namespace FarmersMarketplace.Application.Services.Business
             if (farm == null)
             {
                 string message = $"Farm with Id {updateFarmCategoriesAndSubcategoriesDto.FarmId} was not found.";
-                string userFacingMessage = CultureHelper.Exception("FarmWithIdNotFound", updateFarmCategoriesAndSubcategoriesDto.FarmId.ToString());
+                string userFacingMessage = CultureHelper.Exception("FarmNotFound");
                 throw new NotFoundException(message, userFacingMessage);
             }
 
@@ -504,7 +504,8 @@ namespace FarmersMarketplace.Application.Services.Business
             if (farm == null)
             {
                 string message = $"Farm with Id {updateFarmSettingsDto.FarmId} was not found.";
-                string userFacingMessage = CultureHelper.Exception("FarmWithIdNotFound", updateFarmSettingsDto.FarmId.ToString());
+                string userFacingMessage = CultureHelper.Exception("FarmFound");
+
                 throw new NotFoundException(message, userFacingMessage);
             }
 

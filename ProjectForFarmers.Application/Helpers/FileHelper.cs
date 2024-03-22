@@ -57,7 +57,7 @@ namespace FarmersMarketplace.Application.Helpers
             {
                 string fileName = Path.GetFileName(sourceFilePath);
                 string message = $"Directory with path {sourceFilePath} was not found.";
-                string userFacingMessage = CultureHelper.Exception("An error occurred while creating the file.");
+                string userFacingMessage = CultureHelper.Exception("FileCreatingError");
 
                 throw new NotFoundException(message, userFacingMessage);
             }

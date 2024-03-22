@@ -19,8 +19,11 @@ namespace FarmersMarketplace.Application.Services.Business
 {
     public class OrderService : Service, IOrderService
     {
+        private readonly ValidateService Validator;
+
         public OrderService(IMapper mapper, IApplicationDbContext dbContext, IConfiguration configuration) : base(mapper, dbContext, configuration)
         {
+            Validator = new ValidateService(DbContext);
         }
 
         public async Task<OrderListVm> GetAll(GetOrderListDto getOrderListDto)
@@ -141,7 +144,7 @@ namespace FarmersMarketplace.Application.Services.Business
                 if (account == null)
                 {
                     string message = $"Account with Id {producerId} was not found.";
-                    string userFacingMessage = CultureHelper.Exception("AccountWithIdNotFound", producerId.ToString());
+                    string userFacingMessage = CultureHelper.Exception("AccountNotFound");
 
                     throw new NotFoundException(message, userFacingMessage);
                 }
@@ -155,7 +158,7 @@ namespace FarmersMarketplace.Application.Services.Business
                 if (farm == null)
                 {
                     string message = $"Farm with Id {producerId} was not found.";
-                    string userFacingMessage = CultureHelper.Exception("FarmWithIdNotFound", producerId.ToString());
+                    string userFacingMessage = CultureHelper.Exception("FarmNotFound");
 
                     throw new NotFoundException(message, userFacingMessage);
                 }
@@ -168,42 +171,6 @@ namespace FarmersMarketplace.Application.Services.Business
             return fileName;
         }
 
-        public void Validate(Guid accountId, Guid producerId, Producer producer)
-        {
-            if(producer == Producer.Seller)
-            {
-                if (producerId != accountId)
-                {
-                    string message = $"Access denied: Permission denied to modify data.";
-                    string userFacingMessage = CultureHelper.Exception("AccessDenied");
-
-                    throw new AuthorizationException(message, userFacingMessage);
-                }
-            }
-            else if(producer == Producer.Farm)
-            {
-                var farm = DbContext.Farms.FirstOrDefault(f => f.Id == producerId);
-                if (farm == null)
-                {
-                    string message = $"Farm with Id {producerId} was not found.";
-                    string userFacingMessage = CultureHelper.Exception("FarmWithIdNotFound", producerId.ToString());
-
-                    throw new NotFoundException(message, userFacingMessage);
-                }
-                if(farm.OwnerId != accountId)
-                {
-                    string message = $"Access denied: Permission denied to modify data.";
-                    string userFacingMessage = CultureHelper.Exception("AccessDenied");
-
-                    throw new AuthorizationException(message, userFacingMessage);
-                }
-            }
-            else
-            {
-                throw new Exception("Producer is not validated.");
-            }
-        }
-
         public async Task Duplicate(OrderListDto orderListDto, Guid accountId)
         {
             foreach(var orderId in orderListDto.OrderIds)
@@ -213,11 +180,11 @@ namespace FarmersMarketplace.Application.Services.Business
                 if (order == null)
                 {
                     string message = $"Order with id {orderId} was not found.";
-                    string userFacingMessage = CultureHelper.Exception("OrderWithIdNotExist", orderId.ToString());
+                    string userFacingMessage = CultureHelper.Exception("OrderWithIdNotExist");
 
                     throw new NotFoundException(message, userFacingMessage);
                 }
-                Validate(accountId, order.ProducerId, order.Producer);
+                Validator.Validate(accountId, order.ProducerId, order.Producer);
 
                 var newOrderId = Guid.NewGuid();
                 var items = new List<OrderItem>();
@@ -286,12 +253,12 @@ namespace FarmersMarketplace.Application.Services.Business
                 if (order == null)
                 {
                     string message = $"Order with id {orderId} was not found.";
-                    string userFacingMessage = CultureHelper.Exception("OrderWithIdNotExist", orderId.ToString());
+                    string userFacingMessage = CultureHelper.Exception("OrderNotExist");
 
                     throw new NotFoundException(message, userFacingMessage);
                 }
 
-                Validate(accountId, order.ProducerId, order.Producer);
+                Validator.Validate(accountId, order.ProducerId, order.Producer);
 
                 DbContext.Orders.Remove(order);
             }
@@ -306,7 +273,7 @@ namespace FarmersMarketplace.Application.Services.Business
             if (order == null)
             {
                 string message = $"Order with id {orderId} was not found.";
-                string userFacingMessage = CultureHelper.Exception("OrderWithIdNotExist", orderId.ToString());
+                string userFacingMessage = CultureHelper.Exception("OrderNotExist");
 
                 throw new NotFoundException(message, userFacingMessage);
             }
@@ -321,7 +288,7 @@ namespace FarmersMarketplace.Application.Services.Business
                 if (product == null)
                 {
                     string message = $"Product with id {item.ProductId} was not found.";
-                    string userFacingMessage = CultureHelper.Exception("ProductWithIdNotExist", item.ProductId.ToString());
+                    string userFacingMessage = CultureHelper.Exception("ProductNotExist");
 
                     throw new NotFoundException(message, userFacingMessage);
                 }
@@ -351,12 +318,12 @@ namespace FarmersMarketplace.Application.Services.Business
             if (order == null)
             {
                 string message = $"Order with id {updateOrderDto.Id} was not found.";
-                string userFacingMessage = CultureHelper.Exception("OrderWithIdNotExist", updateOrderDto.Id.ToString());
+                string userFacingMessage = CultureHelper.Exception("OrderNotExist");
 
                 throw new NotFoundException(message, userFacingMessage);
             }
 
-            Validate(accountId, order.ProducerId, order.Producer);
+            Validator.Validate(accountId, order.ProducerId, order.Producer);
 
             order.ReceiveDate = updateOrderDto.ReceiveDate;
             order.PaymentType = updateOrderDto.PaymentType;
@@ -419,19 +386,19 @@ namespace FarmersMarketplace.Application.Services.Business
             if (order == null)
             {
                 string message = $"Order with id {addOrderItemDto.OrderId} was not found.";
-                string userFacingMessage = CultureHelper.Exception("OrderWithIdNotExist", addOrderItemDto.OrderId.ToString());
+                string userFacingMessage = CultureHelper.Exception("OrderNotExist");
 
                 throw new NotFoundException(message, userFacingMessage);
             }
 
-            Validate(accountId, order.ProducerId, order.Producer);
+            Validator.Validate(accountId, order.ProducerId, order.Producer);
 
             var product = await DbContext.Products.FirstOrDefaultAsync(p => p.Id == addOrderItemDto.ProductId);
 
             if (product == null)
             {
                 string message = $"Product with id {addOrderItemDto.ProductId} was not found.";
-                string userFacingMessage = CultureHelper.Exception("ProductWithIdNotExist", addOrderItemDto.ProductId.ToString());
+                string userFacingMessage = CultureHelper.Exception("ProductNotExist");
 
                 throw new NotFoundException(message, userFacingMessage);
             }

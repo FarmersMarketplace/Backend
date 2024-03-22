@@ -70,6 +70,15 @@ namespace FarmersMarketplace.Application.Resources.Exceptions {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Account was not found..
+        /// </summary>
+        internal static string AccountNotFound {
+            get {
+                return ResourceManager.GetString("AccountNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Account with email {0} was not found..
         /// </summary>
         internal static string AccountWithEmailNotFound {
@@ -88,11 +97,11 @@ namespace FarmersMarketplace.Application.Resources.Exceptions {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Account with Id {0} was not found..
+        ///   Looks up a localized string similar to Category was not found..
         /// </summary>
-        internal static string AccountWithIdNotFound {
+        internal static string CategoryNotFound {
             get {
-                return ResourceManager.GetString("AccountWithIdNotFound", resourceCulture);
+                return ResourceManager.GetString("CategoryNotFound", resourceCulture);
             }
         }
         
@@ -133,11 +142,11 @@ namespace FarmersMarketplace.Application.Resources.Exceptions {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Farm with Id {0} was not found..
+        ///   Looks up a localized string similar to Farm was not found..
         /// </summary>
-        internal static string FarmWithIdNotFound {
+        internal static string FarmNotFound {
             get {
-                return ResourceManager.GetString("FarmWithIdNotFound", resourceCulture);
+                return ResourceManager.GetString("FarmNotFound", resourceCulture);
             }
         }
         
@@ -169,11 +178,11 @@ namespace FarmersMarketplace.Application.Resources.Exceptions {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Order with id {0} was not found..
+        ///   Looks up a localized string similar to Order was not found..
         /// </summary>
-        internal static string OrderWithIdNotExist {
+        internal static string OrderNotExist {
             get {
-                return ResourceManager.GetString("OrderWithIdNotExist", resourceCulture);
+                return ResourceManager.GetString("OrderNotExist", resourceCulture);
             }
         }
         
@@ -187,11 +196,20 @@ namespace FarmersMarketplace.Application.Resources.Exceptions {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Product with id {0} was not found..
+        ///   Looks up a localized string similar to Product is used in existing orders..
         /// </summary>
-        internal static string ProductWithIdNotFound {
+        internal static string ProductIsUsed {
             get {
-                return ResourceManager.GetString("ProductWithIdNotFound", resourceCulture);
+                return ResourceManager.GetString("ProductIsUsed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Product was not found..
+        /// </summary>
+        internal static string ProductNotFound {
+            get {
+                return ResourceManager.GetString("ProductNotFound", resourceCulture);
             }
         }
         
@@ -219,6 +237,15 @@ namespace FarmersMarketplace.Application.Resources.Exceptions {
         internal static string SubcategoryNotBelongsToCategory {
             get {
                 return ResourceManager.GetString("SubcategoryNotBelongsToCategory", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Subcategory was not found..
+        /// </summary>
+        internal static string SubcategoryNotFound {
+            get {
+                return ResourceManager.GetString("SubcategoryNotFound", resourceCulture);
             }
         }
         
