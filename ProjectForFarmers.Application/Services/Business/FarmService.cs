@@ -512,7 +512,7 @@ namespace FarmersMarketplace.Application.Services.Business
             Validate(ownerId, farm.OwnerId);
 
             if (farm.PaymentData == null)
-                farm.PaymentData = new PaymentData();
+                farm.PaymentData = new ProducerPaymentData();
 
             if(updateFarmSettingsDto.PaymentData != null)
             {
@@ -521,6 +521,8 @@ namespace FarmersMarketplace.Application.Services.Business
                 LogAndUpdateIfChanged("BankUSREOU", farm.PaymentData.BankUSREOU, updateFarmSettingsDto.PaymentData.BankUSREOU, () => farm.PaymentData.BankUSREOU = updateFarmSettingsDto.PaymentData.BankUSREOU, farm.Id);
                 LogAndUpdateIfChanged("BIC", farm.PaymentData.BIC, updateFarmSettingsDto.PaymentData.BIC, () => farm.PaymentData.BIC = updateFarmSettingsDto.PaymentData.BIC, farm.Id);
                 LogAndUpdateIfChanged("HolderFullName", farm.PaymentData.HolderFullName, updateFarmSettingsDto.PaymentData.HolderFullName, () => farm.PaymentData.HolderFullName = updateFarmSettingsDto.PaymentData.HolderFullName, farm.Id);
+                LogAndUpdateIfChanged("CardExpirationYear", farm.PaymentData.CardExpirationYear, updateFarmSettingsDto.PaymentData.CardExpirationYear, () => farm.PaymentData.CardExpirationYear = updateFarmSettingsDto.PaymentData.CardExpirationYear, farm.Id);
+                LogAndUpdateIfChanged("CardExpirationMonth", farm.PaymentData.CardExpirationMonth, updateFarmSettingsDto.PaymentData.CardExpirationMonth, () => farm.PaymentData.CardExpirationMonth = updateFarmSettingsDto.PaymentData.CardExpirationMonth, farm.Id);
             }
 
             if(farm.ReceivingMethods == null) 

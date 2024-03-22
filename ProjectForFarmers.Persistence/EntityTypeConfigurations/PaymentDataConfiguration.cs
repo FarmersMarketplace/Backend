@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace FarmersMarketplace.Persistence.EntityTypeConfigurations
 {
-    public class PaymentDataConfiguration : IEntityTypeConfiguration<PaymentData>
+    public class PaymentDataConfiguration : IEntityTypeConfiguration<ProducerPaymentData>
     {
-        public void Configure(EntityTypeBuilder<PaymentData> builder)
+        public void Configure(EntityTypeBuilder<ProducerPaymentData> builder)
         {
             builder.ToTable("PaymentData");
 

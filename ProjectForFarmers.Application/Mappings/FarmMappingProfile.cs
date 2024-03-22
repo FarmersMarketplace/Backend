@@ -31,7 +31,7 @@ namespace FarmersMarketplace.Application.Mappings
 
         private void MapPaymentDataToPaymentDataVm()
         {
-            CreateMap<PaymentData, PaymentDataVm>()
+            CreateMap<ProducerPaymentData, PaymentDataVm>()
                .ForMember(vm => vm.CardNumber, opt => opt.MapFrom(data => data.CardNumber))
                .ForMember(vm => vm.AccountNumber, opt => opt.MapFrom(data => data.AccountNumber))
                .ForMember(vm => vm.BankUSREOU, opt => opt.MapFrom(data => data.BankUSREOU))
@@ -109,7 +109,7 @@ namespace FarmersMarketplace.Application.Mappings
 
         private void MapPaymentDataDtoToPaymentData()
         {
-            CreateMap<PaymentDataDto, PaymentData>()
+            CreateMap<ProducerPaymentDataDto, ProducerPaymentData>()
                 .ForMember(data => data.Id, opt => opt.MapFrom(dto => Guid.NewGuid()))
                 .ForMember(data => data.CardNumber, opt => opt.MapFrom(dto => dto.CardNumber))
                 .ForMember(data => data.AccountNumber, opt => opt.MapFrom(dto => dto.AccountNumber))

@@ -10,7 +10,7 @@ namespace FarmersMarketplace.Application.DataTransferObjects.Farm
     public class UpdateFarmSettingsDto
     {
         public Guid FarmId { get; set; }
-        public PaymentDataDto PaymentData { get; set; }
+        public ProducerPaymentDataDto PaymentData { get; set; }
         public bool HasOnlinePayment { get; set; }
     }
 

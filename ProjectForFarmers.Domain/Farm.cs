@@ -24,6 +24,6 @@
         public List<ReceivingMethod>? ReceivingMethods { get; set; }
         public List<PaymentType>? PaymentTypes { get; set; }
         public Guid? PaymentDataId { get; set; }
-        public PaymentData? PaymentData { get; set; }
+        public ProducerPaymentData? PaymentData { get; set; }
     }
 }

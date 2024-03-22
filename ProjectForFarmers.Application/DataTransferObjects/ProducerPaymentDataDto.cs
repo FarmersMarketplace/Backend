@@ -6,13 +6,15 @@ using System.Threading.Tasks;
 
 namespace FarmersMarketplace.Application.DataTransferObjects
 {
-    public class PaymentDataDto
+    public class ProducerPaymentDataDto
     {
         public string CardNumber { get; set; }
         public string AccountNumber { get; set; }
         public string BankUSREOU { get; set; }
         public string BIC { get; set; }
         public string HolderFullName { get; set; }
+        public string CardExpirationYear { get; set; }
+        public string CardExpirationMonth { get; set; }
     }
 
 }

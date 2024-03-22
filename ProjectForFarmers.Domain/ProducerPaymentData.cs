@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace FarmersMarketplace.Domain
 {
-    public class PaymentData
+    public class ProducerPaymentData
     {
         public Guid Id { get; set; }
         public string CardNumber { get; set; }
@@ -14,6 +14,8 @@ namespace FarmersMarketplace.Domain
         public string BankUSREOU {  get; set; }
         public string BIC {  get; set; }
         public string HolderFullName { get; set; }
+        public string CardExpirationYear { get; set; }
+        public string CardExpirationMonth { get; set; }
     }
 
 }

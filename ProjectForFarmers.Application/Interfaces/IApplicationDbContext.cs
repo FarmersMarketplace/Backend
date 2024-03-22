@@ -17,7 +17,7 @@ namespace FarmersMarketplace.Application.Interfaces
         DbSet<Category> Categories { get; set; }
         DbSet<Subcategory> Subcategories { get; set; }
         DbSet<Product> Products { get; set; }
-        DbSet<PaymentData> PaymentData { get; set; }
+        DbSet<ProducerPaymentData> PaymentData { get; set; }
         DbSet<FarmLog> FarmsLogs { get; set; }
         Task<int> SaveChangesAsync(CancellationToken token);
         Task<int> SaveChangesAsync();

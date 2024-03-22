@@ -19,7 +19,7 @@ namespace FarmersMarketplace.Persistence.DbContexts
         public DbSet<Category> Categories { get; set; }
         public DbSet<Subcategory> Subcategories { get; set; }
         public DbSet<Product> Products { get; set; }
-        public DbSet<PaymentData> PaymentData { get; set; }
+        public DbSet<ProducerPaymentData> PaymentData { get; set; }
         public DbSet<FarmLog> FarmsLogs { get; set; }
 
         public MainDbContext(DbContextOptions<MainDbContext> options) : base(options)

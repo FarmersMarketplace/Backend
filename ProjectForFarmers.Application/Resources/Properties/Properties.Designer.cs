@@ -106,6 +106,24 @@ namespace FarmersMarketplace.Application.Resources.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Expiration month of card.
+        /// </summary>
+        internal static string CardExpirationMonth {
+            get {
+                return ResourceManager.GetString("CardExpirationMonth", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Expiration year of card.
+        /// </summary>
+        internal static string CardExpirationYear {
+            get {
+                return ResourceManager.GetString("CardExpirationYear", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Card number.
         /// </summary>
         internal static string CardNumber {
