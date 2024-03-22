@@ -101,7 +101,7 @@ namespace FarmersMarketplace.WebApi
             if (app.Environment.IsDevelopment()) app.UseDeveloperExceptionPage();
 
             app.UseHangfireServer();
-            app.UseHangfireDashboard();
+            app.UseHangfireDashboard("/dashboard");
 
             HangfireHelper.RegisterTasks(app.Services);
 

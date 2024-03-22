@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using FarmersMarketplace.Application.Interfaces;
 using FarmersMarketplace.Application.Services.Business;
 using Serilog;
+using Hangfire.Storage;
 
 namespace FarmersMarketplace.Application.Helpers
 {
@@ -42,6 +43,17 @@ namespace FarmersMarketplace.Application.Helpers
 
         public static void RegisterTasks(IServiceProvider services)
         {
+            using (var connection = JobStorage.Current.GetConnection())
+            {
+                var monitoringApi = JobStorage.Current.GetMonitoringApi();
+                var scheduledCount = monitoringApi.ScheduledCount();
+
+                if (scheduledCount > 0)
+                {
+                    return;
+                }
+            }
+
             var scope = services.CreateScope();
             var serviceProvider = scope.ServiceProvider;
 

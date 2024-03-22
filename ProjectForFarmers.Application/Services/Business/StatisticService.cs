@@ -161,7 +161,7 @@ namespace FarmersMarketplace.Application.Services.Business
             return (float)((sum*100)/totalRevenu);
         }
 
-        private async Task<MonthStatistic> CalculateMonthStatisticForFirstMonth(Guid producerId, Producer producer, DateTimeOffset lastDateOfMonth)
+        private async Task<MonthStatistic> CalculateMonthStatisticForFirstMonth(Guid producerId, Producer producer, DateTime lastDateOfMonth)
         {
             var orders = DbContext.Orders.Where(o => o.Producer == producer
                 && o.ProducerId == producerId
@@ -252,7 +252,7 @@ namespace FarmersMarketplace.Application.Services.Business
             return result;
         }
 
-        private async Task<MonthStatistic> GetPreviousStatistic(Guid producerId, Producer producer, DateTimeOffset lastDayOfPreviousMonth)
+        private async Task<MonthStatistic> GetPreviousStatistic(Guid producerId, Producer producer, DateTime lastDayOfPreviousMonth)
         {
             var previousStatistic = await DbContext.MonthesStatistics
                 .Include(m => m.BookedOrdersStatistic)
@@ -286,7 +286,7 @@ namespace FarmersMarketplace.Application.Services.Business
             }
         }
 
-        private async Task<bool> ExistsOrdersForPeriodOfTime(Guid producerId, DateTimeOffset startDate, DateTimeOffset endDate)
+        private async Task<bool> ExistsOrdersForPeriodOfTime(Guid producerId, DateTime startDate, DateTime endDate)
         {
             var existsOrdersForPreviousMonth = DbContext.Orders.Any(o => o.CreationDate.Year >= startDate.Year 
                 && o.ProducerId == producerId
