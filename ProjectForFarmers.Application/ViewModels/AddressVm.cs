@@ -15,7 +15,7 @@ namespace FarmersMarketplace.Application.ViewModels
         public string HouseNumber { get; set; }
         public string PostalCode { get; set; }
         public string Note { get; set; }
-        public double Longtitude { get; set; }
+        public double Longitude { get; set; }
         public double Latitude { get; set; }
     }
 

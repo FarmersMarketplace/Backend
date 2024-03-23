@@ -13,7 +13,7 @@ namespace FarmersMarketplace.Application.ViewModels.Farm
         public string OwnerName { get; set; }
         public AddressVm Address { get; set; }
         public ScheduleVm Schedule { get; set; }
-        public PaymentDataVm PaymentData { get; set; }
+        public ProducerPaymentDataVm PaymentData { get; set; }
         public List<ReceivingMethod>? ReceivingMethods { get; set; }
         public bool HasDelivery { get; set; }
         public List<string> ImagesNames { get; set; }
