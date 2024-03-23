@@ -1,17 +1,15 @@
-﻿using FarmersMarketplace.Application.DataTransferObjects.Auth;
+﻿using AutoMapper;
+using FarmersMarketplace.Application.DataTransferObjects.Auth;
 using FarmersMarketplace.Application.Exceptions;
+using FarmersMarketplace.Application.Helpers;
 using FarmersMarketplace.Application.Interfaces;
 using FarmersMarketplace.Application.ViewModels.Auth;
 using FarmersMarketplace.Domain;
 using Google.Apis.Auth;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using System.ComponentModel.DataAnnotations;
 using static Google.Apis.Auth.GoogleJsonWebSignature;
-using FarmersMarketplace.Application.Helpers;
-using AutoMapper;
-using Microsoft.AspNetCore.Authorization;
-using FarmersMarketplace.Application.ViewModels;
+using InvalidDataException = FarmersMarketplace.Application.Exceptions.InvalidDataException;
 
 namespace FarmersMarketplace.Application.Services.Auth
 {
@@ -38,75 +36,238 @@ namespace FarmersMarketplace.Application.Services.Auth
 
         public async Task ConfirmEmail(Guid accountId, string email)
         {
-            var existingAccountWithSameEmail = await DbContext.Accounts.FirstOrDefaultAsync(a => a.Email == email);
-            if (existingAccountWithSameEmail != null) 
+            if (await ExistsAccountWithEmail(email))
             {
                 string message = $"Email {email} is already associated with another account.";
                 string userFacingMessage = CultureHelper.Exception("DuplicateEmail", email);
 
                 throw new DuplicateException(message, userFacingMessage);
-            } 
+            }
 
-            var account = await DbContext.Accounts.FirstOrDefaultAsync(a => a.Id == accountId);
-
-            if (account == null) 
-            {
-                string message = $"Account with Id {accountId} was not found.";
-                string userFacingMessage = CultureHelper.Exception("AccountNotFound");
-
-                throw new NotFoundException(message, userFacingMessage);
-            } 
-            
+            var account = await GetAccount(accountId);
             account.Email = email;
+
+            
             await DbContext.SaveChangesAsync();
+        }
+
+        public async Task<Account> GetAccount(Guid accountId)
+        {
+            var customer = await DbContext.Customers.FirstOrDefaultAsync(a => a.Id == accountId);
+
+            if (customer != null)
+            {
+                return customer;
+            }
+            else
+            {
+                var seller = await DbContext.Sellers.FirstOrDefaultAsync(a => a.Id == accountId);
+
+                if (seller != null)
+                {
+                    return seller;
+                }
+                else
+                {
+                    var farmer = await DbContext.Farmers.FirstOrDefaultAsync(a => a.Id == accountId);
+
+                    if (farmer != null)
+                    {
+                        return farmer;
+                    }
+                    else
+                    {
+                        string message = $"Account with Id {accountId} was not found.";
+                        string userFacingMessage = CultureHelper.Exception("AccountNotFound");
+
+                        throw new NotFoundException(message, userFacingMessage);
+                    }
+                }
+            }
+        }
+
+        public async Task<Account> GetAccount(string email)
+        {
+            var customer = await DbContext.Customers.FirstOrDefaultAsync(a => a.Email == email);
+
+            if (customer != null)
+            {
+                return customer;
+            }
+            else
+            {
+                var seller = await DbContext.Sellers.FirstOrDefaultAsync(a => a.Email == email);
+
+                if (seller != null)
+                {
+                    return seller;
+                }
+                else
+                {
+                    var farmer = await DbContext.Farmers.FirstOrDefaultAsync(a => a.Email == email);
+
+                    if (farmer != null)
+                    {
+                        return farmer;
+                    }
+                    else
+                    {
+                        string message = $"Account with email {email} was not found.";
+                        string userFacingMessage = CultureHelper.Exception("AccountWithEmailNotFound");
+
+                        throw new NotFoundException(message, userFacingMessage);
+                    }
+                }
+            }
         }
 
         public async Task<LoginVm> Login(LoginDto loginDto)
         {
-            var account = DbContext.Accounts.FirstOrDefault(a => a.Email ==  loginDto.Email);
-            if (account == null) 
+            var customer = await DbContext.Customers.FirstOrDefaultAsync(a => a.Email == loginDto.Email);
+
+            if (customer != null)
             {
-                string message = $"Account with email {loginDto.Email} was not found.";
-                string userFacingMessage = CultureHelper.Exception("AccountWithEmailNotFound", loginDto.Email);
+                if (CryptoHelper.ComputeSha256Hash(loginDto.Password) != customer.Password)
+                {
+                    string message = $"Invalid password.";
+                    string userFacingMessage = CultureHelper.Exception("InvalidPassword", loginDto.Email);
 
-                throw new NotFoundException(message, userFacingMessage);
-            } 
-            else if(CryptoHelper.ComputeSha256Hash(loginDto.Password) != account.Password) throw new UnauthorizedAccessException("Invalid password.");
+                    throw new AuthorizationException(message, userFacingMessage);
+                }
 
-            var token = await JwtService.Authenticate(account);
-            var vm = new LoginVm(token, account.Role, account.Id);
+                var token = await JwtService.Authenticate(customer.Id, Role.Customer);
+                var vm = new LoginVm(token, Role.Customer, customer.Id);
 
-            return vm;
+                return vm;
+            }
+            else
+            {
+                var seller = await DbContext.Sellers.FirstOrDefaultAsync(a => a.Email == loginDto.Email);
+
+                if (seller != null)
+                {
+                    if (CryptoHelper.ComputeSha256Hash(loginDto.Password) != seller.Password)
+                    {
+                        string message = $"Invalid password.";
+                        string userFacingMessage = CultureHelper.Exception("InvalidPassword", loginDto.Email);
+
+                        throw new AuthorizationException(message, userFacingMessage);
+                    }
+
+                    var token = await JwtService.Authenticate(seller.Id, Role.Seller);
+                    var vm = new LoginVm(token, Role.Seller, seller.Id);
+
+                    return vm;
+                }
+                else
+                {
+                    var farmer = await DbContext.Farmers.FirstOrDefaultAsync(a => a.Email == loginDto.Email);
+
+                    if (farmer != null)
+                    {
+                        if (CryptoHelper.ComputeSha256Hash(loginDto.Password) != farmer.Password)
+                        {
+                            string message = $"Invalid password.";
+                            string userFacingMessage = CultureHelper.Exception("InvalidPassword", loginDto.Email);
+
+                            throw new AuthorizationException(message, userFacingMessage);
+                        }
+
+                        var token = await JwtService.Authenticate(farmer.Id, Role.Farmer);
+                        var vm = new LoginVm(token, Role.Farmer, farmer.Id);
+
+                        return vm;
+                    }
+                    else
+                    {
+                        string message = $"Account with email {loginDto.Email} was not found.";
+                        string userFacingMessage = CultureHelper.Exception("AccountWithEmailNotFound", loginDto.Email);
+
+                        throw new NotFoundException(message, userFacingMessage);
+                    }
+                }
+            }
         }
 
         private async Task CreateAccount(Guid id, RegisterDto accountDto)
         {
-            if(accountDto.Password != accountDto.ConfirmPassword) throw new ValidationException("The password and confirm password do not match.");
-            var existingAccountWithSameEmail = await DbContext.Accounts.FirstOrDefaultAsync(a => a.Email == accountDto.Email);
-            if (existingAccountWithSameEmail != null) 
+            if(accountDto.Password != accountDto.ConfirmPassword)
+            {
+                string message = $"The password and confirm password do not match.";
+                string userFacingMessage = CultureHelper.Exception("PasswordNotMatchToConfirmPassword");
+
+                throw new InvalidDataException(message, userFacingMessage);
+            }
+
+            if (await ExistsAccountWithEmail(accountDto.Email)) 
             {
                 string message = $"Email {accountDto.Email} is already associated with another account.";
                 string userFacingMessage = CultureHelper.Exception("EmailIsAssociatedWithAnotherAccount", accountDto.Email);
 
                 throw new DuplicateException(message, userFacingMessage);
-            } 
+            }
 
-            var account = new Account
+            if (accountDto.Role == Role.Customer) 
             {
-                Id = id,
-                Name = accountDto.Name,
-                Surname = accountDto.Surname,
-                Password = CryptoHelper.ComputeSha256Hash(accountDto.Password),
-                Role = accountDto.Role
-            };
+                var account = new Customer
+                {
+                    Id = id,
+                    Name = accountDto.Name,
+                    Surname = accountDto.Surname,
+                    Password = CryptoHelper.ComputeSha256Hash(accountDto.Password),
+                };
 
-            await DbContext.Accounts.AddAsync(account);
+                await DbContext.Customers.AddAsync(account);
+            }
+            else if (accountDto.Role == Role.Seller) 
+            {
+                var account = new Seller
+                {
+                    Id = id,
+                    Name = accountDto.Name,
+                    Surname = accountDto.Surname,
+                    Password = CryptoHelper.ComputeSha256Hash(accountDto.Password),
+                };
+
+                await DbContext.Sellers.AddAsync(account);
+            }
+            else if (accountDto.Role == Role.Farmer)
+            {
+                var account = new Farmer
+                {
+                    Id = id,
+                    Name = accountDto.Name,
+                    Surname = accountDto.Surname,
+                    Password = CryptoHelper.ComputeSha256Hash(accountDto.Password),
+                };
+
+                await DbContext.Farmers.AddAsync(account);
+            }
+            else 
+            {
+                string message = $"Role is incorrect.";
+                string userFacingMessage = CultureHelper.Exception("IncorrectRole", accountDto.Email);
+
+                throw new InvalidDataException(message, userFacingMessage);
+            }
+        }
+
+        public async Task<bool> ExistsAccountWithEmail(string email) 
+        {
+            var existingCustomerWithSameEmail = await DbContext.Customers.FirstOrDefaultAsync(a => a.Email == email);
+            var existingSellerWithSameEmail = await DbContext.Customers.FirstOrDefaultAsync(a => a.Email == email);
+            var existingFarmerWithSameEmail = await DbContext.Customers.FirstOrDefaultAsync(a => a.Email == email);
+
+            return existingCustomerWithSameEmail != null
+                || existingSellerWithSameEmail != null
+                || existingFarmerWithSameEmail != null;
         }
 
         public async Task ResetPassword(Guid accountId, string email, ResetPasswordDto resetPasswordDto)
         {
-            var account = await DbContext.Accounts.FirstOrDefaultAsync(a => a.Id == accountId && a.Email == email);
-            if (account == null)
+            var account = await GetAccount(accountId);
+
+            if (account == null || account.Email != email)
             {
                 string message = $"Account with Id {accountId} and email {email} was not found or email does not match the provided account.";
                 string userFacingMessage = CultureHelper.Exception("AccountWithIdEmailNotFound");
@@ -114,7 +275,13 @@ namespace FarmersMarketplace.Application.Services.Auth
                 throw new NotFoundException(message, userFacingMessage);
             }
             
-            else if(resetPasswordDto.Password != resetPasswordDto.ConfirmPassword) throw new UnauthorizedAccessException("Password and confirm password do not match.");
+            else if(resetPasswordDto.Password != resetPasswordDto.ConfirmPassword)
+            {
+                string message = $"The password and confirm password do not match.";
+                string userFacingMessage = CultureHelper.Exception("PasswordNotMatchToConfirmPassword");
+
+                throw new InvalidDataException(message, userFacingMessage);
+            }
 
             account.Password = CryptoHelper.ComputeSha256Hash(resetPasswordDto.Password);
             await DbContext.SaveChangesAsync();
@@ -122,7 +289,8 @@ namespace FarmersMarketplace.Application.Services.Auth
 
         public async Task ForgotPassword(ForgotPasswordDto forgotPasswordDto)
         {
-            var account = await DbContext.Accounts.FirstOrDefaultAsync(a => a.Email == forgotPasswordDto.Email);
+            var account = await GetAccount(forgotPasswordDto.Email);
+
             if (account == null)
             {
                 string message = $"Account with email {forgotPasswordDto.Email} was not found.";
@@ -154,26 +322,7 @@ namespace FarmersMarketplace.Application.Services.Auth
         {
             Payload payload = await GoogleJsonWebSignature.ValidateAsync(authenticateWithGoogleDto.GoogleIdToken);
 
-            var account = await DbContext.Accounts.FirstOrDefaultAsync(a => a.Email == payload.Email);
-            if (account == null) 
-            {
-                throw new Exception("Set role!");
-                account = new Account 
-                {
-                    Id = Guid.NewGuid(),
-                    Name = payload.GivenName,
-                    Surname = payload.FamilyName,
-                    Email = payload.Email,
-                    //Role = Role.Customer
-                };
-                DbContext.Accounts.Add(account);
-                await DbContext.SaveChangesAsync();
-            }
-
-            var token = await JwtService.Authenticate(account);
-            var vm = new LoginVm(token, account.Role, account.Id);
-
-            return vm;
+            throw new Exception("Set role!");
         }
     }
 }

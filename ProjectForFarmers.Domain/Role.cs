@@ -9,7 +9,7 @@ namespace FarmersMarketplace.Domain
     public enum Role
     {
         Customer,
-        FarmOwner,
+        Farmer,
         Seller
     }
 }

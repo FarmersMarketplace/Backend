@@ -4,7 +4,6 @@ using Geocoding.Google;
 using Geocoding;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using FarmersMarketplace.Application.DataTransferObjects.Farm;
 using FarmersMarketplace.Application.DataTransferObjects.Order;
 using FarmersMarketplace.Application.Exceptions;
 using FarmersMarketplace.Application.Interfaces;
@@ -14,6 +13,7 @@ using FarmersMarketplace.Application.Helpers;
 using InvalidDataException = FarmersMarketplace.Application.Exceptions.InvalidDataException;
 using Microsoft.IdentityModel.Tokens;
 using Address = FarmersMarketplace.Domain.Address;
+using FarmersMarketplace.Application.DataTransferObjects;
 
 namespace FarmersMarketplace.Application.Services.Business
 {
@@ -138,8 +138,7 @@ namespace FarmersMarketplace.Application.Services.Business
 
             if (producer == Producer.Seller)
             {
-                var account = await DbContext.Accounts.FirstOrDefaultAsync(a => a.Id == producerId
-                    && a.Role == Role.Seller);
+                var account = await DbContext.Sellers.FirstOrDefaultAsync(a => a.Id == producerId);
 
                 if (account == null)
                 {

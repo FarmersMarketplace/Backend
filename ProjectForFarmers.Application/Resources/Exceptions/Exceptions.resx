@@ -153,11 +153,20 @@
   <data name="FileNotExist" xml:space="preserve">
     <value>File with name {0} does not exist in directory {1}.</value>
   </data>
+  <data name="IncorrectRole" xml:space="preserve">
+    <value>Role is incorrect.</value>
+  </data>
   <data name="InvalidImageFormat" xml:space="preserve">
     <value>Invalid format of image {0}. Acceptable formats: {1}.</value>
   </data>
+  <data name="InvalidPassword" xml:space="preserve">
+    <value>Invalid password.</value>
+  </data>
   <data name="OrderNotExist" xml:space="preserve">
     <value>Order was not found.</value>
+  </data>
+  <data name="PasswordNotMatchToConfirmPassword" xml:space="preserve">
+    <value>The password and confirm password do not match.</value>
   </data>
   <data name="ProductCreationDateIsLaterThanReceiveDate" xml:space="preserve">
     <value>Creation date of product cannot be later than receive date.</value>

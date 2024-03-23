@@ -18,10 +18,10 @@ namespace FarmersMarketplace.Application
             services.AddTransient<ISubcategoryService, SubcategoryService>();
             services.AddTransient<IProductService, ProductService>();
             services.AddTransient<IDashboardService, DashboardService>();
+            services.AddTransient<IAccountService, AccountService>();
 
             services.AddAutoMapper(config =>
             {
-                config.AddProfile(new AuthMappingProfile());
                 config.AddProfile(new FarmMappingProfile());
                 config.AddProfile(new OrderMappingProfile());
                 config.AddProfile(new CategoryMappingProfile());

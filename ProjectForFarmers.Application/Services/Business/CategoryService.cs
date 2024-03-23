@@ -1,6 +1,4 @@
 ﻿using AutoMapper;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using FarmersMarketplace.Application.DataTransferObjects.Catefory;
 using FarmersMarketplace.Application.Exceptions;
 using FarmersMarketplace.Application.Helpers;
@@ -8,6 +6,8 @@ using FarmersMarketplace.Application.Interfaces;
 using FarmersMarketplace.Application.ViewModels.Category;
 using FarmersMarketplace.Application.ViewModels.Subcategory;
 using FarmersMarketplace.Domain;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace FarmersMarketplace.Application.Services.Business
 {

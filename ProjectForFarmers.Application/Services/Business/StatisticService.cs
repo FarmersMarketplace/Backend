@@ -27,7 +27,7 @@ namespace FarmersMarketplace.Application.Services.Business
                 DbContext.MonthesStatistics.Add(farmMonthStatistic);
             }
 
-            var sellers = DbContext.Accounts.Where(a => a.Role == Role.Seller).ToArray();
+            var sellers = DbContext.Sellers.ToArray();
 
             foreach (var seller in sellers)
             {
@@ -307,7 +307,7 @@ namespace FarmersMarketplace.Application.Services.Business
                  .Select(o => o.CustomerId)
                  .ToListAsync());
 
-            var customer = await DbContext.Accounts.FirstOrDefaultAsync(a => $"{a.Name} {a.Surname}" == getCustomerDto.CustomerName
+            var customer = await DbContext.Customers.FirstOrDefaultAsync(a => $"{a.Name} {a.Surname}" == getCustomerDto.CustomerName
                 && customerIdsHashSet.Contains(a.Id));
 
             if (customer == null)

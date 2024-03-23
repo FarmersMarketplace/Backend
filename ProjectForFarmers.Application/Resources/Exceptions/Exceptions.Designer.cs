@@ -169,6 +169,15 @@ namespace FarmersMarketplace.Application.Resources.Exceptions {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Role is incorrect..
+        /// </summary>
+        internal static string IncorrectRole {
+            get {
+                return ResourceManager.GetString("IncorrectRole", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Invalid format of image {0}. Acceptable formats: {1}..
         /// </summary>
         internal static string InvalidImageFormat {
@@ -178,11 +187,29 @@ namespace FarmersMarketplace.Application.Resources.Exceptions {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Invalid password..
+        /// </summary>
+        internal static string InvalidPassword {
+            get {
+                return ResourceManager.GetString("InvalidPassword", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Order was not found..
         /// </summary>
         internal static string OrderNotExist {
             get {
                 return ResourceManager.GetString("OrderNotExist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The password and confirm password do not match..
+        /// </summary>
+        internal static string PasswordNotMatchToConfirmPassword {
+            get {
+                return ResourceManager.GetString("PasswordNotMatchToConfirmPassword", resourceCulture);
             }
         }
         

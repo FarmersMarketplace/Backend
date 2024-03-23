@@ -52,7 +52,7 @@ namespace FarmersMarketplace.Application.Services.Business
                 farm.ImagesNames = new List<string>();
             }
             string token = await JwtService.EmailConfirmationToken(farm.Id, farmDto.ContactEmail);
-            var owner = await DbContext.Accounts.FirstOrDefaultAsync(a => a.Id == farm.OwnerId);
+            var owner = await DbContext.Farmers.FirstOrDefaultAsync(a => a.Id == farm.OwnerId);
 
             string message = EmailContentBuilder.FarmEmailConfirmationMessageBody(farm.Name, owner.Name, owner.Surname, farmDto.ContactEmail, token);
             await EmailHelper.SendEmail(message, farmDto.ContactEmail, "Farm Email Confirmation");

@@ -458,8 +458,7 @@ namespace FarmersMarketplace.Application.Services.Business
 
             if (producer == Producer.Seller)
             {
-                var account = await DbContext.Accounts.FirstOrDefaultAsync(a => a.Id == producerId
-                    && a.Role == Role.Seller);
+                var account = await DbContext.Sellers.FirstOrDefaultAsync(a => a.Id == producerId);
 
                 if (account == null)
                 {

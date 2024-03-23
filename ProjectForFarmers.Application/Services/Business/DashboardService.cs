@@ -44,7 +44,7 @@ namespace FarmersMarketplace.Application.Services.Business
                 .Select(o => o.CustomerId)
                 .ToListAsync());
 
-            var customerNames = await DbContext.Accounts
+            var customerNames = await DbContext.Customers
                 .Where(a => customerIdsHashSet.Contains(a.Id))
                 .Select(a => $"{a.Name} {a.Surname}")
                 .Distinct()
@@ -88,7 +88,7 @@ namespace FarmersMarketplace.Application.Services.Business
                 currentMonthDashboardVm.CustomerInfo.Name = "Customer with highest payment was not found";
             }
 
-            var customerWithHighestPayment = await DbContext.Accounts.FirstOrDefaultAsync(a => a.Id == currentMonthStatistic.CustomerWithHighestPaymentId);
+            var customerWithHighestPayment = await DbContext.Customers.FirstOrDefaultAsync(a => a.Id == currentMonthStatistic.CustomerWithHighestPaymentId);
             if (customerWithHighestPayment != null)
             {
                 currentMonthDashboardVm.CustomerInfo.Name = $"{customerWithHighestPayment.Surname} {customerWithHighestPayment.Name}";
@@ -124,7 +124,7 @@ namespace FarmersMarketplace.Application.Services.Business
             }).ToList();
 
             var currentMonthDashboardVm = Mapper.Map<DashboardVm>(currentMonthStatistic);
-            var customerWithHighestPayment = await DbContext.Accounts.FirstOrDefaultAsync(a => a.Id == currentMonthStatistic.CustomerWithHighestPaymentId);
+            var customerWithHighestPayment = await DbContext.Customers.FirstOrDefaultAsync(a => a.Id == currentMonthStatistic.CustomerWithHighestPaymentId);
 
             if (customerWithHighestPayment != null)
             {

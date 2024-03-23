@@ -22,14 +22,14 @@ namespace FarmersMarketplace.Application.Services.Auth
             Configuration = configuration;
         }
 
-        public async Task<string> Authenticate(Account account)
+        public async Task<string> Authenticate(Guid accountId, Role role)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.UTF8.GetBytes(Configuration["Auth:Secret"]);
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.NameIdentifier, account.Id.ToString()),
-                new Claim(ClaimTypes.Role, account.Role.ToString())
+                new Claim(ClaimTypes.NameIdentifier, accountId.ToString()),
+                new Claim(ClaimTypes.Role, role.ToString())
             };
 
             var notBefore = DateTime.UtcNow;
