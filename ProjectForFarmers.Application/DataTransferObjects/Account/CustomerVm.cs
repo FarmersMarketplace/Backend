@@ -18,8 +18,7 @@ namespace FarmersMarketplace.Application.DataTransferObjects.Account
         public DateTime? DateOfBirth { get; set; }
         public string AvatarName { get; set; }
         public CustomerPaymentDataDto PaymentData { get; set; }
-        public Guid AddressId { get; set; }
-        public CustomerAddress? Address { get; set; }
+        public CustomerAddressDto Address { get; set; }
     }
 
 }
