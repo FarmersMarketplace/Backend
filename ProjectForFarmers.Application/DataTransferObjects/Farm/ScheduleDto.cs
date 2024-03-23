@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FarmersMarketplace.Application.DataTransferObjects.Farm
+namespace FarmersMarketplace.Application.DataTransferObjects
 {
     public class ScheduleDto
     {

@@ -15,6 +15,7 @@ using DayOfWeek = FarmersMarketplace.Domain.DayOfWeek;
 using Microsoft.AspNetCore.Http;
 using FarmersMarketplace.Application.ViewModels.Category;
 using FarmersMarketplace.Application.ViewModels.Subcategory;
+using FarmersMarketplace.Application.DataTransferObjects;
 
 namespace FarmersMarketplace.Application.Services.Business
 {
