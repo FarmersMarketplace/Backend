@@ -31,7 +31,7 @@ namespace FarmersMarketplace.Application.Mappings
 
         private void MapPaymentDataToPaymentDataVm()
         {
-            CreateMap<ProducerPaymentData, PaymentDataVm>()
+            CreateMap<ProducerPaymentData, ProducerPaymentDataVm>()
                .ForMember(vm => vm.CardNumber, opt => opt.MapFrom(data => data.CardNumber))
                .ForMember(vm => vm.AccountNumber, opt => opt.MapFrom(data => data.AccountNumber))
                .ForMember(vm => vm.BankUSREOU, opt => opt.MapFrom(data => data.BankUSREOU))
@@ -48,7 +48,9 @@ namespace FarmersMarketplace.Application.Mappings
                 .ForMember(vm => vm.Street, opt => opt.MapFrom(address => address.Street))
                 .ForMember(vm => vm.HouseNumber, opt => opt.MapFrom(address => address.HouseNumber))
                 .ForMember(vm => vm.PostalCode, opt => opt.MapFrom(address => address.PostalCode))
-                .ForMember(vm => vm.Note, opt => opt.MapFrom(address => address.Note));
+                .ForMember(vm => vm.Note, opt => opt.MapFrom(address => address.Note))
+                .ForMember(vm => vm.Longitude, opt => opt.MapFrom(address => address.Longitude))
+                .ForMember(vm => vm.Latitude, opt => opt.MapFrom(address => address.Latitude));
         }
 
         private void MapScheduleToScheduleVm()
