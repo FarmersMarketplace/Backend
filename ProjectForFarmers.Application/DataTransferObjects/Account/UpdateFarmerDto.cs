@@ -1,4 +1,5 @@
 ﻿using FarmersMarketplace.Domain;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,7 +17,7 @@ namespace FarmersMarketplace.Application.DataTransferObjects.Account
         public string? Password { get; set; }
         public Gender? Gender { get; set; }
         public DateTime? DateOfBirth { get; set; }
-        public string? AvatarName { get; set; }
+        public IFormFile? Avatar { get; set; }
         public AddressDto? Address { get; set; }
     }
 

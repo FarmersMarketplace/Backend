@@ -17,7 +17,7 @@ namespace FarmersMarketplace.Application.DataTransferObjects.Account
         public string? Phone { get; set; }
         public Gender? Gender { get; set; }
         public DateTime? DateOfBirth { get; set; }
-        public List<IFormFile>? ImagesNames { get; set; }
+        public List<IFormFile>? Images { get; set; }
         public AddressDto? Address { get; set; }
         public virtual ScheduleDto Schedule { get; set; }
         public string? FirstSocialPageUrl { get; set; }

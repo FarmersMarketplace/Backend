@@ -12,11 +12,10 @@ namespace FarmersMarketplace.Application.Services.Business
         Task UpdateCustomerPaymentData(CustomerPaymentDataDto dto, Guid accountId);
         Task<SellerVm> GetSeller(Guid accountId);
         Task UpdateSeller(UpdateSellerDto dto, Guid accountId);
-        Task UpdateSellerPaymentData(ProducerPaymentDataDto dto, Guid accountId);
         Task UpdateSellerCategoriesAndSubcategories(SellerCategoriesAndSubcategoriesDto dto, Guid accountId);
         Task<FarmerVm> GetFarmer(Guid accountId);
         Task UpdateFarmer(UpdateFarmerDto dto, Guid accountId);
-        Task UpdateFarmerPaymentData(FarmerPaymentDataDto dto, Guid accountId);
+        Task UpdateProducerPaymentData(ProducerPaymentDataDto dto, Guid accountId, Role producer);
         Task DeleteAccount(Role role, Guid accountId);
     }
 }

@@ -1,8 +1,7 @@
 ﻿namespace FarmersMarketplace.Application.DataTransferObjects.Account
 {
-    public class FarmerPaymentDataDto
+    public class FarmerPaymentDataDto : ProducerPaymentDataDto
     {
         public bool HasOnlinePayment { get; set; }
-        public ProducerPaymentDataDto PaymentData { get; set; }
     }
 }

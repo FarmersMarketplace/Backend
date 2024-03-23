@@ -1,21 +1,20 @@
-﻿using FarmersMarketplace.Application.DataTransferObjects.Farm;
+﻿using AutoMapper;
+using FarmersMarketplace.Application.DataTransferObjects;
+using FarmersMarketplace.Application.DataTransferObjects.Farm;
 using FarmersMarketplace.Application.Exceptions;
+using FarmersMarketplace.Application.Helpers;
 using FarmersMarketplace.Application.Interfaces;
+using FarmersMarketplace.Application.Services.Auth;
+using FarmersMarketplace.Application.ViewModels.Category;
 using FarmersMarketplace.Application.ViewModels.Farm;
+using FarmersMarketplace.Application.ViewModels.Subcategory;
 using FarmersMarketplace.Domain;
+using Geocoding;
+using Geocoding.Google;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Geocoding;
-using FarmersMarketplace.Application.Helpers;
-using AutoMapper;
-using Geocoding.Google;
-using Address = FarmersMarketplace.Domain.Address;
-using FarmersMarketplace.Application.Services.Auth;
 using DayOfWeek = FarmersMarketplace.Domain.DayOfWeek;
-using Microsoft.AspNetCore.Http;
-using FarmersMarketplace.Application.ViewModels.Category;
-using FarmersMarketplace.Application.ViewModels.Subcategory;
-using FarmersMarketplace.Application.DataTransferObjects;
 
 namespace FarmersMarketplace.Application.Services.Business
 {
@@ -25,6 +24,7 @@ namespace FarmersMarketplace.Application.Services.Business
         private readonly FileHelper FileHelper;
         private readonly EmailHelper EmailHelper;
         private readonly JwtService JwtService;
+        private readonly CoordinateHelper CoordinateHelper;
 
         public FarmService(IMapper mapper, IApplicationDbContext dbContext, IConfiguration configuration) : base(mapper, dbContext, configuration)
         {
@@ -32,6 +32,7 @@ namespace FarmersMarketplace.Application.Services.Business
             FileHelper = new FileHelper();
             EmailHelper = new EmailHelper(configuration);
             JwtService = new JwtService(configuration);
+            CoordinateHelper = new CoordinateHelper(configuration);
         }
 
         public async Task Create(CreateFarmDto farmDto)
@@ -39,7 +40,7 @@ namespace FarmersMarketplace.Application.Services.Business
             var farm = Mapper.Map<Farm>(farmDto);
             var address = farm.Address;
 
-            var coords = await GetCoordinates(address);
+            var coords = await CoordinateHelper.GetCoordinates(address);
             address.Latitude = coords.Latitude;
             address.Longitude = coords.Longitude;
 
@@ -113,14 +114,6 @@ namespace FarmersMarketplace.Application.Services.Business
             DbContext.Farms.Remove(farm);
             await FileHelper.DeleteFiles(farm.ImagesNames, FarmsImageFolder);
             await DbContext.SaveChangesAsync();
-        }
-
-        private async Task<Location> GetCoordinates(Address address)
-        {
-            IGeocoder geocoder = new GoogleGeocoder() { ApiKey = Configuration["Geocoding:Apikey"] };
-            var request = await geocoder.GeocodeAsync($"{address.Region} oblast, {address.District} district, {address.Settlement} street {address.Street}, {address.HouseNumber}, Ukraine");
-            var coords = request.FirstOrDefault().Coordinates;
-            return coords;
         }
 
         private async Task<Location> GetCoordinates(AddressDto dto)

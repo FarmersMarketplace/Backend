@@ -8,8 +8,8 @@ namespace FarmersMarketplace.Application.DataTransferObjects.Account
 {
     public class SellerCategoriesAndSubcategoriesDto
     {
-        public List<Guid> Categories { get; set; }
-        public List<Guid> Subcategories { get; set; }
+        public List<Guid>? Categories { get; set; }
+        public List<Guid>? Subcategories { get; set; }
     }
 
 }
