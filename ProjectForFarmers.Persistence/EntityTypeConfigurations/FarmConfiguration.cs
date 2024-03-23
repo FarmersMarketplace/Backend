@@ -25,7 +25,6 @@ namespace FarmersMarketplace.Persistence.EntityTypeConfigurations
             builder.HasOne(f => f.Address)
                  .WithOne()
                  .HasForeignKey<Farm>(f => f.AddressId)
-                 .IsRequired()
                  .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasOne(f => f.Owner)
@@ -36,12 +35,11 @@ namespace FarmersMarketplace.Persistence.EntityTypeConfigurations
             builder.HasOne(f => f.Schedule)
                  .WithOne()
                  .HasForeignKey<Farm>(f => f.ScheduleId)
-                 .IsRequired()
                  .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasOne(f => f.PaymentData)
-                 .WithMany()
-                 .HasForeignKey(f => f.PaymentDataId)
+                 .WithOne()
+                 .HasForeignKey<Farm>(f => f.PaymentDataId)
                  .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasIndex(farm => farm.Id).IsUnique();

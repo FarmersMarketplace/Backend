@@ -216,7 +216,7 @@ namespace FarmersMarketplace.Application.Services.Business
                     Longitude = order.DeliveryPoint.Longitude,
                 };
 
-                DbContext.Addresses.Add(deliveryPoint);
+                DbContext.ProducerAddresses.Add(deliveryPoint);
 
                 var newOrder = new Order
                 {

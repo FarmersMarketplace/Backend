@@ -6,8 +6,11 @@ namespace FarmersMarketplace.Application.Interfaces
 {
     public interface IApplicationDbContext
     {
-        DbSet<Account> Accounts { get; set; }
-        DbSet<Address> Addresses { get; set; }
+        DbSet<Customer> Customers { get; set; }
+        DbSet<Seller> Sellers { get; set; }
+        DbSet<Farmer> Farmers { get; set; }
+        DbSet<Address> ProducerAddresses { get; set; }
+        DbSet<CustomerAddress> CustomerAddresses { get; set; }
         DbSet<Farm> Farms { get; set; }
         DbSet<Order> Orders { get; set; }
         DbSet<DayOfWeek> DaysOfWeek { get; set; }
@@ -17,7 +20,8 @@ namespace FarmersMarketplace.Application.Interfaces
         DbSet<Category> Categories { get; set; }
         DbSet<Subcategory> Subcategories { get; set; }
         DbSet<Product> Products { get; set; }
-        DbSet<ProducerPaymentData> PaymentData { get; set; }
+        DbSet<ProducerPaymentData> ProducerPaymentData { get; set; }
+        DbSet<CustomerPaymentData> CustomerPaymentData { get; set; }
         DbSet<FarmLog> FarmsLogs { get; set; }
         Task<int> SaveChangesAsync(CancellationToken token);
         Task<int> SaveChangesAsync();

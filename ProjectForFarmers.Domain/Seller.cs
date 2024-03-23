@@ -21,7 +21,8 @@ namespace FarmersMarketplace.Domain
         public List<PaymentType>? PaymentTypes { get; set; }
         public List<Guid>? Categories { get; set; }
         public List<Guid>? Subcategories { get; set; }
-
+        public virtual List<MonthStatistic> Statistics { get; set; }
+        public virtual List<Product> Products { get; set; }
     }
 
 }
