@@ -127,7 +127,7 @@ namespace FarmersMarketplace.Application.Services.Business
 
                     throw new NotFoundException(message, userFacingMessage);
                 }
-                Validator.Validate(accountId, product.ProducerId, product.Producer);
+                Validator.ValidateProducer(accountId, product.ProducerId, product.Producer);
 
                 bool hasOrdersWithProduct = await DbContext.OrdersItems.AnyAsync(oi => oi.ProductId == productId);
 
@@ -261,7 +261,7 @@ namespace FarmersMarketplace.Application.Services.Business
 
                 throw new NotFoundException(message, userFacingMessage);
             }
-            Validator.Validate(accountId, product.ProducerId, product.Producer);
+            Validator.ValidateProducer(accountId, product.ProducerId, product.Producer);
 
             product.Name = updateProductDto.Name;
             product.Description = updateProductDto.Description;
@@ -334,7 +334,7 @@ namespace FarmersMarketplace.Application.Services.Business
 
                     throw new NotFoundException(message, userFacingMessage);
                 }
-                Validator.Validate(accountId, product.ProducerId, product.Producer);
+                Validator.ValidateProducer(accountId, product.ProducerId, product.Producer);
 
                 var newProduct = new Product
                 {

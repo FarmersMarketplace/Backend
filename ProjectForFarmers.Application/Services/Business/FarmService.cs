@@ -498,7 +498,7 @@ namespace FarmersMarketplace.Application.Services.Business
             await DbContext.SaveChangesAsync();
         }
 
-        public async Task UpdateSettings(UpdateFarmSettingsDto updateFarmSettingsDto, Guid ownerId)
+        public async Task UpdatePaymentData(UpdateFarmPaymentDataDto updateFarmSettingsDto, Guid ownerId)
         {
             var farm = await DbContext.Farms.FirstOrDefaultAsync(f => f.Id == updateFarmSettingsDto.FarmId);
             if (farm == null)

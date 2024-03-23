@@ -20,7 +20,7 @@ namespace FarmersMarketplace.Application.Services.Business
             DbContext = dbContext;
         }
 
-        public void Validate(Guid accountId, Guid producerId, Producer producer)
+        public void ValidateProducer(Guid accountId, Guid producerId, Producer producer)
         {
             if (producer == Producer.Seller)
             {

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace FarmersMarketplace.Application.DataTransferObjects.Farm
 {
-    public class UpdateFarmSettingsDto
+    public class UpdateFarmPaymentDataDto
     {
         public Guid FarmId { get; set; }
         public ProducerPaymentDataDto PaymentData { get; set; }

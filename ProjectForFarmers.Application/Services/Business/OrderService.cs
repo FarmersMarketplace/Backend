@@ -184,7 +184,7 @@ namespace FarmersMarketplace.Application.Services.Business
 
                     throw new NotFoundException(message, userFacingMessage);
                 }
-                Validator.Validate(accountId, order.ProducerId, order.Producer);
+                Validator.ValidateProducer(accountId, order.ProducerId, order.Producer);
 
                 var newOrderId = Guid.NewGuid();
                 var items = new List<OrderItem>();
@@ -258,7 +258,7 @@ namespace FarmersMarketplace.Application.Services.Business
                     throw new NotFoundException(message, userFacingMessage);
                 }
 
-                Validator.Validate(accountId, order.ProducerId, order.Producer);
+                Validator.ValidateProducer(accountId, order.ProducerId, order.Producer);
 
                 DbContext.Orders.Remove(order);
             }
@@ -323,7 +323,7 @@ namespace FarmersMarketplace.Application.Services.Business
                 throw new NotFoundException(message, userFacingMessage);
             }
 
-            Validator.Validate(accountId, order.ProducerId, order.Producer);
+            Validator.ValidateProducer(accountId, order.ProducerId, order.Producer);
 
             order.ReceiveDate = updateOrderDto.ReceiveDate;
             order.PaymentType = updateOrderDto.PaymentType;
@@ -391,7 +391,7 @@ namespace FarmersMarketplace.Application.Services.Business
                 throw new NotFoundException(message, userFacingMessage);
             }
 
-            Validator.Validate(accountId, order.ProducerId, order.Producer);
+            Validator.ValidateProducer(accountId, order.ProducerId, order.Producer);
 
             var product = await DbContext.Products.FirstOrDefaultAsync(p => p.Id == addOrderItemDto.ProductId);
 
