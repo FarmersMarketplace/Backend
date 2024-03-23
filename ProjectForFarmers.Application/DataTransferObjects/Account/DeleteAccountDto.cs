@@ -1,4 +1,4 @@
-﻿using FarmersMarketplace.Application.DataTransferObjects.Farm;
+﻿using FarmersMarketplace.Domain;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,9 +7,10 @@ using System.Threading.Tasks;
 
 namespace FarmersMarketplace.Application.DataTransferObjects.Account
 {
-    public class CustomerAddressDto : AddressDto
+    public class DeleteAccountDto
     {
-        public string? Apartment { get; set; }
+        public Guid Id { get; set; }
+        public Role Role { get; set; }
     }
 
 }
