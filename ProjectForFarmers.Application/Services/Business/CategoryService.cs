@@ -17,13 +17,13 @@ namespace FarmersMarketplace.Application.Services.Business
         {
         }
 
-        public async Task Create(CategoryDto createCategoryDto)
+        public async Task Create(CategoryDto dto)
         {
             Guid id = Guid.NewGuid();
             var category = new Category 
             { 
                 Id = id,
-                Name = createCategoryDto.Name
+                Name = dto.Name
             };
 
             DbContext.Categories.Add(category);
@@ -66,7 +66,7 @@ namespace FarmersMarketplace.Application.Services.Business
             return vm;
         }
 
-        public async Task Update(Guid categoryId, CategoryDto categoryDto)
+        public async Task Update(Guid categoryId, CategoryDto dto)
         {
             var category = DbContext.Categories.FirstOrDefault(c => c.Id == categoryId);
 
@@ -78,7 +78,7 @@ namespace FarmersMarketplace.Application.Services.Business
                 throw new NotFoundException(message, userFacingMessage);
             }
 
-            category.Name = categoryDto.Name;
+            category.Name = dto.Name;
 
             await DbContext.SaveChangesAsync();
         }

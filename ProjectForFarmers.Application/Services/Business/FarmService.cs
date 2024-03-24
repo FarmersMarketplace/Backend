@@ -35,28 +35,28 @@ namespace FarmersMarketplace.Application.Services.Business
             CoordinateHelper = new CoordinateHelper(configuration);
         }
 
-        public async Task Create(CreateFarmDto farmDto)
+        public async Task Create(CreateFarmDto dto)
         {
-            var farm = Mapper.Map<Farm>(farmDto);
+            var farm = Mapper.Map<Farm>(dto);
             var address = farm.Address;
 
             var coords = await CoordinateHelper.GetCoordinates(address);
             address.Latitude = coords.Latitude;
             address.Longitude = coords.Longitude;
 
-            if(farmDto.Images != null)
+            if(dto.Images != null)
             {
-                farm.ImagesNames = await FileHelper.SaveImages(farmDto.Images, FarmsImageFolder);
+                farm.ImagesNames = await FileHelper.SaveImages(dto.Images, FarmsImageFolder);
             }
             else
             {
                 farm.ImagesNames = new List<string>();
             }
-            string token = await JwtService.EmailConfirmationToken(farm.Id, farmDto.ContactEmail);
+            string token = await JwtService.EmailConfirmationToken(farm.Id, dto.ContactEmail);
             var owner = await DbContext.Farmers.FirstOrDefaultAsync(a => a.Id == farm.OwnerId);
 
-            string message = EmailContentBuilder.FarmEmailConfirmationMessageBody(farm.Name, owner.Name, owner.Surname, farmDto.ContactEmail, token);
-            await EmailHelper.SendEmail(message, farmDto.ContactEmail, "Farm Email Confirmation");
+            string message = EmailContentBuilder.FarmEmailConfirmationMessageBody(farm.Name, owner.Name, owner.Surname, dto.ContactEmail, token);
+            await EmailHelper.SendEmail(message, dto.ContactEmail, "Farm Email Confirmation");
             await DbContext.SaveChangesAsync();
 
             var farmLog = new FarmLog
@@ -124,7 +124,7 @@ namespace FarmersMarketplace.Application.Services.Business
             return coords;
         }
 
-        public async Task Update(UpdateFarmDto updateFarmDto, Guid ownerId)
+        public async Task Update(UpdateFarmDto dto, Guid ownerId)
         {
             var farm = await DbContext.Farms
                 .Include(f => f.Owner)
@@ -144,11 +144,11 @@ namespace FarmersMarketplace.Application.Services.Business
                     .ThenInclude(s => s.Saturday)
                 .Include(f => f.Schedule)
                     .ThenInclude(s => s.Sunday)
-                .FirstOrDefaultAsync(f => f.Id == updateFarmDto.Id);
+                .FirstOrDefaultAsync(f => f.Id == dto.Id);
 
             if (farm == null)
             {
-                string message = $"Farm with Id {updateFarmDto.Id} was not found.";
+                string message = $"Farm with Id {dto.Id} was not found.";
                 string userFacingMessage = CultureHelper.Exception("FarmNotFound");
 
                 throw new NotFoundException(message, userFacingMessage);
@@ -156,34 +156,34 @@ namespace FarmersMarketplace.Application.Services.Business
 
             Validate(ownerId, farm.OwnerId);
 
-            LogAndUpdateIfChanged("Name", farm.Name, updateFarmDto.Name, () => farm.Name = updateFarmDto.Name, farm.Id);
-            LogAndUpdateIfChanged("Description", farm.Description, updateFarmDto.Description, () => farm.Description = updateFarmDto.Description, farm.Id);
-            LogAndUpdateIfChanged("ContactEmail", farm.ContactEmail, updateFarmDto.ContactEmail, async () => 
+            LogAndUpdateIfChanged("Name", farm.Name, dto.Name, () => farm.Name = dto.Name, farm.Id);
+            LogAndUpdateIfChanged("Description", farm.Description, dto.Description, () => farm.Description = dto.Description, farm.Id);
+            LogAndUpdateIfChanged("ContactEmail", farm.ContactEmail, dto.ContactEmail, async () => 
             {
-                string token = await JwtService.EmailConfirmationToken(farm.Id, updateFarmDto.ContactEmail);
-                string message = EmailContentBuilder.FarmEmailConfirmationMessageBody(farm.Name, farm.Owner.Name, farm.Owner.Surname, updateFarmDto.ContactEmail, token);
-                await EmailHelper.SendEmail(message, updateFarmDto.ContactEmail, "Farm Email Confirmation");
+                string token = await JwtService.EmailConfirmationToken(farm.Id, dto.ContactEmail);
+                string message = EmailContentBuilder.FarmEmailConfirmationMessageBody(farm.Name, farm.Owner.Name, farm.Owner.Surname, dto.ContactEmail, token);
+                await EmailHelper.SendEmail(message, dto.ContactEmail, "Farm Email Confirmation");
             }, farm.Id);
-            LogAndUpdateIfChanged("ContactPhone", farm.ContactPhone, updateFarmDto.ContactPhone, () => farm.ContactPhone = updateFarmDto.ContactPhone, farm.Id);
-            LogAndUpdateIfChanged("SocialPageUrl", farm.FirstSocialPageUrl, updateFarmDto.FirstSocialPageUrl, () => farm.FirstSocialPageUrl = updateFarmDto.FirstSocialPageUrl, farm.Id);
-            LogAndUpdateIfChanged("SocialPageUrl", farm.SecondSocialPageUrl, updateFarmDto.SecondSocialPageUrl, () => farm.SecondSocialPageUrl = updateFarmDto.SecondSocialPageUrl, farm.Id);
-            UpdateReceivingTypes(farm, updateFarmDto);
+            LogAndUpdateIfChanged("ContactPhone", farm.ContactPhone, dto.ContactPhone, () => farm.ContactPhone = dto.ContactPhone, farm.Id);
+            LogAndUpdateIfChanged("SocialPageUrl", farm.FirstSocialPageUrl, dto.FirstSocialPageUrl, () => farm.FirstSocialPageUrl = dto.FirstSocialPageUrl, farm.Id);
+            LogAndUpdateIfChanged("SocialPageUrl", farm.SecondSocialPageUrl, dto.SecondSocialPageUrl, () => farm.SecondSocialPageUrl = dto.SecondSocialPageUrl, farm.Id);
+            UpdateReceivingTypes(farm, dto);
             
             await DbContext.SaveChangesAsync();
 
-            await UpdateAddress(farm, updateFarmDto.Address);
-            await UpdateSchedule(farm, updateFarmDto.Schedule);
-            await UpdateImages(farm, updateFarmDto.Images);
+            await UpdateAddress(farm, dto.Address);
+            await UpdateSchedule(farm, dto.Schedule);
+            await UpdateImages(farm, dto.Images);
 
             await DbContext.SaveChangesAsync();
         }
 
-        private void UpdateReceivingTypes(Farm farm, UpdateFarmDto updateFarmDto)
+        private void UpdateReceivingTypes(Farm farm, UpdateFarmDto dto)
         {
             farm.ReceivingMethods = farm.ReceivingMethods.OrderBy(x => x).ToList();
-            updateFarmDto.ReceivingMethods = updateFarmDto.ReceivingMethods.OrderBy(x => x).ToList();
+            dto.ReceivingMethods = dto.ReceivingMethods.OrderBy(x => x).ToList();
 
-            if (!farm.ReceivingMethods.SequenceEqual(updateFarmDto.ReceivingMethods))
+            if (!farm.ReceivingMethods.SequenceEqual(dto.ReceivingMethods))
             {
                 var farmLog = new FarmLog
                 {
@@ -193,7 +193,7 @@ namespace FarmersMarketplace.Application.Services.Business
                     Parameters = new string[]
                     {
                         string.Join(", ", farm.ReceivingMethods),
-                        string.Join(", ", updateFarmDto.ReceivingMethods)
+                        string.Join(", ", dto.ReceivingMethods)
                     },
                     CreationDate = DateTime.UtcNow,
                     FarmId = farm.Id
@@ -201,7 +201,7 @@ namespace FarmersMarketplace.Application.Services.Business
 
                 DbContext.FarmsLogs.Add(farmLog);
 
-                farm.ReceivingMethods = updateFarmDto.ReceivingMethods;
+                farm.ReceivingMethods = dto.ReceivingMethods;
             }
 
             
@@ -292,37 +292,37 @@ namespace FarmersMarketplace.Application.Services.Business
             }
         }
 
-        private async Task UpdateSchedule(Farm farm, ScheduleDto scheduleDto)
+        private async Task UpdateSchedule(Farm farm, ScheduleDto dto)
         {
             var schedule = farm.Schedule;
 
-            await UpdateDayOfWeek("Monday", schedule.Monday, scheduleDto.Monday, farm.Id);
-            await UpdateDayOfWeek("Tuesday", schedule.Tuesday, scheduleDto.Tuesday, farm.Id);
-            await UpdateDayOfWeek("Wednesday", schedule.Wednesday, scheduleDto.Wednesday, farm.Id);
-            await UpdateDayOfWeek("Thursday", schedule.Thursday, scheduleDto.Thursday, farm.Id);
-            await UpdateDayOfWeek("Friday", schedule.Friday, scheduleDto.Friday, farm.Id);
-            await UpdateDayOfWeek("Saturday", schedule.Saturday, scheduleDto.Saturday, farm.Id);
-            await UpdateDayOfWeek("Sunday", schedule.Sunday, scheduleDto.Sunday, farm.Id);
+            await UpdateDayOfWeek("Monday", schedule.Monday, dto.Monday, farm.Id);
+            await UpdateDayOfWeek("Tuesday", schedule.Tuesday, dto.Tuesday, farm.Id);
+            await UpdateDayOfWeek("Wednesday", schedule.Wednesday, dto.Wednesday, farm.Id);
+            await UpdateDayOfWeek("Thursday", schedule.Thursday, dto.Thursday, farm.Id);
+            await UpdateDayOfWeek("Friday", schedule.Friday, dto.Friday, farm.Id);
+            await UpdateDayOfWeek("Saturday", schedule.Saturday, dto.Saturday, farm.Id);
+            await UpdateDayOfWeek("Sunday", schedule.Sunday, dto.Sunday, farm.Id);
 
             await DbContext.SaveChangesAsync();
         }
 
-        private async Task UpdateDayOfWeek(string dayName, DayOfWeek dayOfWeek, DayOfWeekDto dayOfWeekDto, Guid farmId)
+        private async Task UpdateDayOfWeek(string dayName, DayOfWeek dayOfWeek, DayOfWeekDto dto, Guid farmId)
         {
-            if (dayOfWeek.IsOpened == dayOfWeekDto.IsOpened &&
-                dayOfWeek.StartHour == dayOfWeekDto.StartHour &&
-                dayOfWeek.StartMinute == dayOfWeekDto.StartMinute &&
-                dayOfWeek.EndHour == dayOfWeekDto.EndHour &&
-                dayOfWeek.EndMinute == dayOfWeekDto.EndMinute)
+            if (dayOfWeek.IsOpened == dto.IsOpened &&
+                dayOfWeek.StartHour == dto.StartHour &&
+                dayOfWeek.StartMinute == dto.StartMinute &&
+                dayOfWeek.EndHour == dto.EndHour &&
+                dayOfWeek.EndMinute == dto.EndMinute)
             {
                 return;
             }
 
-            dayOfWeek.IsOpened = dayOfWeekDto.IsOpened;
-            dayOfWeek.StartHour = dayOfWeekDto.StartHour;
-            dayOfWeek.StartMinute = dayOfWeekDto.StartMinute;
-            dayOfWeek.EndHour = dayOfWeekDto.EndHour;
-            dayOfWeek.EndMinute = dayOfWeekDto.EndMinute;
+            dayOfWeek.IsOpened = dto.IsOpened;
+            dayOfWeek.StartHour = dto.StartHour;
+            dayOfWeek.StartMinute = dto.StartMinute;
+            dayOfWeek.EndHour = dto.EndHour;
+            dayOfWeek.EndMinute = dto.EndMinute;
 
             var farmLog = new FarmLog
             {
@@ -331,11 +331,11 @@ namespace FarmersMarketplace.Application.Services.Business
                 Message = "DayScheduleChanged",
                 Parameters = new string[] 
                 {
-                    dayOfWeekDto.IsOpened.ToString(),
-                    dayOfWeekDto.StartHour.ToString(),
-                    dayOfWeekDto.StartMinute.ToString(),
-                    dayOfWeekDto.EndHour.ToString(),
-                    dayOfWeekDto.EndMinute.ToString()
+                    dto.IsOpened.ToString(),
+                    dto.StartHour.ToString(),
+                    dto.StartMinute.ToString(),
+                    dto.EndHour.ToString(),
+                    dto.EndMinute.ToString()
                 },
                 CreationDate = DateTime.UtcNow,
                 FarmId = farmId
@@ -344,29 +344,29 @@ namespace FarmersMarketplace.Application.Services.Business
             DbContext.FarmsLogs.Add(farmLog);
         }
 
-        private async Task UpdateAddress(Farm farm, AddressDto addressDto)
+        private async Task UpdateAddress(Farm farm, AddressDto dto)
         {
             var address = farm.Address;
 
-            if (address.Region != addressDto.Region
-                || address.District != addressDto.District
-                || address.Settlement != addressDto.Settlement
-                || address.Street != addressDto.Street
-                || address.HouseNumber != addressDto.HouseNumber)
+            if (address.Region != dto.Region
+                || address.District != dto.District
+                || address.Settlement != dto.Settlement
+                || address.Street != dto.Street
+                || address.HouseNumber != dto.HouseNumber)
             {
-                var coords = await GetCoordinates(addressDto);
+                var coords = await GetCoordinates(dto);
 
                 LogAndUpdateIfChanged("Latitude", address.Latitude.ToString(), coords.Latitude.ToString(), () => address.Latitude = coords.Latitude, farm.Id);
                 LogAndUpdateIfChanged("Longitude", address.Longitude.ToString(), coords.Longitude.ToString(), () => address.Longitude = coords.Longitude, farm.Id);
             }
 
-            LogAndUpdateIfChanged("Region", address.Region, addressDto.Region, () => address.Region = addressDto.Region, farm.Id);
-            LogAndUpdateIfChanged("District", address.District, addressDto.District, () => address.District = addressDto.District, farm.Id);
-            LogAndUpdateIfChanged("Settlement", address.Settlement, addressDto.Settlement, () => address.Settlement = addressDto.Settlement, farm.Id);
-            LogAndUpdateIfChanged("Street", address.Street, addressDto.Street, () => address.Street = addressDto.Street, farm.Id);
-            LogAndUpdateIfChanged("HouseNumber", address.HouseNumber, addressDto.HouseNumber, () => address.HouseNumber = addressDto.HouseNumber, farm.Id);
-            LogAndUpdateIfChanged("PostalCode", address.PostalCode, addressDto.PostalCode, () => address.PostalCode = addressDto.PostalCode, farm.Id);
-            LogAndUpdateIfChanged("Note", address.Note, addressDto.Note, () => address.Note = addressDto.Note, farm.Id);
+            LogAndUpdateIfChanged("Region", address.Region, dto.Region, () => address.Region = dto.Region, farm.Id);
+            LogAndUpdateIfChanged("District", address.District, dto.District, () => address.District = dto.District, farm.Id);
+            LogAndUpdateIfChanged("Settlement", address.Settlement, dto.Settlement, () => address.Settlement = dto.Settlement, farm.Id);
+            LogAndUpdateIfChanged("Street", address.Street, dto.Street, () => address.Street = dto.Street, farm.Id);
+            LogAndUpdateIfChanged("HouseNumber", address.HouseNumber, dto.HouseNumber, () => address.HouseNumber = dto.HouseNumber, farm.Id);
+            LogAndUpdateIfChanged("PostalCode", address.PostalCode, dto.PostalCode, () => address.PostalCode = dto.PostalCode, farm.Id);
+            LogAndUpdateIfChanged("Note", address.Note, dto.Note, () => address.Note = dto.Note, farm.Id);
 
             await DbContext.SaveChangesAsync();
         }
@@ -474,30 +474,30 @@ namespace FarmersMarketplace.Application.Services.Business
             return response;
         }
 
-        public async Task UpdateFarmCategoriesAndSubcategories(UpdateFarmCategoriesAndSubcategoriesDto updateFarmCategoriesAndSubcategoriesDto, Guid ownerId)
+        public async Task UpdateFarmCategoriesAndSubcategories(UpdateFarmCategoriesAndSubcategoriesDto dto, Guid ownerId)
         {
-            var farm = await DbContext.Farms.FirstOrDefaultAsync(f => f.Id == updateFarmCategoriesAndSubcategoriesDto.FarmId);
+            var farm = await DbContext.Farms.FirstOrDefaultAsync(f => f.Id == dto.FarmId);
             if (farm == null)
             {
-                string message = $"Farm with Id {updateFarmCategoriesAndSubcategoriesDto.FarmId} was not found.";
+                string message = $"Farm with Id {dto.FarmId} was not found.";
                 string userFacingMessage = CultureHelper.Exception("FarmNotFound");
                 throw new NotFoundException(message, userFacingMessage);
             }
 
             Validate(ownerId, farm.OwnerId);
 
-            farm.Categories = updateFarmCategoriesAndSubcategoriesDto.Categories;
-            farm.Subcategories = updateFarmCategoriesAndSubcategoriesDto.Subcategories;
+            farm.Categories = dto.Categories;
+            farm.Subcategories = dto.Subcategories;
 
             await DbContext.SaveChangesAsync();
         }
 
-        public async Task UpdatePaymentData(UpdateFarmPaymentDataDto updateFarmSettingsDto, Guid ownerId)
+        public async Task UpdatePaymentData(UpdateFarmPaymentDataDto dto, Guid ownerId)
         {
-            var farm = await DbContext.Farms.FirstOrDefaultAsync(f => f.Id == updateFarmSettingsDto.FarmId);
+            var farm = await DbContext.Farms.FirstOrDefaultAsync(f => f.Id == dto.FarmId);
             if (farm == null)
             {
-                string message = $"Farm with Id {updateFarmSettingsDto.FarmId} was not found.";
+                string message = $"Farm with Id {dto.FarmId} was not found.";
                 string userFacingMessage = CultureHelper.Exception("FarmFound");
 
                 throw new NotFoundException(message, userFacingMessage);
@@ -508,21 +508,21 @@ namespace FarmersMarketplace.Application.Services.Business
             if (farm.PaymentData == null)
                 farm.PaymentData = new ProducerPaymentData();
 
-            if(updateFarmSettingsDto.PaymentData != null)
+            if(dto.PaymentData != null)
             {
-                LogAndUpdateIfChanged("CardNumber", farm.PaymentData.CardNumber, updateFarmSettingsDto.PaymentData.CardNumber, () => farm.PaymentData.CardNumber = updateFarmSettingsDto.PaymentData.CardNumber, farm.Id);
-                LogAndUpdateIfChanged("AccountNumber", farm.PaymentData.AccountNumber, updateFarmSettingsDto.PaymentData.AccountNumber, () => farm.PaymentData.AccountNumber = updateFarmSettingsDto.PaymentData.AccountNumber, farm.Id);
-                LogAndUpdateIfChanged("BankUSREOU", farm.PaymentData.BankUSREOU, updateFarmSettingsDto.PaymentData.BankUSREOU, () => farm.PaymentData.BankUSREOU = updateFarmSettingsDto.PaymentData.BankUSREOU, farm.Id);
-                LogAndUpdateIfChanged("BIC", farm.PaymentData.BIC, updateFarmSettingsDto.PaymentData.BIC, () => farm.PaymentData.BIC = updateFarmSettingsDto.PaymentData.BIC, farm.Id);
-                LogAndUpdateIfChanged("HolderFullName", farm.PaymentData.HolderFullName, updateFarmSettingsDto.PaymentData.HolderFullName, () => farm.PaymentData.HolderFullName = updateFarmSettingsDto.PaymentData.HolderFullName, farm.Id);
-                LogAndUpdateIfChanged("CardExpirationYear", farm.PaymentData.CardExpirationYear, updateFarmSettingsDto.PaymentData.CardExpirationYear, () => farm.PaymentData.CardExpirationYear = updateFarmSettingsDto.PaymentData.CardExpirationYear, farm.Id);
-                LogAndUpdateIfChanged("CardExpirationMonth", farm.PaymentData.CardExpirationMonth, updateFarmSettingsDto.PaymentData.CardExpirationMonth, () => farm.PaymentData.CardExpirationMonth = updateFarmSettingsDto.PaymentData.CardExpirationMonth, farm.Id);
+                LogAndUpdateIfChanged("CardNumber", farm.PaymentData.CardNumber, dto.PaymentData.CardNumber, () => farm.PaymentData.CardNumber = dto.PaymentData.CardNumber, farm.Id);
+                LogAndUpdateIfChanged("AccountNumber", farm.PaymentData.AccountNumber, dto.PaymentData.AccountNumber, () => farm.PaymentData.AccountNumber = dto.PaymentData.AccountNumber, farm.Id);
+                LogAndUpdateIfChanged("BankUSREOU", farm.PaymentData.BankUSREOU, dto.PaymentData.BankUSREOU, () => farm.PaymentData.BankUSREOU = dto.PaymentData.BankUSREOU, farm.Id);
+                LogAndUpdateIfChanged("BIC", farm.PaymentData.BIC, dto.PaymentData.BIC, () => farm.PaymentData.BIC = dto.PaymentData.BIC, farm.Id);
+                LogAndUpdateIfChanged("HolderFullName", farm.PaymentData.HolderFullName, dto.PaymentData.HolderFullName, () => farm.PaymentData.HolderFullName = dto.PaymentData.HolderFullName, farm.Id);
+                LogAndUpdateIfChanged("CardExpirationYear", farm.PaymentData.CardExpirationYear, dto.PaymentData.CardExpirationYear, () => farm.PaymentData.CardExpirationYear = dto.PaymentData.CardExpirationYear, farm.Id);
+                LogAndUpdateIfChanged("CardExpirationMonth", farm.PaymentData.CardExpirationMonth, dto.PaymentData.CardExpirationMonth, () => farm.PaymentData.CardExpirationMonth = dto.PaymentData.CardExpirationMonth, farm.Id);
             }
 
             if(farm.ReceivingMethods == null) 
                 farm.PaymentTypes = new List<PaymentType>() { PaymentType.Cash };  
 
-            if (updateFarmSettingsDto.HasOnlinePayment 
+            if (dto.HasOnlinePayment 
                 && !farm.PaymentTypes.Contains(PaymentType.Online))
             {
                 farm.PaymentTypes.Add(PaymentType.Online);
@@ -536,7 +536,7 @@ namespace FarmersMarketplace.Application.Services.Business
                     FarmId = farm.Id
                 };
             }
-            else if (!updateFarmSettingsDto.HasOnlinePayment
+            else if (!dto.HasOnlinePayment
                 && farm.PaymentTypes.Contains(PaymentType.Online))
             {
                 farm.PaymentTypes.Remove(PaymentType.Online);

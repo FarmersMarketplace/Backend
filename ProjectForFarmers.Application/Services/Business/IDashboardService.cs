@@ -10,6 +10,6 @@ namespace FarmersMarketplace.Application.Services.Business
         Task<DashboardVm> Get(Guid id);
         Task<DashboardVm> GetCurrentMonth(Guid producerId, Producer producer);
         Task<OptionListVm> CustomerAutocomplete(Guid producerId, Producer producer, string query, int count);
-        Task<CustomerInfoVm> SearchCustomer(GetCustomerDto getCustomerDto);
+        Task<CustomerInfoVm> SearchCustomer(GetCustomerDto dto);
     }
 }

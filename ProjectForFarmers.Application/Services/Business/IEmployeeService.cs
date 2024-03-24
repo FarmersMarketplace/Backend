@@ -10,8 +10,8 @@ namespace FarmersMarketplace.Application.Services.Business
 {
     public interface IEmployeeService
     {
-        Task Add(AddPermissionsDto addPermissionsDto);
-        Task Update(UpdatePermissionsDto updatePermissionsDto);
+        Task Add(AddPermissionsDto dto);
+        Task Update(UpdatePermissionsDto dto);
         Task Delete(Guid permissionsId);
         Task<PermissionsVm> Get(Guid permissionsId);
         Task<EmployeeListVm> GetAll(Guid farmId);

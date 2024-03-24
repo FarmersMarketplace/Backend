@@ -35,9 +35,9 @@ namespace FarmersMarketplace.Application.Services.Business
             Validator = new ValidateService(DbContext);
         }
 
-        public async Task<OptionListVm> Autocomplete(ProductAutocompleteDto productAutocompleteDto)
+        public async Task<OptionListVm> Autocomplete(ProductAutocompleteDto dto)
         {
-            var cacheKey = CacheHelper.GenerateCacheKey<ProductFilter>(productAutocompleteDto.ProducerId, productAutocompleteDto.Producer, "products");
+            var cacheKey = CacheHelper.GenerateCacheKey<ProductFilter>(dto.ProducerId, dto.Producer, "products");
 
             var vm = new OptionListVm();
             var productsInfo = new List<ProductInfo>();
@@ -45,7 +45,7 @@ namespace FarmersMarketplace.Application.Services.Business
             if (!MemoryCache.TryGetValue(cacheKey, out productsInfo))
             {
                 productsInfo = await DbContext.Products
-                    .Where(p => p.ProducerId == productAutocompleteDto.ProducerId && p.Producer == productAutocompleteDto.Producer)
+                    .Where(p => p.ProducerId == dto.ProducerId && p.Producer == dto.Producer)
                     .Select(p => new ProductInfo { Name = p.Name, ArticleNumber = p.ArticleNumber })
                     .Distinct()
                     .ToListAsync();
@@ -55,18 +55,18 @@ namespace FarmersMarketplace.Application.Services.Business
 
             int added = 0;
 
-            if(!productAutocompleteDto.Query.IsNullOrEmpty()) productAutocompleteDto.Query = productAutocompleteDto.Query.Trim();
+            if(!dto.Query.IsNullOrEmpty()) dto.Query = dto.Query.Trim();
 
-            for (int i = 0; i < productsInfo.Count && added < productAutocompleteDto.Count; i++)
+            for (int i = 0; i < productsInfo.Count && added < dto.Count; i++)
             {
-                if (productsInfo[i].Name.Contains(productAutocompleteDto.Query, StringComparison.OrdinalIgnoreCase)
+                if (productsInfo[i].Name.Contains(dto.Query, StringComparison.OrdinalIgnoreCase)
                      && !vm.Options.Contains(productsInfo[i].Name))
                 {
                     vm.Options.Add(productsInfo[i].Name);
                     added++;
                 }
 
-                if (productsInfo[i].ArticleNumber.Contains(productAutocompleteDto.Query, StringComparison.OrdinalIgnoreCase)
+                if (productsInfo[i].ArticleNumber.Contains(dto.Query, StringComparison.OrdinalIgnoreCase)
                     && !vm.Options.Contains(productsInfo[i].ArticleNumber))
                 {
                     vm.Options.Add(productsInfo[i].ArticleNumber);
@@ -77,9 +77,9 @@ namespace FarmersMarketplace.Application.Services.Business
             return vm;
         }
 
-        public async Task Create(CreateProductDto createProductDto)
+        public async Task Create(CreateProductDto dto)
         {
-            var product = Mapper.Map<Product>(createProductDto);
+            var product = Mapper.Map<Product>(dto);
 
             var category = await DbContext.Categories.FirstOrDefaultAsync(c => c.Id == product.CategoryId);
             if (category == null)
@@ -107,16 +107,16 @@ namespace FarmersMarketplace.Application.Services.Business
             }
 
             product.ArticleNumber = GenerateArticleNumber();
-            product.ImagesNames = await FileHelper.SaveImages(createProductDto.Images, ProductsImagesFolder);
-            product.DocumentsNames = await FileHelper.SaveFiles(createProductDto.Documents, DocumentsFolder);
+            product.ImagesNames = await FileHelper.SaveImages(dto.Images, ProductsImagesFolder);
+            product.DocumentsNames = await FileHelper.SaveFiles(dto.Documents, DocumentsFolder);
 
             DbContext.Products.Add(product);
             await DbContext.SaveChangesAsync();
         }
 
-        public async Task Delete(ProductListDto productListDto, Guid accountId)
+        public async Task Delete(ProductListDto dto, Guid accountId)
         {
-            foreach (var productId in productListDto.Products)
+            foreach (var productId in dto.Products)
             {
                 var product = await DbContext.Products.FirstAsync(p => p.Id == productId);
 
@@ -183,26 +183,26 @@ namespace FarmersMarketplace.Application.Services.Business
             return vm;
         }
 
-        public async Task<ProductListVm> GetAll(GetProductListDto getProductListDto)
+        public async Task<ProductListVm> GetAll(GetProductListDto dto)
         {
             var productsQuery = DbContext.Products.Include(p => p.Category)
                 .Include(p => p.Subcategory)
-                .Where(p => p.CreationDate < getProductListDto.Cursor 
-                && p.ProducerId == getProductListDto.ProducerId
-                && p.Producer == getProductListDto.Producer);
+                .Where(p => p.CreationDate < dto.Cursor 
+                && p.ProducerId == dto.ProducerId
+                && p.Producer == dto.Producer);
 
-            if (!getProductListDto.Query.IsNullOrEmpty())
+            if (!dto.Query.IsNullOrEmpty())
             {
-                getProductListDto.Query = getProductListDto.Query.Trim().ToLower();
+                dto.Query = dto.Query.Trim().ToLower();
                 productsQuery = productsQuery.Where(p =>
-                    p.Name.ToLower().Contains(getProductListDto.Query) ||
-                    p.ArticleNumber.ToLower().Contains(getProductListDto.Query));
+                    p.Name.ToLower().Contains(dto.Query) ||
+                    p.ArticleNumber.ToLower().Contains(dto.Query));
 
             }
 
-            if (getProductListDto.Filter != null)
+            if (dto.Filter != null)
             {
-                productsQuery = await getProductListDto.Filter.ApplyFilter(productsQuery);
+                productsQuery = await dto.Filter.ApplyFilter(productsQuery);
             }
 
             var products = await productsQuery.OrderByDescending(product => product.CreationDate)
@@ -214,7 +214,7 @@ namespace FarmersMarketplace.Application.Services.Business
                 Count = products.Count
             };
 
-            products = products.Take(getProductListDto.PageSize).ToList();
+            products = products.Take(dto.PageSize).ToList();
 
             foreach (var product in products)
             {
@@ -225,66 +225,66 @@ namespace FarmersMarketplace.Application.Services.Business
             return vm;
         }
 
-        public async Task Update(UpdateProductDto updateProductDto, Guid accountId)
+        public async Task Update(UpdateProductDto dto, Guid accountId)
         {
-            var category = await DbContext.Categories.FirstOrDefaultAsync(c => c.Id == updateProductDto.CategoryId);
+            var category = await DbContext.Categories.FirstOrDefaultAsync(c => c.Id == dto.CategoryId);
             if (category == null)
             {
-                string message = $"Category with Id {updateProductDto.CategoryId} was not found.";
+                string message = $"Category with Id {dto.CategoryId} was not found.";
                 string userFacingMessage = CultureHelper.Exception("CategoryNotFound");
 
                 throw new NotFoundException(message, userFacingMessage);
             }
 
-            var subcategory = await DbContext.Subcategories.FirstOrDefaultAsync(c => c.Id == updateProductDto.SubcategoryId);
+            var subcategory = await DbContext.Subcategories.FirstOrDefaultAsync(c => c.Id == dto.SubcategoryId);
             if (subcategory == null)
             {
-                string message = $"Subcategory with Id {updateProductDto.SubcategoryId} was not found.";
+                string message = $"Subcategory with Id {dto.SubcategoryId} was not found.";
                 string userFacingMessage = CultureHelper.Exception("SubcategoryNotFound");
 
                 throw new NotFoundException(message, userFacingMessage);
             }
             else if (subcategory.CategoryId != category.Id)
             {
-                string message = $"Subcategory with Id {updateProductDto.SubcategoryId} does not belong to the category with Id {updateProductDto.CategoryId}.";
+                string message = $"Subcategory with Id {dto.SubcategoryId} does not belong to the category with Id {dto.CategoryId}.";
                 string userFacingMessage = CultureHelper.Exception("SubcategoryNotBelongsToCategory");
 
                 throw new InvalidDataException(message, userFacingMessage);
             }
 
-            var product = await DbContext.Products.FirstAsync(p => p.Id == updateProductDto.Id);
+            var product = await DbContext.Products.FirstAsync(p => p.Id == dto.Id);
 
             if (product == null)
             {
-                string message = $"Product with Id {updateProductDto.Id} was not found.";
+                string message = $"Product with Id {dto.Id} was not found.";
                 string userFacingMessage = CultureHelper.Exception("ProductNotFound");
 
                 throw new NotFoundException(message, userFacingMessage);
             }
             Validator.ValidateProducer(accountId, product.ProducerId, product.Producer);
 
-            product.Name = updateProductDto.Name;
-            product.Description = updateProductDto.Description;
-            product.CategoryId = updateProductDto.CategoryId;
-            product.SubcategoryId = updateProductDto.SubcategoryId;
-            product.PackagingType = updateProductDto.PackagingType;
-            product.Status = updateProductDto.Status;
-            product.UnitOfMeasurement = updateProductDto.UnitOfMeasurement;
-            product.PricePerOne = updateProductDto.PricePerOne;
-            product.MinPurchaseQuantity = updateProductDto.MinPurchaseQuantity;
-            product.Count = updateProductDto.Count;
-            product.ExpirationDate = updateProductDto.ExpirationDate;
-            product.CreationDate = updateProductDto.CreationDate;
+            product.Name = dto.Name;
+            product.Description = dto.Description;
+            product.CategoryId = dto.CategoryId;
+            product.SubcategoryId = dto.SubcategoryId;
+            product.PackagingType = dto.PackagingType;
+            product.Status = dto.Status;
+            product.UnitOfMeasurement = dto.UnitOfMeasurement;
+            product.PricePerOne = dto.PricePerOne;
+            product.MinPurchaseQuantity = dto.MinPurchaseQuantity;
+            product.Count = dto.Count;
+            product.ExpirationDate = dto.ExpirationDate;
+            product.CreationDate = dto.CreationDate;
 
-            if (updateProductDto.Images == null) updateProductDto.Images = new List<IFormFile>();
-            if (updateProductDto.Documents == null) updateProductDto.Documents = new List<IFormFile>();
+            if (dto.Images == null) dto.Images = new List<IFormFile>();
+            if (dto.Documents == null) dto.Documents = new List<IFormFile>();
 
             if (product.ImagesNames == null) product.ImagesNames = new List<string>();
             if (product.DocumentsNames == null) product.DocumentsNames = new List<string>();
 
             foreach (var imageName in product.ImagesNames.ToList())
             {
-                if (!updateProductDto.Images.Any(file => file.FileName == imageName))
+                if (!dto.Images.Any(file => file.FileName == imageName))
                 {
                     FileHelper.DeleteFile(imageName, ProductsImagesFolder);
                     product.ImagesNames.Remove(imageName);
@@ -293,14 +293,14 @@ namespace FarmersMarketplace.Application.Services.Business
 
             foreach (var documentName in product.DocumentsNames.ToList())
             {
-                if (!updateProductDto.Documents.Any(file => file.FileName == documentName))
+                if (!dto.Documents.Any(file => file.FileName == documentName))
                 {
                     FileHelper.DeleteFile(documentName, DocumentsFolder);
                     product.DocumentsNames.Remove(documentName);
                 }
             }
 
-            foreach (var newImage in updateProductDto.Images)
+            foreach (var newImage in dto.Images)
             {
                 if (!product.ImagesNames.Contains(newImage.FileName))
                 {
@@ -309,7 +309,7 @@ namespace FarmersMarketplace.Application.Services.Business
                 }
             }
 
-            foreach (var newDocument in updateProductDto.Documents)
+            foreach (var newDocument in dto.Documents)
             {
                 if (!product.DocumentsNames.Contains(newDocument.FileName))
                 {
@@ -321,9 +321,9 @@ namespace FarmersMarketplace.Application.Services.Business
             await DbContext.SaveChangesAsync();
         }
 
-        public async Task Duplicate(ProductListDto productListDto, Guid accountId)
+        public async Task Duplicate(ProductListDto dto, Guid accountId)
         {
-            foreach(var productId in productListDto.Products)
+            foreach(var productId in dto.Products)
             {
                 var product = await DbContext.Products.FirstOrDefaultAsync(p => p.Id == productId);
 
@@ -389,21 +389,21 @@ namespace FarmersMarketplace.Application.Services.Business
             return vm;
         }
 
-        public async Task<(string fileName, byte[] bytes)> ExportToExcel(ExportProductsDto exportProductsDto)
+        public async Task<(string fileName, byte[] bytes)> ExportToExcel(ExportProductsDto dto)
         {
             var productsQuery = DbContext.Products.Include(p => p.Category)
                 .Include(p => p.Subcategory)
-                .Where(p => p.ProducerId == exportProductsDto.ProducerId 
-                && p.Producer == exportProductsDto.Producer);
+                .Where(p => p.ProducerId == dto.ProducerId 
+                && p.Producer == dto.Producer);
 
-            if(exportProductsDto.Filter != null)
+            if(dto.Filter != null)
             {
-                productsQuery = await exportProductsDto.Filter.ApplyFilter(productsQuery);
+                productsQuery = await dto.Filter.ApplyFilter(productsQuery);
             }
 
             List<ProductLookupVm> products = await productsQuery.Select(p => Mapper.Map<ProductLookupVm>(p)).ToListAsync();
 
-            string fileName = await GetFileName(exportProductsDto.ProducerId, exportProductsDto.Producer);
+            string fileName = await GetFileName(dto.ProducerId, dto.Producer);
             string filePath = Path.Combine(Configuration["File:Temporary"], fileName);
             string templatePath = Path.Combine(Configuration["File:Temporary"], "template.xlsx");
 

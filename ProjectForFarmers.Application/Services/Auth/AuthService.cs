@@ -24,13 +24,13 @@ namespace FarmersMarketplace.Application.Services.Auth
             EmailHelper = new EmailHelper(configuration);
         }
 
-        public async Task Register(RegisterDto accountDto)
+        public async Task Register(RegisterDto dto)
         {
             Guid id = Guid.NewGuid();
 
-            await CreateAccount(id, accountDto);
-            string message = EmailContentBuilder.ConfirmationMessageBody(accountDto.Name, accountDto.Surname, accountDto.Email, await JwtService.EmailConfirmationToken(id, accountDto.Email));
-            await EmailHelper.SendEmail(message, accountDto.Email, "Farmers marketplace Registration Confirmation");
+            await CreateAccount(id, dto);
+            string message = EmailContentBuilder.ConfirmationMessageBody(dto.Name, dto.Surname, dto.Email, await JwtService.EmailConfirmationToken(id, dto.Email));
+            await EmailHelper.SendEmail(message, dto.Email, "Farmers marketplace Registration Confirmation");
             await DbContext.SaveChangesAsync();
         }
 
@@ -121,16 +121,16 @@ namespace FarmersMarketplace.Application.Services.Auth
             }
         }
 
-        public async Task<LoginVm> Login(LoginDto loginDto)
+        public async Task<LoginVm> Login(LoginDto dto)
         {
-            var customer = await DbContext.Customers.FirstOrDefaultAsync(a => a.Email == loginDto.Email);
+            var customer = await DbContext.Customers.FirstOrDefaultAsync(a => a.Email == dto.Email);
 
             if (customer != null)
             {
-                if (CryptoHelper.ComputeSha256Hash(loginDto.Password) != customer.Password)
+                if (CryptoHelper.ComputeSha256Hash(dto.Password) != customer.Password)
                 {
                     string message = $"Invalid password.";
-                    string userFacingMessage = CultureHelper.Exception("InvalidPassword", loginDto.Email);
+                    string userFacingMessage = CultureHelper.Exception("InvalidPassword", dto.Email);
 
                     throw new AuthorizationException(message, userFacingMessage);
                 }
@@ -142,14 +142,14 @@ namespace FarmersMarketplace.Application.Services.Auth
             }
             else
             {
-                var seller = await DbContext.Sellers.FirstOrDefaultAsync(a => a.Email == loginDto.Email);
+                var seller = await DbContext.Sellers.FirstOrDefaultAsync(a => a.Email == dto.Email);
 
                 if (seller != null)
                 {
-                    if (CryptoHelper.ComputeSha256Hash(loginDto.Password) != seller.Password)
+                    if (CryptoHelper.ComputeSha256Hash(dto.Password) != seller.Password)
                     {
                         string message = $"Invalid password.";
-                        string userFacingMessage = CultureHelper.Exception("InvalidPassword", loginDto.Email);
+                        string userFacingMessage = CultureHelper.Exception("InvalidPassword", dto.Email);
 
                         throw new AuthorizationException(message, userFacingMessage);
                     }
@@ -161,14 +161,14 @@ namespace FarmersMarketplace.Application.Services.Auth
                 }
                 else
                 {
-                    var farmer = await DbContext.Farmers.FirstOrDefaultAsync(a => a.Email == loginDto.Email);
+                    var farmer = await DbContext.Farmers.FirstOrDefaultAsync(a => a.Email == dto.Email);
 
                     if (farmer != null)
                     {
-                        if (CryptoHelper.ComputeSha256Hash(loginDto.Password) != farmer.Password)
+                        if (CryptoHelper.ComputeSha256Hash(dto.Password) != farmer.Password)
                         {
                             string message = $"Invalid password.";
-                            string userFacingMessage = CultureHelper.Exception("InvalidPassword", loginDto.Email);
+                            string userFacingMessage = CultureHelper.Exception("InvalidPassword", dto.Email);
 
                             throw new AuthorizationException(message, userFacingMessage);
                         }
@@ -180,8 +180,8 @@ namespace FarmersMarketplace.Application.Services.Auth
                     }
                     else
                     {
-                        string message = $"Account with email {loginDto.Email} was not found.";
-                        string userFacingMessage = CultureHelper.Exception("AccountWithEmailNotFound", loginDto.Email);
+                        string message = $"Account with email {dto.Email} was not found.";
+                        string userFacingMessage = CultureHelper.Exception("AccountWithEmailNotFound", dto.Email);
 
                         throw new NotFoundException(message, userFacingMessage);
                     }
@@ -189,9 +189,9 @@ namespace FarmersMarketplace.Application.Services.Auth
             }
         }
 
-        private async Task CreateAccount(Guid id, RegisterDto accountDto)
+        private async Task CreateAccount(Guid id, RegisterDto dto)
         {
-            if(accountDto.Password != accountDto.ConfirmPassword)
+            if(dto.Password != dto.ConfirmPassword)
             {
                 string message = $"The password and confirm password do not match.";
                 string userFacingMessage = CultureHelper.Exception("PasswordNotMatchToConfirmPassword");
@@ -199,46 +199,46 @@ namespace FarmersMarketplace.Application.Services.Auth
                 throw new InvalidDataException(message, userFacingMessage);
             }
 
-            if (await ExistsAccountWithEmail(accountDto.Email)) 
+            if (await ExistsAccountWithEmail(dto.Email)) 
             {
-                string message = $"Email {accountDto.Email} is already associated with another account.";
-                string userFacingMessage = CultureHelper.Exception("EmailIsAssociatedWithAnotherAccount", accountDto.Email);
+                string message = $"Email {dto.Email} is already associated with another account.";
+                string userFacingMessage = CultureHelper.Exception("EmailIsAssociatedWithAnotherAccount", dto.Email);
 
                 throw new DuplicateException(message, userFacingMessage);
             }
 
-            if (accountDto.Role == Role.Customer) 
+            if (dto.Role == Role.Customer) 
             {
                 var account = new Customer
                 {
                     Id = id,
-                    Name = accountDto.Name,
-                    Surname = accountDto.Surname,
-                    Password = CryptoHelper.ComputeSha256Hash(accountDto.Password),
+                    Name = dto.Name,
+                    Surname = dto.Surname,
+                    Password = CryptoHelper.ComputeSha256Hash(dto.Password),
                 };
 
                 await DbContext.Customers.AddAsync(account);
             }
-            else if (accountDto.Role == Role.Seller) 
+            else if (dto.Role == Role.Seller) 
             {
                 var account = new Seller
                 {
                     Id = id,
-                    Name = accountDto.Name,
-                    Surname = accountDto.Surname,
-                    Password = CryptoHelper.ComputeSha256Hash(accountDto.Password),
+                    Name = dto.Name,
+                    Surname = dto.Surname,
+                    Password = CryptoHelper.ComputeSha256Hash(dto.Password),
                 };
 
                 await DbContext.Sellers.AddAsync(account);
             }
-            else if (accountDto.Role == Role.Farmer)
+            else if (dto.Role == Role.Farmer)
             {
                 var account = new Farmer
                 {
                     Id = id,
-                    Name = accountDto.Name,
-                    Surname = accountDto.Surname,
-                    Password = CryptoHelper.ComputeSha256Hash(accountDto.Password),
+                    Name = dto.Name,
+                    Surname = dto.Surname,
+                    Password = CryptoHelper.ComputeSha256Hash(dto.Password),
                 };
 
                 await DbContext.Farmers.AddAsync(account);
@@ -246,7 +246,7 @@ namespace FarmersMarketplace.Application.Services.Auth
             else 
             {
                 string message = $"Role is incorrect.";
-                string userFacingMessage = CultureHelper.Exception("IncorrectRole", accountDto.Email);
+                string userFacingMessage = CultureHelper.Exception("IncorrectRole", dto.Email);
 
                 throw new InvalidDataException(message, userFacingMessage);
             }
@@ -263,7 +263,7 @@ namespace FarmersMarketplace.Application.Services.Auth
                 || existingFarmerWithSameEmail != null;
         }
 
-        public async Task ResetPassword(Guid accountId, string email, ResetPasswordDto resetPasswordDto)
+        public async Task ResetPassword(Guid accountId, string email, ResetPasswordDto dto)
         {
             var account = await GetAccount(accountId);
 
@@ -275,7 +275,7 @@ namespace FarmersMarketplace.Application.Services.Auth
                 throw new NotFoundException(message, userFacingMessage);
             }
             
-            else if(resetPasswordDto.Password != resetPasswordDto.ConfirmPassword)
+            else if(dto.Password != dto.ConfirmPassword)
             {
                 string message = $"The password and confirm password do not match.";
                 string userFacingMessage = CultureHelper.Exception("PasswordNotMatchToConfirmPassword");
@@ -283,23 +283,23 @@ namespace FarmersMarketplace.Application.Services.Auth
                 throw new InvalidDataException(message, userFacingMessage);
             }
 
-            account.Password = CryptoHelper.ComputeSha256Hash(resetPasswordDto.Password);
+            account.Password = CryptoHelper.ComputeSha256Hash(dto.Password);
             await DbContext.SaveChangesAsync();
         }
 
-        public async Task ForgotPassword(ForgotPasswordDto forgotPasswordDto)
+        public async Task ForgotPassword(ForgotPasswordDto dto)
         {
-            var account = await GetAccount(forgotPasswordDto.Email);
+            var account = await GetAccount(dto.Email);
 
             if (account == null)
             {
-                string message = $"Account with email {forgotPasswordDto.Email} was not found.";
-                string userFacingMessage = CultureHelper.Exception("AccountWithEmailNotFound", forgotPasswordDto.Email);
+                string message = $"Account with email {dto.Email} was not found.";
+                string userFacingMessage = CultureHelper.Exception("AccountWithEmailNotFound", dto.Email);
 
                 throw new NotFoundException(message, userFacingMessage);
             }
             string letterMessage = EmailContentBuilder.ResetPasswordMessageBody(account.Name, account.Surname, await JwtService.EmailConfirmationToken(account.Id, account.Email));
-            await EmailHelper.SendEmail(letterMessage, forgotPasswordDto.Email, "Password reset request for Agroforum account");
+            await EmailHelper.SendEmail(letterMessage, dto.Email, "Password reset request for Agroforum account");
         }
 
         public async Task ConfirmFarmEmail(Guid farmId, string email)
@@ -318,9 +318,9 @@ namespace FarmersMarketplace.Application.Services.Auth
             await DbContext.SaveChangesAsync();
         }
 
-        public async Task<LoginVm> AuthenticateWithGoogle(AuthenticateWithGoogleDto authenticateWithGoogleDto)
+        public async Task<LoginVm> AuthenticateWithGoogle(AuthenticateWithGoogleDto dto)
         {
-            Payload payload = await GoogleJsonWebSignature.ValidateAsync(authenticateWithGoogleDto.GoogleIdToken);
+            Payload payload = await GoogleJsonWebSignature.ValidateAsync(dto.GoogleIdToken);
 
             throw new Exception("Set role!");
         }

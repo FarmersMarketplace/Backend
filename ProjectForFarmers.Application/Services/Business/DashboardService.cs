@@ -101,9 +101,9 @@ namespace FarmersMarketplace.Application.Services.Business
             return currentMonthDashboardVm;
         }
 
-        public async Task<CustomerInfoVm> SearchCustomer(GetCustomerDto getCustomerDto)
+        public async Task<CustomerInfoVm> SearchCustomer(GetCustomerDto dto)
         {
-            var vm = await StatisticService.GetCustomerInfo(getCustomerDto);
+            var vm = await StatisticService.GetCustomerInfo(dto);
 
             return vm;
         }

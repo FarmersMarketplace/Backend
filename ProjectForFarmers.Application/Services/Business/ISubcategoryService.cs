@@ -9,8 +9,8 @@ namespace FarmersMarketplace.Application.Services.Business
 {
     public interface ISubcategoryService
     {
-        Task Create(CreateSubcategoryDto createSubcategoryDto);
-        Task Update(UpdateSubcategoryDto updateSubcategoryDto);
+        Task Create(CreateSubcategoryDto dto);
+        Task Update(UpdateSubcategoryDto dto);
         Task Delete(Guid subcategoryId);
     }
 }

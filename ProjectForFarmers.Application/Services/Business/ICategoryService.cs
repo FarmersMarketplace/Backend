@@ -10,8 +10,8 @@ namespace FarmersMarketplace.Application.Services.Business
 {
     public interface ICategoryService
     {
-        Task Create(CategoryDto createCategoryDto);
-        Task Update(Guid categoryId, CategoryDto categoryDto);
+        Task Create(CategoryDto dto);
+        Task Update(Guid categoryId, CategoryDto dto);
         Task Delete(Guid categoryId);
         Task<CategoryListVm> GetAll();
     }

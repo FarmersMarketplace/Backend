@@ -26,26 +26,26 @@ namespace FarmersMarketplace.Application.Services.Business
             Validator = new ValidateService(DbContext);
         }
 
-        public async Task<OrderListVm> GetAll(GetOrderListDto getOrderListDto)
+        public async Task<OrderListVm> GetAll(GetOrderListDto dto)
         {
             var ordersQuery = DbContext.Orders.Include(o => o.Customer)
-                .Where(o => o.CreationDate < getOrderListDto.Cursor
-                && o.Producer == getOrderListDto.Producer
-                && o.ProducerId == getOrderListDto.ProducerId);
+                .Where(o => o.CreationDate < dto.Cursor
+                && o.Producer == dto.Producer
+                && o.ProducerId == dto.ProducerId);
 
-            if (!getOrderListDto.Query.IsNullOrEmpty())
+            if (!dto.Query.IsNullOrEmpty())
             {
-                ordersQuery = ordersQuery.Where(o => o.Number.ToString().Contains(getOrderListDto.Query, StringComparison.OrdinalIgnoreCase)
-                && (o.Customer.Name + " " + o.Customer.Surname).Contains(getOrderListDto.Query, StringComparison.OrdinalIgnoreCase));
+                ordersQuery = ordersQuery.Where(o => o.Number.ToString().Contains(dto.Query, StringComparison.OrdinalIgnoreCase)
+                && (o.Customer.Name + " " + o.Customer.Surname).Contains(dto.Query, StringComparison.OrdinalIgnoreCase));
             }
 
-            if (getOrderListDto.Filter != null)
+            if (dto.Filter != null)
             {
-                ordersQuery = await getOrderListDto.Filter.ApplyFilter(ordersQuery);
+                ordersQuery = await dto.Filter.ApplyFilter(ordersQuery);
             }
             
             var orders = await ordersQuery.OrderByDescending(order => order.CreationDate)
-                .Take(getOrderListDto.PageSize)
+                .Take(dto.PageSize)
                 .ToListAsync();
 
             var vm = new OrderListVm
@@ -62,21 +62,21 @@ namespace FarmersMarketplace.Application.Services.Business
             return vm;
         }
 
-        public async Task<(string fileName, byte[] bytes)> ExportToExcel(ExportOrdersDto exportOrdersDto)
+        public async Task<(string fileName, byte[] bytes)> ExportToExcel(ExportOrdersDto dto)
         {
             var ordersQuery = DbContext.Orders.Include(o => o.Customer)
-                .Where(o => o.Producer == exportOrdersDto.Producer
-                && o.ProducerId == exportOrdersDto.ProducerId);
+                .Where(o => o.Producer == dto.Producer
+                && o.ProducerId == dto.ProducerId);
 
-            if(exportOrdersDto.Filter != null)
+            if(dto.Filter != null)
             {
-                ordersQuery = await exportOrdersDto.Filter.ApplyFilter(ordersQuery);
+                ordersQuery = await dto.Filter.ApplyFilter(ordersQuery);
             }
 
             var orders = ordersQuery.ToList();
             List<Guid> ids = orders.Select(o => o.Id).ToList();
 
-            string fileName = await GetFileName(exportOrdersDto.ProducerId, exportOrdersDto.Producer);
+            string fileName = await GetFileName(dto.ProducerId, dto.Producer);
             string filePath = Path.Combine(Configuration["File:Temporary"], fileName);
             string templatePath = Path.Combine(Configuration["File:Temporary"], "template.xlsx");
 
@@ -170,9 +170,9 @@ namespace FarmersMarketplace.Application.Services.Business
             return fileName;
         }
 
-        public async Task Duplicate(OrderListDto orderListDto, Guid accountId)
+        public async Task Duplicate(OrderListDto dto, Guid accountId)
         {
-            foreach(var orderId in orderListDto.OrderIds)
+            foreach(var orderId in dto.OrderIds)
             {
                 var order = DbContext.Orders.FirstOrDefault(o => o.Id == orderId);
 
@@ -243,9 +243,9 @@ namespace FarmersMarketplace.Application.Services.Business
             await DbContext.SaveChangesAsync();
         }
 
-        public async Task Delete(OrderListDto orderListDto, Guid accountId)
+        public async Task Delete(OrderListDto dto, Guid accountId)
         {
-            foreach (var orderId in orderListDto.OrderIds)
+            foreach (var orderId in dto.OrderIds)
             {
                 var order = DbContext.Orders.FirstOrDefault(o => o.Id == orderId);
 
@@ -310,13 +310,13 @@ namespace FarmersMarketplace.Application.Services.Business
             return vm;
         }
 
-        public async Task Update(UpdateOrderDto updateOrderDto, Guid accountId)
+        public async Task Update(UpdateOrderDto dto, Guid accountId)
         {
-            var order = await DbContext.Orders.Include(o => o.Items).FirstOrDefaultAsync(o => o.Id == updateOrderDto.Id);
+            var order = await DbContext.Orders.Include(o => o.Items).FirstOrDefaultAsync(o => o.Id == dto.Id);
 
             if (order == null)
             {
-                string message = $"Order with id {updateOrderDto.Id} was not found.";
+                string message = $"Order with id {dto.Id} was not found.";
                 string userFacingMessage = CultureHelper.Exception("OrderNotExist");
 
                 throw new NotFoundException(message, userFacingMessage);
@@ -324,17 +324,17 @@ namespace FarmersMarketplace.Application.Services.Business
 
             Validator.ValidateProducer(accountId, order.ProducerId, order.Producer);
 
-            order.ReceiveDate = updateOrderDto.ReceiveDate;
-            order.PaymentType = updateOrderDto.PaymentType;
-            order.PaymentStatus = updateOrderDto.PaymentStatus;
-            order.ReceivingType = updateOrderDto.ReceivingType;
-            order.Status = updateOrderDto.Status;
+            order.ReceiveDate = dto.ReceiveDate;
+            order.PaymentType = dto.PaymentType;
+            order.PaymentStatus = dto.PaymentStatus;
+            order.ReceivingType = dto.ReceivingType;
+            order.Status = dto.Status;
 
-            await UpdateAddress(order.DeliveryPoint, updateOrderDto.DeliveryAddress);
+            await UpdateAddress(order.DeliveryPoint, dto.DeliveryAddress);
             
             foreach (var item in order.Items)
             {
-                var itemDto = updateOrderDto.Items.FirstOrDefault(i => i.Id == item.Id);
+                var itemDto = dto.Items.FirstOrDefault(i => i.Id == item.Id);
                 if(itemDto == null)
                 {
                     order.Items.Remove(item);
@@ -348,26 +348,26 @@ namespace FarmersMarketplace.Application.Services.Business
             await DbContext.SaveChangesAsync();
         }
 
-        private async Task UpdateAddress(Domain.Address address, AddressDto addressDto)
+        private async Task UpdateAddress(Address address, AddressDto dto)
         {
-            if (address.Region != addressDto.Region
-                || address.District != addressDto.District
-                || address.Settlement != addressDto.Settlement
-                || address.Street != addressDto.Street
-                || address.HouseNumber != addressDto.HouseNumber)
+            if (address.Region != dto.Region
+                || address.District != dto.District
+                || address.Settlement != dto.Settlement
+                || address.Street != dto.Street
+                || address.HouseNumber != dto.HouseNumber)
             {
-                var coords = await GetCoordinates(addressDto);
+                var coords = await GetCoordinates(dto);
                 address.Latitude = coords.Latitude;
                 address.Longitude = coords.Longitude;
             }
 
-            address.Region = addressDto.Region;
-            address.District = addressDto.District;
-            address.Settlement = addressDto.Settlement;
-            address.Street = addressDto.Street;
-            address.HouseNumber = addressDto.HouseNumber;
-            address.PostalCode = addressDto.PostalCode;
-            address.Note = addressDto.Note;
+            address.Region = dto.Region;
+            address.District = dto.District;
+            address.Settlement = dto.Settlement;
+            address.Street = dto.Street;
+            address.HouseNumber = dto.HouseNumber;
+            address.PostalCode = dto.PostalCode;
+            address.Note = dto.Note;
         }
 
         private async Task<Location> GetCoordinates(AddressDto dto)
@@ -378,13 +378,13 @@ namespace FarmersMarketplace.Application.Services.Business
             return coords;
         }
 
-        public async Task AddOrderItem(AddOrderItemDto addOrderItemDto, Guid accountId)
+        public async Task AddOrderItem(AddOrderItemDto dto, Guid accountId)
         {
-            var order = await DbContext.Orders.Include(o => o.Items).FirstOrDefaultAsync(o => o.Id == addOrderItemDto.OrderId);
+            var order = await DbContext.Orders.Include(o => o.Items).FirstOrDefaultAsync(o => o.Id == dto.OrderId);
 
             if (order == null)
             {
-                string message = $"Order with id {addOrderItemDto.OrderId} was not found.";
+                string message = $"Order with id {dto.OrderId} was not found.";
                 string userFacingMessage = CultureHelper.Exception("OrderNotExist");
 
                 throw new NotFoundException(message, userFacingMessage);
@@ -392,11 +392,11 @@ namespace FarmersMarketplace.Application.Services.Business
 
             Validator.ValidateProducer(accountId, order.ProducerId, order.Producer);
 
-            var product = await DbContext.Products.FirstOrDefaultAsync(p => p.Id == addOrderItemDto.ProductId);
+            var product = await DbContext.Products.FirstOrDefaultAsync(p => p.Id == dto.ProductId);
 
             if (product == null)
             {
-                string message = $"Product with id {addOrderItemDto.ProductId} was not found.";
+                string message = $"Product with id {dto.ProductId} was not found.";
                 string userFacingMessage = CultureHelper.Exception("ProductNotExist");
 
                 throw new NotFoundException(message, userFacingMessage);
@@ -415,8 +415,8 @@ namespace FarmersMarketplace.Application.Services.Business
                 Id = Guid.NewGuid(),
                 ProductId = product.Id,
                 OrderId = order.Id,
-                Count = addOrderItemDto.Count,
-                TotalPrice = product.PricePerOne * addOrderItemDto.Count
+                Count = dto.Count,
+                TotalPrice = product.PricePerOne * dto.Count
             };
 
             order.Items.Add(item);

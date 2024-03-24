@@ -26,6 +26,8 @@ namespace FarmersMarketplace.Application
                 config.AddProfile(new OrderMappingProfile());
                 config.AddProfile(new CategoryMappingProfile());
                 config.AddProfile(new ProductMappingProfile());
+                config.AddProfile(new DataMappingProfile());
+                config.AddProfile(new AccountMappingProfile());
             });
 
             return services;
