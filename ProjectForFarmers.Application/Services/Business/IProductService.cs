@@ -10,6 +10,7 @@ namespace FarmersMarketplace.Application.Services.Business
         Task Create(CreateProductDto dto);
         Task Update(UpdateProductDto dto, Guid accountId);
         Task Delete(ProductListDto dto, Guid accountId);
+        Task ChangeStatus(ProductListDto dto, ProductStatus status, Guid accountId);
         Task Duplicate(ProductListDto dto, Guid accountId);
         Task<ProductVm> Get(Guid productId);
         Task<ProductListVm> GetAll (GetProductListDto dto);

@@ -4,6 +4,7 @@ using FarmersMarketplace.Application.Services.Business;
 using FarmersMarketplace.Application.ViewModels.Dashboard;
 using FarmersMarketplace.Application.ViewModels.Order;
 using System.Security.Claims;
+using FarmersMarketplace.Domain;
 
 namespace FarmersMarketplace.WebApi.Controllers
 {
@@ -58,7 +59,7 @@ namespace FarmersMarketplace.WebApi.Controllers
 
         [HttpDelete]
         [ProducesResponseType(204)]
-        public async Task<IActionResult> Delete([FromBody] OrderListDto dto)
+        public async Task<IActionResult> Delete([FromQuery] OrderListDto dto)
         {
             await OrderService.Delete(dto, AccountId);
 
@@ -70,6 +71,15 @@ namespace FarmersMarketplace.WebApi.Controllers
         public async Task<IActionResult> Update([FromBody] UpdateOrderDto dto)
         {
             await OrderService.Update(dto, AccountId);
+
+            return NoContent();
+        }
+
+        [HttpPut("{status}")]
+        [ProducesResponseType(204)]
+        public async Task<IActionResult> ChangeStatus([FromBody] OrderListDto dto, [FromRoute] OrderStatus status)
+        {
+            await OrderService.ChangeStatus(dto, status, AccountId);
 
             return NoContent();
         }

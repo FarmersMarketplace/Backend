@@ -61,9 +61,18 @@ namespace FarmersMarketplace.WebApi.Controllers
         [HttpPut]
         [Authorize(Roles = "FarmOwner, Seller")]
         [ProducesResponseType(204)]
-        public async Task<IActionResult> Duplicate([FromQuery] ProductListDto dto)
+        public async Task<IActionResult> Duplicate([FromBody] ProductListDto dto)
         {
             await ProductService.Duplicate(dto, AccountId);
+            return NoContent();
+        }
+
+        [HttpPut("{status}")]
+        [Authorize(Roles = "FarmOwner, Seller")]
+        [ProducesResponseType(204)]
+        public async Task<IActionResult> ChangeStatus([FromBody] ProductListDto dto, [FromRoute] ProductStatus status)
+        {
+            await ProductService.ChangeStatus(dto, status, AccountId);
             return NoContent();
         }
 

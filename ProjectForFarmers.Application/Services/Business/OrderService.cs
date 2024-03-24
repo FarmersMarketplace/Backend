@@ -423,6 +423,28 @@ namespace FarmersMarketplace.Application.Services.Business
 
             await DbContext.SaveChangesAsync();
         }
+
+        public async Task ChangeStatus(OrderListDto dto, OrderStatus status, Guid accountId)
+        {
+            foreach (var orderId in dto.OrderIds)
+            {
+                var order = DbContext.Orders.FirstOrDefault(o => o.Id == orderId);
+
+                if (order == null)
+                {
+                    string message = $"Order with id {orderId} was not found.";
+                    string userFacingMessage = CultureHelper.Exception("OrderNotExist");
+
+                    throw new NotFoundException(message, userFacingMessage);
+                }
+
+                Validator.ValidateProducer(accountId, order.ProducerId, order.Producer);
+
+                order.Status = status;
+            }
+
+            await DbContext.SaveChangesAsync();
+        }
     }
 
 }

@@ -27,13 +27,6 @@ namespace FarmersMarketplace.WebApi.Controllers
             return NoContent();
         }
 
-        [HttpPost]
-        [Authorize]
-        public async Task<IActionResult> Test()
-        {
-            return Ok("");
-        }
-
         [HttpPut]
         [Authorize]
         [ProducesResponseType(204)]

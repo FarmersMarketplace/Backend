@@ -489,6 +489,27 @@ namespace FarmersMarketplace.Application.Services.Business
 
             return fileName;
         }
+
+        public async Task ChangeStatus(ProductListDto dto, ProductStatus status, Guid accountId)
+        {
+            foreach (var productId in dto.Products)
+            {
+                var product = await DbContext.Products.FirstAsync(p => p.Id == productId);
+
+                if (product == null)
+                {
+                    string message = $"Product with Id {productId} was not found.";
+                    string userFacingMessage = CultureHelper.Exception("ProductNotFound");
+
+                    throw new NotFoundException(message, userFacingMessage);
+                }
+
+                Validator.ValidateProducer(accountId, product.ProducerId, product.Producer);
+
+                product.Status = status;
+            }
+            await DbContext.SaveChangesAsync();
+        }
     }
     
     class ProductInfo
