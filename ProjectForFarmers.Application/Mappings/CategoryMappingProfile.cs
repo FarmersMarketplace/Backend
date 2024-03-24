@@ -21,18 +21,12 @@ namespace FarmersMarketplace.Application.Mappings
 
         private void MapSubcategoryToSubcategoryVm()
         {
-            CreateMap<Subcategory, SubcategoryVm>()
-               .ForMember(vm => vm.Id, opt => opt.MapFrom(subcategory => subcategory.Id))
-               .ForMember(vm => vm.Name, opt => opt.MapFrom(subcategory => subcategory.Name))
-               .ForMember(vm => vm.CategoryId, opt => opt.MapFrom(subcategory => subcategory.CategoryId));
+            CreateMap<Subcategory, SubcategoryVm>();
         }
 
         private void MapCategoryToCategoryVm()
         {
-            CreateMap<Category, CategoryVm>()
-               .ForMember(vm => vm.Id, opt => opt.MapFrom(category => category.Id))
-               .ForMember(vm => vm.Name, opt => opt.MapFrom(category => category.Name))
-               .ForMember(vm => vm.Subcategories, opt => opt.MapFrom(category => new List<SubcategoryVm>()));
+            CreateMap<Category, CategoryVm>();
         }
     }
 

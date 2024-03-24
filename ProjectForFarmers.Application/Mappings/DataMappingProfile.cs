@@ -28,7 +28,8 @@ namespace FarmersMarketplace.Application.Mappings
 
         private void MapCustomerPaymentDataDtoToCustomerPaymentData()
         {
-            CreateMap<CustomerPaymentDataDto, CustomerPaymentData>();
+            CreateMap<CustomerPaymentDataDto, CustomerPaymentData>()
+                .ForMember(data => data.Id, opt => opt.MapFrom(dto => Guid.NewGuid()));
         }
 
         private void MapCustomerPaymentDataToCustomerPaymentDataVm()
@@ -43,22 +44,12 @@ namespace FarmersMarketplace.Application.Mappings
         private void MapProducerPaymentDataDtoToProducerPaymentData()
         {
             CreateMap<ProducerPaymentDataDto, ProducerPaymentData>()
-                .ForMember(data => data.Id, opt => opt.MapFrom(dto => Guid.NewGuid()))
-                .ForMember(data => data.CardNumber, opt => opt.MapFrom(dto => dto.CardNumber))
-                .ForMember(data => data.AccountNumber, opt => opt.MapFrom(dto => dto.AccountNumber))
-                .ForMember(data => data.BankUSREOU, opt => opt.MapFrom(dto => dto.BankUSREOU))
-                .ForMember(data => data.BIC, opt => opt.MapFrom(dto => dto.BIC))
-                .ForMember(data => data.HolderFullName, opt => opt.MapFrom(dto => dto.HolderFullName));
+                .ForMember(data => data.Id, opt => opt.MapFrom(dto => Guid.NewGuid()));
         }
         private void MapDayOfWeekDtoToDayOfWeek()
         {
             CreateMap<DayOfWeekDto, DayOfWeek>()
-                .ForMember(dayOfWeek => dayOfWeek.Id, opt => opt.MapFrom(dto => Guid.NewGuid()))
-                .ForMember(dayOfWeek => dayOfWeek.IsOpened, opt => opt.MapFrom(dto => dto.IsOpened))
-                .ForMember(dayOfWeek => dayOfWeek.StartHour, opt => opt.MapFrom(dto => dto.StartHour))
-                .ForMember(dayOfWeek => dayOfWeek.StartMinute, opt => opt.MapFrom(dto => dto.StartMinute))
-                .ForMember(dayOfWeek => dayOfWeek.EndHour, opt => opt.MapFrom(dto => dto.EndHour))
-                .ForMember(dayOfWeek => dayOfWeek.EndMinute, opt => opt.MapFrom(dto => dto.EndMinute));
+                .ForMember(dayOfWeek => dayOfWeek.Id, opt => opt.MapFrom(dto => Guid.NewGuid()));
         }
 
         private void MapScheduleDtoToSchedule()
@@ -88,49 +79,23 @@ namespace FarmersMarketplace.Application.Mappings
 
         private void MapProducerPaymentDataToProducerPaymentDataVm()
         {
-            CreateMap<ProducerPaymentData, ProducerPaymentDataVm>()
-               .ForMember(vm => vm.CardNumber, opt => opt.MapFrom(data => data.CardNumber))
-               .ForMember(vm => vm.AccountNumber, opt => opt.MapFrom(data => data.AccountNumber))
-               .ForMember(vm => vm.BankUSREOU, opt => opt.MapFrom(data => data.BankUSREOU))
-               .ForMember(vm => vm.BIC, opt => opt.MapFrom(data => data.BIC))
-               .ForMember(vm => vm.HolderFullName, opt => opt.MapFrom(data => data.HolderFullName));
+            CreateMap<ProducerPaymentData, ProducerPaymentDataVm>();
         }
 
         private void MapAddressToAddressVm()
         {
-            CreateMap<Address, AddressVm>()
-                .ForMember(vm => vm.Region, opt => opt.MapFrom(address => address.Region))
-                .ForMember(vm => vm.District, opt => opt.MapFrom(address => address.District))
-                .ForMember(vm => vm.Settlement, opt => opt.MapFrom(address => address.Settlement))
-                .ForMember(vm => vm.Street, opt => opt.MapFrom(address => address.Street))
-                .ForMember(vm => vm.HouseNumber, opt => opt.MapFrom(address => address.HouseNumber))
-                .ForMember(vm => vm.PostalCode, opt => opt.MapFrom(address => address.PostalCode))
-                .ForMember(vm => vm.Note, opt => opt.MapFrom(address => address.Note))
-                .ForMember(vm => vm.Longitude, opt => opt.MapFrom(address => address.Longitude))
-                .ForMember(vm => vm.Latitude, opt => opt.MapFrom(address => address.Latitude));
+            CreateMap<Address, AddressVm>();
         }
 
         private void MapDayOfWeekToDayOfWeekVm()
         {
-            CreateMap<DayOfWeek, DayOfWeekVm>()
-                .ForMember(vm => vm.IsOpened, opt => opt.MapFrom(dayOfWeek => dayOfWeek.IsOpened))
-                .ForMember(vm => vm.StartHour, opt => opt.MapFrom(dayOfWeek => dayOfWeek.StartHour))
-                .ForMember(vm => vm.StartMinute, opt => opt.MapFrom(dayOfWeek => dayOfWeek.StartMinute))
-                .ForMember(vm => vm.EndHour, opt => opt.MapFrom(dayOfWeek => dayOfWeek.EndHour))
-                .ForMember(vm => vm.EndMinute, opt => opt.MapFrom(dayOfWeek => dayOfWeek.EndMinute));
+            CreateMap<DayOfWeek, DayOfWeekVm>();
         }
 
         private void MapAddressDtoToAddress()
         {
             CreateMap<AddressDto, Address>()
-                .ForMember(address => address.Id, opt => opt.MapFrom(dto => Guid.NewGuid()))
-                .ForMember(address => address.Region, opt => opt.MapFrom(dto => dto.Region))
-                .ForMember(address => address.District, opt => opt.MapFrom(dto => dto.District))
-                .ForMember(address => address.Settlement, opt => opt.MapFrom(dto => dto.Settlement))
-                .ForMember(address => address.Street, opt => opt.MapFrom(dto => dto.Street))
-                .ForMember(address => address.HouseNumber, opt => opt.MapFrom(dto => dto.HouseNumber))
-                .ForMember(address => address.PostalCode, opt => opt.MapFrom(dto => dto.PostalCode))
-                .ForMember(address => address.Note, opt => opt.MapFrom(dto => dto.Note));
+                .ForMember(address => address.Id, opt => opt.MapFrom(dto => Guid.NewGuid()));
         }
     }
 
