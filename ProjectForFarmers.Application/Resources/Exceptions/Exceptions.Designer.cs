@@ -259,6 +259,15 @@ namespace FarmersMarketplace.Application.Resources.Exceptions {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Failed to retrieve or parse role..
+        /// </summary>
+        internal static string String1 {
+            get {
+                return ResourceManager.GetString("String1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Subcategory does not belong to the category..
         /// </summary>
         internal static string SubcategoryNotBelongsToCategory {
