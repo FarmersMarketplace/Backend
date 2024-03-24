@@ -29,7 +29,7 @@ namespace FarmersMarketplace.WebApi.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdateCustomer([FromBody] UpdateCustomerDto dto)
+        public async Task<IActionResult> UpdateCustomer([FromForm] UpdateCustomerDto dto)
         {
             await AccountService.UpdateCustomer(dto, AccountId);
             return NoContent();
@@ -50,7 +50,7 @@ namespace FarmersMarketplace.WebApi.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdateSeller([FromBody] UpdateSellerDto dto)
+        public async Task<IActionResult> UpdateSeller([FromForm] UpdateSellerDto dto)
         {
             await AccountService.UpdateSeller(dto, AccountId);
             return NoContent();
@@ -71,7 +71,7 @@ namespace FarmersMarketplace.WebApi.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdateFarmer([FromBody] UpdateFarmerDto dto)
+        public async Task<IActionResult> UpdateFarmer([FromForm] UpdateFarmerDto dto)
         {
             await AccountService.UpdateFarmer(dto, AccountId);
             return NoContent();

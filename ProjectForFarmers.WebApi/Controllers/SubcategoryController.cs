@@ -17,17 +17,17 @@ namespace FarmersMarketplace.WebApi.Controllers
 
         [HttpPost]
         [ProducesResponseType(204)]
-        public async Task<IActionResult> Create(CreateSubcategoryDto createSubcategoryDto)
+        public async Task<IActionResult> Create(CreateSubcategoryDto dto)
         {
-            await SubcategoryService.Create(createSubcategoryDto);
+            await SubcategoryService.Create(dto);
             return NoContent();
         }
 
         [HttpPut]
         [ProducesResponseType(204)]
-        public async Task<IActionResult> Update(UpdateSubcategoryDto updateSubcategoryDto)
+        public async Task<IActionResult> Update(UpdateSubcategoryDto dto)
         {
-            await SubcategoryService.Update(updateSubcategoryDto);
+            await SubcategoryService.Update(dto);
             return NoContent();
         }
 

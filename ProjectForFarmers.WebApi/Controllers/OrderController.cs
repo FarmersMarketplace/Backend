@@ -29,56 +29,56 @@ namespace FarmersMarketplace.WebApi.Controllers
 
         [HttpGet]
         [ProducesResponseType(typeof(OrderListVm), 200)]
-        public async Task<IActionResult> GetAll([FromQuery] GetOrderListDto getOrderListDto)
+        public async Task<IActionResult> GetAll([FromQuery] GetOrderListDto dto)
         {
-            var vm = await OrderService.GetAll(getOrderListDto);
+            var vm = await OrderService.GetAll(dto);
             return Ok(vm);
         }
 
         [HttpGet]
         [ProducesResponseType(typeof(DashboardVm), 200)]
         [Produces("application/octet-stream")]
-        public async Task<IActionResult> ExportToExcel([FromQuery] ExportOrdersDto exportOrdersDto)
+        public async Task<IActionResult> ExportToExcel([FromQuery] ExportOrdersDto dto)
         {
             string contentType = "application/octet-stream";
 
-            (string fileName ,byte[] bytes) file = await OrderService.ExportToExcel(exportOrdersDto);
+            (string fileName ,byte[] bytes) file = await OrderService.ExportToExcel(dto);
 
             return File(file.bytes, contentType, file.fileName);
         }
 
         [HttpPut]
         [ProducesResponseType(204)]
-        public async Task<IActionResult> Duplicate([FromBody] OrderListDto orderListDto)
+        public async Task<IActionResult> Duplicate([FromBody] OrderListDto dto)
         {
-            await OrderService.Duplicate(orderListDto, AccountId);
+            await OrderService.Duplicate(dto, AccountId);
 
             return NoContent();
         }
 
         [HttpDelete]
         [ProducesResponseType(204)]
-        public async Task<IActionResult> Delete([FromBody] OrderListDto orderListDto)
+        public async Task<IActionResult> Delete([FromBody] OrderListDto dto)
         {
-            await OrderService.Delete(orderListDto, AccountId);
+            await OrderService.Delete(dto, AccountId);
 
             return NoContent();
         }
 
         [HttpPut]
         [ProducesResponseType(204)]
-        public async Task<IActionResult> Update([FromBody] UpdateOrderDto updateOrderDto)
+        public async Task<IActionResult> Update([FromBody] UpdateOrderDto dto)
         {
-            await OrderService.Update(updateOrderDto, AccountId);
+            await OrderService.Update(dto, AccountId);
 
             return NoContent();
         }
 
         [HttpPut]
         [ProducesResponseType(204)]
-        public async Task<IActionResult> AddOrderItem([FromBody] AddOrderItemDto addOrderItemDto)
+        public async Task<IActionResult> AddOrderItem([FromBody] AddOrderItemDto dto)
         {
-            await OrderService.AddOrderItem(addOrderItemDto, AccountId);
+            await OrderService.AddOrderItem(dto, AccountId);
 
             return NoContent();
         }

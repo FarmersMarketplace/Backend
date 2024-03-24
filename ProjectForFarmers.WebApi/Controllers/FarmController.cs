@@ -40,10 +40,10 @@ namespace FarmersMarketplace.WebApi.Controllers
         [HttpPost]
         [Authorize(Roles = "FarmOwner")]
         [ProducesResponseType(204)]
-        public async Task<IActionResult> Create([FromForm] CreateFarmDto createFarmDto)
+        public async Task<IActionResult> Create([FromForm] CreateFarmDto dto)
         {
-            createFarmDto.OwnerId = AccountId;
-            await FarmService.Create(createFarmDto);
+            dto.OwnerId = AccountId;
+            await FarmService.Create(dto);
             return NoContent();
         }
 
@@ -58,27 +58,27 @@ namespace FarmersMarketplace.WebApi.Controllers
 
         [HttpPut]
         [Authorize(Roles = "FarmOwner")]
-        public async Task<IActionResult> Update([FromForm] UpdateFarmDto updateFarmDto)
+        public async Task<IActionResult> Update([FromForm] UpdateFarmDto dto)
         {
-            await FarmService.Update(updateFarmDto, AccountId);
+            await FarmService.Update(dto, AccountId);
             return NoContent();
         }
 
         [HttpPut]
         [Authorize(Roles = "FarmOwner")]
         [ProducesResponseType(204)]
-        public async Task<IActionResult> UpdateFarmCategoriesAndSubcategories([FromBody] UpdateFarmCategoriesAndSubcategoriesDto updateFarmCategoriesAndSubcategoriesDto)
+        public async Task<IActionResult> UpdateFarmCategoriesAndSubcategories([FromBody] UpdateFarmCategoriesAndSubcategoriesDto dto)
         {
-            await FarmService.UpdateFarmCategoriesAndSubcategories(updateFarmCategoriesAndSubcategoriesDto, AccountId);
+            await FarmService.UpdateFarmCategoriesAndSubcategories(dto, AccountId);
             return NoContent();
         }
 
         [HttpPut]
         [Authorize(Roles = "FarmOwner")]
         [ProducesResponseType(204)]
-        public async Task<IActionResult> UpdateSettings([FromBody] UpdateFarmPaymentDataDto updateFarmSettingsDto)
+        public async Task<IActionResult> UpdateSettings([FromBody] UpdateFarmPaymentDataDto dto)
         {
-            await FarmService.UpdatePaymentData(updateFarmSettingsDto, AccountId);
+            await FarmService.UpdatePaymentData(dto, AccountId);
             return NoContent();
         }
     }

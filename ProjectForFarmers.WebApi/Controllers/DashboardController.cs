@@ -52,9 +52,9 @@ namespace FarmersMarketplace.WebApi.Controllers
 
         [HttpGet]
         [ProducesResponseType(typeof(CustomerInfoVm), 200)]
-        public async Task<IActionResult> GetCustomer([FromQuery] GetCustomerDto getCustomerDto)
+        public async Task<IActionResult> GetCustomer([FromQuery] GetCustomerDto dto)
         {
-            var vm = await DashboardService.SearchCustomer(getCustomerDto);
+            var vm = await DashboardService.SearchCustomer(dto);
             return Ok(vm);
         }
     }

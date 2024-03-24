@@ -20,17 +20,17 @@ namespace FarmersMarketplace.WebApi.Controllers
 
         [HttpPost]
         [ProducesResponseType(204)]
-        public async Task<IActionResult> Create(CategoryDto categoryDto)
+        public async Task<IActionResult> Create(CategoryDto dto)
         {
-            await CategoryService.Create(categoryDto);
+            await CategoryService.Create(dto);
             return NoContent();
         }
 
         [HttpPut("{categoryId}")]
         [ProducesResponseType(204)]
-        public async Task<IActionResult> Update(Guid categoryId, CategoryDto categoryDto)
+        public async Task<IActionResult> Update(Guid categoryId, CategoryDto dto)
         {
-            await CategoryService.Update(categoryId, categoryDto);
+            await CategoryService.Update(categoryId, dto);
             return NoContent();
 
         }
