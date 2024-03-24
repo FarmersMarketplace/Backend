@@ -15,6 +15,7 @@ namespace FarmersMarketplace.Application.DataTransferObjects.Account
         public string Surname { get; set; }
         public string? Patronymic { get; set; }
         public string? Phone { get; set; }
+        public string? AdditionalPhone { get; set; }
         public Gender? Gender { get; set; }
         public DateTime? DateOfBirth { get; set; }
         public IFormFile? Avatar { get; set; }

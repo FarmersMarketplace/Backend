@@ -10,6 +10,8 @@ namespace FarmersMarketplace.Application.ViewModels.Farm
         public string Name { get; set; }
         public string Description { get; set; }
         public string ContactEmail { get; set; }
+        public string Phone { get; set; }
+        public string? AdditionalPhone { get; set; }
         public string OwnerName { get; set; }
         public AddressVm Address { get; set; }
         public ScheduleVm Schedule { get; set; }
