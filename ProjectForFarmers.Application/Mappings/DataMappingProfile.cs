@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using FarmersMarketplace.Application.DataTransferObjects;
+using FarmersMarketplace.Application.DataTransferObjects.Account;
 using FarmersMarketplace.Application.ViewModels;
 using FarmersMarketplace.Application.ViewModels.Account;
 using FarmersMarketplace.Application.ViewModels.Farm;
@@ -21,8 +22,15 @@ namespace FarmersMarketplace.Application.Mappings
             MapDayOfWeekToDayOfWeekVm();
             MapAddressDtoToAddress();
             MapCustomerPaymentDataToCustomerPaymentDataVm();
+            MapCustomerPaymentDataDtoToCustomerPaymentData();
             MapCustomerAddressToCustomerAddressVm();
         }
+
+        private void MapCustomerPaymentDataDtoToCustomerPaymentData()
+        {
+            CreateMap<CustomerPaymentDataDto, CustomerPaymentData>();
+        }
+
         private void MapCustomerPaymentDataToCustomerPaymentDataVm()
         {
             CreateMap<CustomerPaymentData, CustomerPaymentDataVm>();

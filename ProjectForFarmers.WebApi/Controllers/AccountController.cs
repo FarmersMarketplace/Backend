@@ -1,6 +1,5 @@
-﻿using FarmersMarketplace.Application.DataTransferObjects.Account;
-using FarmersMarketplace.Application.DataTransferObjects;
-using FarmersMarketplace.Application.Services;
+﻿using FarmersMarketplace.Application.DataTransferObjects;
+using FarmersMarketplace.Application.DataTransferObjects.Account;
 using FarmersMarketplace.Application.Services.Business;
 using FarmersMarketplace.Domain;
 using Microsoft.AspNetCore.Mvc;
