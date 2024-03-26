@@ -2,6 +2,7 @@
 using FarmersMarketplace.Application.Services;
 using FarmersMarketplace.Application.ViewModels;
 using FarmersMarketplace.Application.ViewModels.Auth;
+using FarmersMarketplace.Domain;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;

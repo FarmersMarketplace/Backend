@@ -9,9 +9,11 @@ namespace FarmersMarketplace.Persistence.EntityTypeConfigurations
     {
         public void Configure(EntityTypeBuilder<Address> builder)
         {
-            builder.ToTable("ProducerAddresses");
+            builder.UseTpcMappingStrategy().ToTable("ProducerAddresses");
 
             builder.HasKey(address => address.Id);
+            builder.Property(address => address.Id).ValueGeneratedNever();
+
             builder.Property(address => address.Region).HasMaxLength(30).IsRequired();
             builder.Property(address => address.District).HasMaxLength(30).IsRequired();
             builder.Property(address => address.Settlement).HasMaxLength(50).IsRequired();

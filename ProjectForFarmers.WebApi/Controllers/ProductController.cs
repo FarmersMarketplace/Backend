@@ -50,7 +50,7 @@ namespace FarmersMarketplace.WebApi.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "FarmOwner, Seller")]
+        [Authorize(Roles = "Farmer, Seller")]
         [ProducesResponseType(typeof(ProductListVm), 200)]
         public async Task<IActionResult> GetAll([FromQuery] GetProductListDto dto)
         {
@@ -59,7 +59,7 @@ namespace FarmersMarketplace.WebApi.Controllers
         }
 
         [HttpPut]
-        [Authorize(Roles = "FarmOwner, Seller")]
+        [Authorize(Roles = "Farmer, Seller")]
         [ProducesResponseType(204)]
         public async Task<IActionResult> Duplicate([FromBody] ProductListDto dto)
         {
@@ -68,7 +68,7 @@ namespace FarmersMarketplace.WebApi.Controllers
         }
 
         [HttpPut("{status}")]
-        [Authorize(Roles = "FarmOwner, Seller")]
+        [Authorize(Roles = "Farmer, Seller")]
         [ProducesResponseType(204)]
         public async Task<IActionResult> ChangeStatus([FromBody] ProductListDto dto, [FromRoute] ProductStatus status)
         {
@@ -77,7 +77,7 @@ namespace FarmersMarketplace.WebApi.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "FarmOwner, Seller")]
+        [Authorize(Roles = "Farmer, Seller")]
         [ProducesResponseType(204)]
         public async Task<IActionResult> Create([FromForm] CreateProductDto dto)
         {
@@ -86,7 +86,7 @@ namespace FarmersMarketplace.WebApi.Controllers
         }
 
         [HttpDelete]
-        [Authorize(Roles = "FarmOwner, Seller")]
+        [Authorize(Roles = "Farmer, Seller")]
         [ProducesResponseType(204)]
         public async Task<IActionResult> Delete([FromQuery] ProductListDto dto)
         {
@@ -95,7 +95,7 @@ namespace FarmersMarketplace.WebApi.Controllers
         }
 
         [HttpPut]
-        [Authorize(Roles = "FarmOwner, Seller")]
+        [Authorize(Roles = "Farmer, Seller")]
         public async Task<IActionResult> Update([FromForm] UpdateProductDto dto)
         {
             await ProductService.Update(dto, AccountId);

@@ -201,7 +201,7 @@ namespace FarmersMarketplace.Application.Services.Business
                     items.Add(newItem);
                 }
 
-                var deliveryPoint = new Address
+                var deliveryPoint = new CustomerAddress
                 {
                     Id = Guid.NewGuid(),
                     Region = order.DeliveryPoint.Region,
@@ -211,11 +211,12 @@ namespace FarmersMarketplace.Application.Services.Business
                     HouseNumber = order.DeliveryPoint.HouseNumber,
                     PostalCode = order.DeliveryPoint.PostalCode,
                     Note = order.DeliveryPoint.Note,
+                    Apartment = order.DeliveryPoint.Apartment,
                     Latitude = order.DeliveryPoint.Latitude,
                     Longitude = order.DeliveryPoint.Longitude,
                 };
 
-                DbContext.ProducerAddresses.Add(deliveryPoint);
+                DbContext.CustomerAddresses.Add(deliveryPoint);
 
                 var newOrder = new Order
                 {

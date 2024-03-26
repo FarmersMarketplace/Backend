@@ -55,10 +55,6 @@ namespace FarmersMarketplace.Application.Services.Business
             foreach (var category in categories)
             {
                 var categoryVm = Mapper.Map<CategoryVm>(category);
-                foreach (var subcategory in category.Subcategories)
-                {
-                    categoryVm.Subcategories.Add(Mapper.Map<SubcategoryVm>(subcategory));
-                }
 
                 vm.Categories.Add(categoryVm);
             }

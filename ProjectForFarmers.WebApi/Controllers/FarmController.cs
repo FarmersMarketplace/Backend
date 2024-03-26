@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using FarmersMarketplace.Application.ViewModels.Farm;
+using FarmersMarketplace.Application.DataTransferObjects;
 
 namespace FarmersMarketplace.WebApi.Controllers
 {
@@ -28,7 +29,7 @@ namespace FarmersMarketplace.WebApi.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "FarmOwner")]
+        [Authorize(Roles = "Farmer")]
         [ProducesResponseType(typeof(FarmListVm), 200)]
         public async Task<IActionResult> GetAll()
         {
@@ -38,7 +39,7 @@ namespace FarmersMarketplace.WebApi.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "FarmOwner")]
+        [Authorize(Roles = "Farmer")]
         [ProducesResponseType(204)]
         public async Task<IActionResult> Create([FromForm] CreateFarmDto dto)
         {
@@ -48,7 +49,7 @@ namespace FarmersMarketplace.WebApi.Controllers
         }
 
         [HttpDelete("{farmId}")]
-        [Authorize(Roles = "FarmOwner")]
+        [Authorize(Roles = "Farmer")]
         [ProducesResponseType(204)]
         public async Task<IActionResult> Delete([FromRoute] Guid farmId)
         {
@@ -57,7 +58,7 @@ namespace FarmersMarketplace.WebApi.Controllers
         }
 
         [HttpPut]
-        [Authorize(Roles = "FarmOwner")]
+        [Authorize(Roles = "Farmer")]
         public async Task<IActionResult> Update([FromForm] UpdateFarmDto dto)
         {
             await FarmService.Update(dto, AccountId);
@@ -65,7 +66,7 @@ namespace FarmersMarketplace.WebApi.Controllers
         }
 
         [HttpPut]
-        [Authorize(Roles = "FarmOwner")]
+        [Authorize(Roles = "Farmer")]
         [ProducesResponseType(204)]
         public async Task<IActionResult> UpdateFarmCategoriesAndSubcategories([FromBody] UpdateFarmCategoriesAndSubcategoriesDto dto)
         {
@@ -74,9 +75,9 @@ namespace FarmersMarketplace.WebApi.Controllers
         }
 
         [HttpPut]
-        [Authorize(Roles = "FarmOwner")]
+        [Authorize(Roles = "Farmer")]
         [ProducesResponseType(204)]
-        public async Task<IActionResult> UpdateSettings([FromBody] UpdateFarmPaymentDataDto dto)
+        public async Task<IActionResult> UpdateSettings([FromBody] UpdateProducerPaymentDataDto dto)
         {
             await FarmService.UpdatePaymentData(dto, AccountId);
             return NoContent();

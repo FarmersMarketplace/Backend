@@ -6,6 +6,7 @@ using FarmersMarketplace.Application.Services.Business;
 using FarmersMarketplace.Application.ViewModels.Account;
 using FarmersMarketplace.Application.ViewModels.Auth;
 using FarmersMarketplace.Domain;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using InvalidDataException = FarmersMarketplace.Application.Exceptions.InvalidDataException;
@@ -13,7 +14,7 @@ using InvalidDataException = FarmersMarketplace.Application.Exceptions.InvalidDa
 namespace FarmersMarketplace.WebApi.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     public class AccountController : ControllerBase
     {
         private readonly IAccountService AccountService;
@@ -33,6 +34,7 @@ namespace FarmersMarketplace.WebApi.Controllers
         }
 
         [HttpPut]
+        [Authorize(Roles = "Customer")]
         [ProducesResponseType(204)]
         public async Task<IActionResult> UpdateCustomer([FromForm] UpdateCustomerDto dto)
         {
@@ -41,6 +43,7 @@ namespace FarmersMarketplace.WebApi.Controllers
         }
 
         [HttpPut]
+        [Authorize(Roles = "Customer")]
         [ProducesResponseType(204)]
         public async Task<IActionResult> UpdateCustomerPaymentData([FromBody] CustomerPaymentDataDto dto)
         {
@@ -58,6 +61,7 @@ namespace FarmersMarketplace.WebApi.Controllers
 
         [HttpPut]
         [ProducesResponseType(204)]
+        [Authorize(Roles = "Seller")]
         public async Task<IActionResult> UpdateSeller([FromForm] UpdateSellerDto dto)
         {
             await AccountService.UpdateSeller(dto, AccountId);
@@ -65,6 +69,7 @@ namespace FarmersMarketplace.WebApi.Controllers
         }
 
         [HttpPut]
+        [Authorize(Roles = "Seller")]
         [ProducesResponseType(204)]
         public async Task<IActionResult> UpdateSellerCategoriesAndSubcategories([FromBody] SellerCategoriesAndSubcategoriesDto dto)
         {
@@ -81,6 +86,7 @@ namespace FarmersMarketplace.WebApi.Controllers
         }
 
         [HttpPut]
+        [Authorize(Roles = "Farmer")]
         [ProducesResponseType(204)]
         public async Task<IActionResult> UpdateFarmer([FromForm] UpdateFarmerDto dto)
         {
@@ -88,15 +94,26 @@ namespace FarmersMarketplace.WebApi.Controllers
             return NoContent();
         }
 
-        [HttpPut("{producer}")]
+        [HttpPut]
+        [Authorize(Roles = "Farmer")]
         [ProducesResponseType(204)]
-        public async Task<IActionResult> UpdateProducerPaymentData([FromBody] ProducerPaymentDataDto dto, [FromRoute] Role producer)
+        public async Task<IActionResult> UpdateFarmerPaymentData([FromBody] ProducerPaymentDataDto dto)
         {
-            await AccountService.UpdateProducerPaymentData(dto, AccountId, producer);
+            await AccountService.UpdateFarmerPaymentData(dto, AccountId);
+            return NoContent();
+        }
+
+        [HttpPut]
+        [Authorize(Roles = "Seller")]
+        [ProducesResponseType(204)]
+        public async Task<IActionResult> UpdateSellerPaymentData([FromBody] UpdateProducerPaymentDataDto dto)
+        {
+            await AccountService.UpdateSellerPaymentData(dto, AccountId);
             return NoContent();
         }
 
         [HttpDelete]
+        [Authorize]
         [ProducesResponseType(204)]
         public async Task<IActionResult> DeleteAccount()
         {

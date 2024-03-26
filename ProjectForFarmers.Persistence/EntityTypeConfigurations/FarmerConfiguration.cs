@@ -8,9 +8,8 @@ namespace FarmersMarketplace.Persistence.EntityTypeConfigurations
     {
         public void Configure(EntityTypeBuilder<Farmer> builder)
         {
-            builder.ToTable("Farmers");
+            builder.UseTpcMappingStrategy().ToTable("Farmers");
 
-            builder.HasKey(farmer => farmer.Id);
             builder.Property(farmer => farmer.Name).HasMaxLength(50).IsRequired();
             builder.Property(farmer => farmer.Surname).HasMaxLength(50).IsRequired();
 

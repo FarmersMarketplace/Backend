@@ -20,31 +20,26 @@ namespace FarmersMarketplace.Persistence.EntityTypeConfigurations
             builder.HasOne(s => s.Monday)
                 .WithOne()
                 .HasForeignKey<Schedule>(s => s.MondayId)
-                .IsRequired()
                 .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasOne(f => f.Tuesday)
                 .WithOne()
                 .HasForeignKey<Schedule>(s => s.TuesdayId)
-                .IsRequired()
                 .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasOne(s => s.Wednesday)
                 .WithOne()
                 .HasForeignKey<Schedule>(s => s.WednesdayId)
-                .IsRequired()
                 .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasOne(s => s.Thursday)
                 .WithOne()
                 .HasForeignKey<Schedule>(s => s.ThursdayId)
-                .IsRequired()
                 .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasOne(s => s.Friday)
                 .WithOne()
                 .HasForeignKey<Schedule>(s => s.FridayId)
-                .IsRequired()
                 .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasOne(s => s.Saturday)
@@ -56,7 +51,6 @@ namespace FarmersMarketplace.Persistence.EntityTypeConfigurations
             builder.HasOne(s => s.Sunday)
                 .WithOne()
                 .HasForeignKey<Schedule>(s => s.SundayId)
-                .IsRequired()
                 .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasIndex(schedule => schedule.Id).IsUnique();

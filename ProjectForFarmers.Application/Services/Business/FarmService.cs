@@ -492,12 +492,12 @@ namespace FarmersMarketplace.Application.Services.Business
             await DbContext.SaveChangesAsync();
         }
 
-        public async Task UpdatePaymentData(UpdateFarmPaymentDataDto dto, Guid ownerId)
+        public async Task UpdatePaymentData(UpdateProducerPaymentDataDto dto, Guid ownerId)
         {
-            var farm = await DbContext.Farms.FirstOrDefaultAsync(f => f.Id == dto.FarmId);
+            var farm = await DbContext.Farms.FirstOrDefaultAsync(f => f.Id == dto.ProducerId);
             if (farm == null)
             {
-                string message = $"Farm with Id {dto.FarmId} was not found.";
+                string message = $"Farm with Id {dto.ProducerId} was not found.";
                 string userFacingMessage = CultureHelper.Exception("FarmFound");
 
                 throw new NotFoundException(message, userFacingMessage);

@@ -14,7 +14,7 @@ namespace FarmersMarketplace.Application.Services
         protected readonly IMapper Mapper;
         protected readonly IApplicationDbContext DbContext;
         protected IConfiguration Configuration { get; set; }
-
+        
         protected Service(IMapper mapper, IApplicationDbContext dbContext, IConfiguration configuration)
         {
             Mapper = mapper;

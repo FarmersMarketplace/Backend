@@ -199,16 +199,18 @@ namespace FarmersMarketplace.Application.Services.Auth
                 throw new InvalidDataException(message, userFacingMessage);
             }
 
-            if (await ExistsAccountWithEmail(dto.Email)) 
-            {
-                string message = $"Email {dto.Email} is already associated with another account.";
-                string userFacingMessage = CultureHelper.Exception("EmailIsAssociatedWithAnotherAccount", dto.Email);
-
-                throw new DuplicateException(message, userFacingMessage);
-            }
-
             if (dto.Role == Role.Customer) 
             {
+                var existingCustomerWithSameEmail = await DbContext.Customers.FirstOrDefaultAsync(a => a.Email == dto.Email);
+
+                if (existingCustomerWithSameEmail != null)
+                {
+                    string message = $"Email {dto.Email} is already associated with another account.";
+                    string userFacingMessage = CultureHelper.Exception("EmailIsAssociatedWithAnotherAccount", dto.Email);
+
+                    throw new DuplicateException(message, userFacingMessage);
+                }
+
                 var account = new Customer
                 {
                     Id = id,
@@ -217,10 +219,20 @@ namespace FarmersMarketplace.Application.Services.Auth
                     Password = CryptoHelper.ComputeSha256Hash(dto.Password),
                 };
 
-                await DbContext.Customers.AddAsync(account);
+                DbContext.Customers.Add(account);
             }
-            else if (dto.Role == Role.Seller) 
+            else if (dto.Role == Role.Seller)
             {
+                var existingSellerWithSameEmail = await DbContext.Sellers.FirstOrDefaultAsync(a => a.Email == dto.Email);
+
+                if (existingSellerWithSameEmail != null)
+                {
+                    string message = $"Email {dto.Email} is already associated with another account.";
+                    string userFacingMessage = CultureHelper.Exception("EmailIsAssociatedWithAnotherAccount", dto.Email);
+
+                    throw new DuplicateException(message, userFacingMessage);
+                }
+
                 var account = new Seller
                 {
                     Id = id,
@@ -229,10 +241,20 @@ namespace FarmersMarketplace.Application.Services.Auth
                     Password = CryptoHelper.ComputeSha256Hash(dto.Password),
                 };
 
-                await DbContext.Sellers.AddAsync(account);
+                DbContext.Sellers.Add(account);
             }
             else if (dto.Role == Role.Farmer)
             {
+                var existingFarmerWithSameEmail = await DbContext.Farmers.FirstOrDefaultAsync(a => a.Email == dto.Email);
+
+                if (existingFarmerWithSameEmail != null)
+                {
+                    string message = $"Email {dto.Email} is already associated with another account.";
+                    string userFacingMessage = CultureHelper.Exception("EmailIsAssociatedWithAnotherAccount", dto.Email);
+
+                    throw new DuplicateException(message, userFacingMessage);
+                }
+
                 var account = new Farmer
                 {
                     Id = id,
@@ -241,7 +263,7 @@ namespace FarmersMarketplace.Application.Services.Auth
                     Password = CryptoHelper.ComputeSha256Hash(dto.Password),
                 };
 
-                await DbContext.Farmers.AddAsync(account);
+                DbContext.Farmers.Add(account);
             }
             else 
             {
@@ -255,8 +277,8 @@ namespace FarmersMarketplace.Application.Services.Auth
         public async Task<bool> ExistsAccountWithEmail(string email) 
         {
             var existingCustomerWithSameEmail = await DbContext.Customers.FirstOrDefaultAsync(a => a.Email == email);
-            var existingSellerWithSameEmail = await DbContext.Customers.FirstOrDefaultAsync(a => a.Email == email);
-            var existingFarmerWithSameEmail = await DbContext.Customers.FirstOrDefaultAsync(a => a.Email == email);
+            var existingFarmerWithSameEmail = await DbContext.Farmers.FirstOrDefaultAsync(a => a.Email == email);
+            var existingSellerWithSameEmail = await DbContext.Sellers.FirstOrDefaultAsync(a => a.Email == email);
 
             return existingCustomerWithSameEmail != null
                 || existingSellerWithSameEmail != null

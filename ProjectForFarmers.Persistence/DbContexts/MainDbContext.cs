@@ -8,6 +8,7 @@ namespace FarmersMarketplace.Persistence.DbContexts
 {
     public class MainDbContext : DbContext, IApplicationDbContext
     {
+        //public DbSet<Account> Accounts { get; set; }
         public DbSet<Customer> Customers { get; set; }
         public DbSet<Seller> Sellers { get; set; }
         public DbSet<Farmer> Farmers { get; set; }
@@ -32,6 +33,7 @@ namespace FarmersMarketplace.Persistence.DbContexts
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.ApplyConfiguration(new AccountConfiguration());
             modelBuilder.ApplyConfiguration(new CustomerConfiguration());
             modelBuilder.ApplyConfiguration(new FarmerConfiguration());
             modelBuilder.ApplyConfiguration(new SellerConfiguration());

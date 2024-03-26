@@ -20,10 +20,10 @@ namespace FarmersMarketplace.Application.DataTransferObjects.Account
         public DateTime? DateOfBirth { get; set; }
         public List<IFormFile>? Images { get; set; }
         public AddressDto? Address { get; set; }
-        public virtual ScheduleDto Schedule { get; set; }
+        public virtual ScheduleDto? Schedule { get; set; }
         public string? FirstSocialPageUrl { get; set; }
         public string? SecondSocialPageUrl { get; set; }
-        public List<PaymentType>? PaymentTypes { get; set; }
+        public List<ReceivingMethod>? ReceivingMethods { get; set; }
     }
 
 }

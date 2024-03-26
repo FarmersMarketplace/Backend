@@ -62,7 +62,7 @@ namespace FarmersMarketplace.Application.Services.Auth
                 Subject = new ClaimsIdentity(new Claim[]
                 {
                     new Claim(ClaimTypes.NameIdentifier, id.ToString()),
-                    new Claim(ClaimTypes.Email, email)
+                    new Claim(ClaimTypes.Email, email),
                 }),
                 NotBefore = notBefore,
                 Expires = expires,

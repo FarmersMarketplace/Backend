@@ -72,6 +72,16 @@ namespace FarmersMarketplace.Domain
             EndMinute = null;
         }
 
+        public DayOfWeek(Guid id)
+        {
+            Id = id;
+            IsOpened = false;
+            StartHour = null;
+            StartMinute = null;
+            EndHour = null;
+            EndMinute = null;
+        }
+
         public DayOfWeek(bool isOpened, byte? startHour, byte? startMinute, byte? endHour, byte? endMinute)
         {
             IsOpened = isOpened;

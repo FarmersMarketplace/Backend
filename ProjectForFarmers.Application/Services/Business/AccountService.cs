@@ -4,15 +4,19 @@ using FarmersMarketplace.Application.DataTransferObjects.Account;
 using FarmersMarketplace.Application.Exceptions;
 using FarmersMarketplace.Application.Helpers;
 using FarmersMarketplace.Application.Interfaces;
+using FarmersMarketplace.Application.ViewModels;
 using FarmersMarketplace.Application.ViewModels.Account;
+using FarmersMarketplace.Application.ViewModels.Farm;
 using FarmersMarketplace.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Address = FarmersMarketplace.Domain.Address;
+using Microsoft.IdentityModel.Tokens;
+using System;
+using DayOfWeek = FarmersMarketplace.Domain.DayOfWeek;
 
 namespace FarmersMarketplace.Application.Services.Business
 {
-    public class AccountService : Service, IAccountService
+    public class AccountService: Service, IAccountService
     {
         private readonly CoordinateHelper CoordinateHelper;
         private readonly FileHelper FileHelper;
@@ -30,9 +34,11 @@ namespace FarmersMarketplace.Application.Services.Business
 
         public async Task<CustomerVm> GetCustomer(Guid accountId)
         {
-            var customer = await DbContext.Customers.FirstOrDefaultAsync(a => a.Id == accountId);
+            var customer = await DbContext.Customers.Include(c => c.Address)
+                .Include(c => c.PaymentData)
+                .FirstOrDefaultAsync(a => a.Id == accountId);
 
-            if(customer == null)
+            if (customer == null)
             {
                 string message = $"Account with Id {accountId} was not found.";
                 string userFacingMessage = CultureHelper.Exception("AccountNotFound");
@@ -47,7 +53,9 @@ namespace FarmersMarketplace.Application.Services.Business
 
         public async Task<FarmerVm> GetFarmer(Guid accountId)
         {
-            var farmer = await DbContext.Farmers.FirstOrDefaultAsync(a => a.Id == accountId);
+            var farmer = await DbContext.Farmers.Include(c => c.Address)
+                .Include(c => c.PaymentData)
+                .FirstOrDefaultAsync(a => a.Id == accountId);
 
             if (farmer == null)
             {
@@ -64,7 +72,23 @@ namespace FarmersMarketplace.Application.Services.Business
 
         public async Task<SellerVm> GetSeller(Guid accountId)
         {
-            var seller = await DbContext.Sellers.FirstOrDefaultAsync(a => a.Id == accountId);
+            var seller = await DbContext.Sellers.Include(c => c.Address)
+                .Include(c => c.PaymentData)
+                .Include(c => c.Schedule)
+                    .ThenInclude(s => s.Monday)
+                .Include(f => f.Schedule)
+                    .ThenInclude(s => s.Tuesday)
+                .Include(f => f.Schedule)
+                    .ThenInclude(s => s.Wednesday)
+                .Include(f => f.Schedule)
+                    .ThenInclude(s => s.Thursday)
+                .Include(f => f.Schedule)
+                    .ThenInclude(s => s.Friday)
+                .Include(f => f.Schedule)
+                    .ThenInclude(s => s.Sunday)
+                .Include(f => f.Schedule)
+                    .ThenInclude(s => s.Saturday)
+                .FirstOrDefaultAsync(a => a.Id == accountId);
 
             if (seller == null)
             {
@@ -81,7 +105,9 @@ namespace FarmersMarketplace.Application.Services.Business
 
         public async Task UpdateCustomer(UpdateCustomerDto dto, Guid accountId)
         {
-            var customer = await DbContext.Customers.FirstOrDefaultAsync(a => a.Id == accountId);
+            var customer = await DbContext.Customers.Include(c => c.Address)
+                .Include(c => c.PaymentData)
+                .FirstOrDefaultAsync(a => a.Id == accountId);
 
             if (customer == null)
             {
@@ -100,7 +126,11 @@ namespace FarmersMarketplace.Application.Services.Business
 
             if (dto.Avatar != null && customer.AvatarName != dto.Avatar.Name)
             {
+                var oldAvatarName = customer.AvatarName;
                 customer.AvatarName = await FileHelper.SaveFile(dto.Avatar, Configuration["File:Images:Account"]);
+
+                if (!oldAvatarName.IsNullOrEmpty())
+                    FileHelper.DeleteFile(oldAvatarName, Configuration["File:Images:Account"]);
             }
 
             if (dto.Address != null)
@@ -108,19 +138,20 @@ namespace FarmersMarketplace.Application.Services.Business
                 var addressDto = dto.Address;
                 if (customer.Address == null)
                 {
-                    customer.Address = new CustomerAddress(); 
+                    customer.Address = new CustomerAddress() { Id = Guid.NewGuid() };
                 }
 
-                if(AddressEqualToDto(customer.Address, addressDto))
+                customer.Address.Apartment = addressDto.Apartment;
+                customer.Address.Note = addressDto.Note;
+                customer.Address.PostalCode = addressDto.PostalCode;
+
+                if (!AddressEqualToDto(customer.Address, addressDto))
                 {
                     customer.Address.Region = addressDto.Region;
                     customer.Address.District = addressDto.District;
                     customer.Address.Settlement = addressDto.Settlement;
                     customer.Address.Street = addressDto.Street;
                     customer.Address.HouseNumber = addressDto.HouseNumber;
-                    customer.Address.PostalCode = addressDto.PostalCode;
-                    customer.Address.Apartment = addressDto.Apartment;
-                    customer.Address.Note = addressDto.Note;
 
                     var coords = await CoordinateHelper.GetCoordinates(customer.Address);
                     customer.Address.Latitude = coords.Latitude;
@@ -137,8 +168,7 @@ namespace FarmersMarketplace.Application.Services.Business
                     address.District == dto.District &&
                     address.Settlement == dto.Settlement &&
                     address.Street == dto.Street &&
-                    address.HouseNumber == dto.HouseNumber &&
-                    address.PostalCode == dto.PostalCode;
+                    address.HouseNumber == dto.HouseNumber;
         }
 
         public async Task UpdateCustomerPaymentData(CustomerPaymentDataDto dto, Guid accountId)
@@ -155,7 +185,8 @@ namespace FarmersMarketplace.Application.Services.Business
 
             if (customer.PaymentData == null)
             {
-                customer.PaymentData = new CustomerPaymentData();
+                customer.PaymentData = new CustomerPaymentData() { Id = Guid.NewGuid() };
+                DbContext.CustomerPaymentData.Add(customer.PaymentData);
             }
 
             customer.PaymentData.CardNumber = dto.CardNumber;
@@ -167,7 +198,8 @@ namespace FarmersMarketplace.Application.Services.Business
 
         public async Task UpdateFarmer(UpdateFarmerDto dto, Guid accountId)
         {
-            var farmer = await DbContext.Farmers.FirstOrDefaultAsync(a => a.Id == accountId);
+            var farmer = await DbContext.Farmers.Include(f => f.Address)
+                .FirstOrDefaultAsync(a => a.Id == accountId);
 
             if (farmer == null)
             {
@@ -177,16 +209,26 @@ namespace FarmersMarketplace.Application.Services.Business
                 throw new NotFoundException(message, userFacingMessage);
             }
 
+            if (farmer.Address == null) 
+            {
+                farmer.Address = new Address() { Id = Guid.NewGuid() };
+                DbContext.ProducerAddresses.Add(farmer.Address);
+            }
+
             farmer.Name = dto.Name;
             farmer.Surname = dto.Surname;
             farmer.Patronymic = dto.Patronymic;
             farmer.Phone = dto.Phone;
             farmer.Gender = dto.Gender;
-            farmer.DateOfBirth = dto.DateOfBirth;
+            farmer.DateOfBirth = dto.DateOfBirth.ToUniversalTime();
 
             if (dto.Avatar != null && farmer.AvatarName != dto.Avatar.Name)
             {
+                var oldAvatarName = farmer.AvatarName;
                 farmer.AvatarName = await FileHelper.SaveFile(dto.Avatar, Configuration["File:Images:Account"]);
+
+                if(!oldAvatarName.IsNullOrEmpty())
+                    FileHelper.DeleteFile(oldAvatarName, Configuration["File:Images:Account"]);
             }
 
             if (dto.Address != null)
@@ -214,7 +256,10 @@ namespace FarmersMarketplace.Application.Services.Business
 
         public async Task UpdateSeller(UpdateSellerDto dto, Guid accountId)
         {
-            var seller = await DbContext.Sellers.FirstOrDefaultAsync(a => a.Id == accountId);
+            var seller = await DbContext.Sellers.Include(c => c.Schedule)
+                .Include(c => c.Address)
+                .Include(c => c.PaymentData)
+                .FirstOrDefaultAsync(a => a.Id == accountId);
 
             if (seller == null)
             {
@@ -228,18 +273,24 @@ namespace FarmersMarketplace.Application.Services.Business
             seller.Surname = dto.Surname;
             seller.Patronymic = dto.Patronymic;
             seller.Phone = dto.Phone;
+            seller.AdditionalPhone = dto.AdditionalPhone;
             seller.Gender = dto.Gender;
-            seller.DateOfBirth = dto.DateOfBirth;
+            seller.ReceivingMethods = dto.ReceivingMethods;
+            seller.DateOfBirth = dto.DateOfBirth.ToUniversalTime();
 
-            if (dto.Images != null)
-            {
-                var imageNames = await FileHelper.SaveImages(dto.Images, Configuration["File:Images:Account"]);
-            }
+            await UpdateSellerImages(seller, dto.Images);
 
             if (dto.Address != null)
             {
                 var addressDto = dto.Address;
-                seller.Address = seller.Address ?? new Address();
+
+                if (seller.Address == null)
+                {
+                    seller.Address = new Address() { Id = Guid.NewGuid() };
+                    DbContext.ProducerAddresses.Add(seller.Address);
+                }
+
+                seller.Address.PostalCode = addressDto.PostalCode;
 
                 if (!AddressEqualToDto(seller.Address, addressDto))
                 {
@@ -248,11 +299,12 @@ namespace FarmersMarketplace.Application.Services.Business
                     seller.Address.Settlement = addressDto.Settlement;
                     seller.Address.Street = addressDto.Street;
                     seller.Address.HouseNumber = addressDto.HouseNumber;
-                    seller.Address.PostalCode = addressDto.PostalCode;
 
                     var coords = await CoordinateHelper.GetCoordinates(seller.Address);
                     seller.Address.Latitude = coords.Latitude;
                     seller.Address.Longitude = coords.Longitude;
+
+                    await DbContext.SaveChangesAsync();
                 }
             }
 
@@ -263,23 +315,62 @@ namespace FarmersMarketplace.Application.Services.Business
 
             seller.FirstSocialPageUrl = dto.FirstSocialPageUrl;
             seller.SecondSocialPageUrl = dto.SecondSocialPageUrl;
-
             await DbContext.SaveChangesAsync();
+        }
+
+        private async Task UpdateSellerImages(Seller seller, List<Microsoft.AspNetCore.Http.IFormFile> images)
+        {
+            if (seller.ImagesNames == null || images == null)
+                seller.ImagesNames = new List<string>();
+
+            if (images != null)
+            {
+                foreach (var imageName in seller.ImagesNames)
+                {
+                    if (!images.Any(file => file.FileName == imageName))
+                    {
+                        FileHelper.DeleteFile(imageName, Configuration["File:Images:Account"]);
+                    }
+                }
+
+                foreach (var newImage in images)
+                {
+                    if (!seller.ImagesNames.Contains(newImage.FileName))
+                    {
+                        string imageName = await FileHelper.SaveFile(newImage, Configuration["File:Images:Account"]);
+                        seller.ImagesNames.Add(imageName);
+                    }
+                }
+            }
+
         }
 
         private async Task UpdateSellerSchedule(Seller seller, ScheduleDto dto)
         {
-            var schedule = seller.Schedule ?? new Schedule(); 
+            if (seller.Schedule == null) 
+            {
+                seller.Schedule = new Schedule() { Id = Guid.NewGuid() };
+                DbContext.Schedules.Add(seller.Schedule);
+                await DbContext.SaveChangesAsync();
+            }
 
-            schedule.Monday.IsOpened = dto.Monday.IsOpened;
-            schedule.Monday.StartHour = dto.Monday.StartHour;
-            schedule.Monday.StartMinute = dto.Monday.StartMinute;
-            schedule.Monday.EndHour = dto.Monday.EndHour;
-            schedule.Monday.EndMinute = dto.Monday.EndMinute;
-
-            seller.Schedule = schedule;
+            await UpdateDayOfWeek(seller.Schedule.Monday, dto.Monday);
+            await UpdateDayOfWeek(seller.Schedule.Tuesday, dto.Tuesday);
+            await UpdateDayOfWeek(seller.Schedule.Wednesday, dto.Wednesday);
+            await UpdateDayOfWeek(seller.Schedule.Thursday, dto.Thursday);
+            await UpdateDayOfWeek(seller.Schedule.Friday, dto.Friday);
+            await UpdateDayOfWeek(seller.Schedule.Sunday, dto.Sunday);
+            await UpdateDayOfWeek(seller.Schedule.Saturday, dto.Saturday);
         }
 
+        private async Task UpdateDayOfWeek(DayOfWeek dayOfWeek, DayOfWeekDto dto)
+        {
+            dayOfWeek.IsOpened = dto.IsOpened;
+            dayOfWeek.StartHour = dto.StartHour;
+            dayOfWeek.StartMinute = dto.StartMinute;
+            dayOfWeek.EndHour = dto.EndHour;
+            dayOfWeek.EndMinute = dto.EndMinute;
+        }
 
         public async Task UpdateSellerCategoriesAndSubcategories(SellerCategoriesAndSubcategoriesDto dto, Guid accountId)
         {
@@ -299,56 +390,75 @@ namespace FarmersMarketplace.Application.Services.Business
             await DbContext.SaveChangesAsync();
         }
 
-        public async Task UpdateProducerPaymentData(ProducerPaymentDataDto dto, Guid accountId, Role producer)
+        public async Task UpdateFarmerPaymentData(ProducerPaymentDataDto dto, Guid accountId)
         {
-            if (producer == Role.Seller)
+            var farmer = await DbContext.Farmers.Include(f => f.PaymentData)
+                .FirstOrDefaultAsync(a => a.Id == accountId);
+
+            if (farmer == null)
             {
-                var seller = await DbContext.Sellers.FirstOrDefaultAsync(a => a.Id == accountId);
+                string message = $"Account with Id {accountId} was not found.";
+                string userFacingMessage = CultureHelper.Exception("AccountNotFound");
 
-                if (seller == null)
-                {
-                    string message = $"Account with Id {accountId} was not found.";
-                    string userFacingMessage = CultureHelper.Exception("AccountNotFound");
-
-                    throw new NotFoundException(message, userFacingMessage);
-                }
-
-                seller.PaymentData.CardNumber = dto.CardNumber;
-                seller.PaymentData.AccountNumber = dto.AccountNumber;
-                seller.PaymentData.BankUSREOU = dto.BankUSREOU;
-                seller.PaymentData.BIC = dto.BIC;
-                seller.PaymentData.HolderFullName = dto.HolderFullName;
-                seller.PaymentData.CardExpirationYear = dto.CardExpirationYear;
-                seller.PaymentData.CardExpirationMonth = dto.CardExpirationMonth;
-
-                await DbContext.SaveChangesAsync();
+                throw new NotFoundException(message, userFacingMessage);
             }
-            else if (producer == Role.Farmer)
+
+            if (farmer.PaymentData == null)
             {
-                var farmer = await DbContext.Farmers.FirstOrDefaultAsync(a => a.Id == accountId);
-
-                if (farmer == null)
-                {
-                    string message = $"Account with Id {accountId} was not found.";
-                    string userFacingMessage = CultureHelper.Exception("AccountNotFound");
-
-                    throw new NotFoundException(message, userFacingMessage);
-                }
-
-                farmer.PaymentData.CardNumber = dto.CardNumber;
-                farmer.PaymentData.AccountNumber = dto.AccountNumber;
-                farmer.PaymentData.BankUSREOU = dto.BankUSREOU;
-                farmer.PaymentData.BIC = dto.BIC;
-                farmer.PaymentData.HolderFullName = dto.HolderFullName;
-                farmer.PaymentData.CardExpirationYear = dto.CardExpirationYear;
-                farmer.PaymentData.CardExpirationMonth = dto.CardExpirationMonth;
-
-                await DbContext.SaveChangesAsync();
+                farmer.PaymentData = new ProducerPaymentData() { Id = Guid.NewGuid() };
+                DbContext.ProducerPaymentData.Add(farmer.PaymentData);
             }
-            else 
+
+            farmer.PaymentData.CardNumber = dto.CardNumber;
+            farmer.PaymentData.AccountNumber = dto.AccountNumber;
+            farmer.PaymentData.BankUSREOU = dto.BankUSREOU;
+            farmer.PaymentData.BIC = dto.BIC;
+            farmer.PaymentData.HolderFullName = dto.HolderFullName;
+            farmer.PaymentData.CardExpirationYear = dto.CardExpirationYear;
+            farmer.PaymentData.CardExpirationMonth = dto.CardExpirationMonth;
+
+            await DbContext.SaveChangesAsync();
+        }
+
+        public async Task UpdateSellerPaymentData(UpdateProducerPaymentDataDto dto, Guid accountId)
+        {
+            var seller = await DbContext.Sellers.Include(s => s.PaymentData)
+                .FirstOrDefaultAsync(a => a.Id == accountId);
+
+            if (seller == null)
             {
-                throw new NotImplementedException("There are no customers any more.");
+                string message = $"Account with Id {accountId} was not found.";
+                string userFacingMessage = CultureHelper.Exception("AccountNotFound");
+
+                throw new NotFoundException(message, userFacingMessage);
             }
+
+            if (seller.PaymentData == null) 
+            {
+                seller.PaymentData = new ProducerPaymentData { Id = Guid.NewGuid() };
+                DbContext.ProducerPaymentData.Add(seller.PaymentData);
+            }
+
+            seller.PaymentData.CardNumber = dto.PaymentData.CardNumber;
+            seller.PaymentData.AccountNumber = dto.PaymentData.AccountNumber;
+            seller.PaymentData.BankUSREOU = dto.PaymentData.BankUSREOU;
+            seller.PaymentData.BIC = dto.PaymentData.BIC;
+            seller.PaymentData.HolderFullName = dto.PaymentData.HolderFullName;
+            seller.PaymentData.CardExpirationYear = dto.PaymentData.CardExpirationYear;
+            seller.PaymentData.CardExpirationMonth = dto.PaymentData.CardExpirationMonth;
+
+            if (dto.HasOnlinePayment) 
+            {
+                seller.PaymentTypes = new List<PaymentType> { PaymentType.Online, PaymentType.Cash };
+            }
+            else
+            {
+                seller.PaymentTypes = new List<PaymentType> { PaymentType.Cash };
+            }
+
+            
+            await DbContext.SaveChangesAsync();
         }
     }
+
 }
