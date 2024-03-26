@@ -325,7 +325,6 @@ namespace FarmersMarketplace.Persistence.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
                     Description = table.Column<string>(type: "text", nullable: true),
-                    ContactEmail = table.Column<string>(type: "text", nullable: true),
                     Phone = table.Column<string>(type: "text", nullable: true),
                     AdditionalPhone = table.Column<string>(type: "text", nullable: true),
                     FirstSocialPageUrl = table.Column<string>(type: "text", nullable: true),

@@ -13,7 +13,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FarmersMarketplace.Persistence.Migrations
 {
     [DbContext(typeof(MainDbContext))]
-    [Migration("20240325142815_Initial")]
+    [Migration("20240326182423_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -213,9 +213,6 @@ namespace FarmersMarketplace.Persistence.Migrations
 
                     b.Property<List<Guid>>("Categories")
                         .HasColumnType("uuid[]");
-
-                    b.Property<string>("ContactEmail")
-                        .HasColumnType("text");
 
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("timestamp with time zone");

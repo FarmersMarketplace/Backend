@@ -75,17 +75,5 @@ namespace FarmersMarketplace.WebApi.Controllers
 
             return NoContent();
         }
-
-        [HttpPut]
-        [Authorize]
-        [ProducesResponseType(204)]
-        public async Task<IActionResult> ConfirmFarmEmail()
-        {
-            var farmId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
-            var email = User.FindFirst(ClaimTypes.Email)?.Value;
-
-            await AuthService.ConfirmFarmEmail(farmId, email);
-            return NoContent();
-        }
     }
 }

@@ -211,9 +211,6 @@ namespace FarmersMarketplace.Persistence.Migrations
                     b.Property<List<Guid>>("Categories")
                         .HasColumnType("uuid[]");
 
-                    b.Property<string>("ContactEmail")
-                        .HasColumnType("text");
-
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("timestamp with time zone");
 
