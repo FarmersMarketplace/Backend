@@ -38,7 +38,6 @@ namespace FarmersMarketplace.Application.Mappings
         {
             CreateMap<CreateFarmDto, Farm>()
                 .ForMember(farm => farm.Id, opt => opt.MapFrom(dto => Guid.NewGuid()))
-                .ForMember(farm => farm.ContactEmail, opt => opt.MapFrom(dto => string.Empty))
                 .ForMember(farm => farm.CreationDate, opt => opt.MapFrom(dto => DateTime.UtcNow))
                 .ForMember(farm => farm.Address, opt => opt.MapFrom(dto => dto.Address))
                 .ForMember(farm => farm.ImagesNames, opt => opt.MapFrom(dto => new List<string>()))

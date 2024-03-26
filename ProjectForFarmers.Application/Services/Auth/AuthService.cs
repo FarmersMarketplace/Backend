@@ -324,22 +324,6 @@ namespace FarmersMarketplace.Application.Services.Auth
             await EmailHelper.SendEmail(letterMessage, dto.Email, "Password reset request for Agroforum account");
         }
 
-        public async Task ConfirmFarmEmail(Guid farmId, string email)
-        {
-            var farm = await DbContext.Farms.FirstOrDefaultAsync(a => a.Id == farmId);
-
-            if (farm == null)
-            {
-                string message = $"Farm with Id {farmId} was not found.";
-                string userFacingMessage = CultureHelper.Exception("FarmNotFound");
-
-                throw new NotFoundException(message, userFacingMessage);
-            }
-
-            farm.ContactEmail = email;
-            await DbContext.SaveChangesAsync();
-        }
-
         public async Task<LoginVm> AuthenticateWithGoogle(AuthenticateWithGoogleDto dto)
         {
             Payload payload = await GoogleJsonWebSignature.ValidateAsync(dto.GoogleIdToken);

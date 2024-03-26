@@ -158,12 +158,6 @@ namespace FarmersMarketplace.Application.Services.Business
 
             LogAndUpdateIfChanged("Name", farm.Name, dto.Name, () => farm.Name = dto.Name, farm.Id);
             LogAndUpdateIfChanged("Description", farm.Description, dto.Description, () => farm.Description = dto.Description, farm.Id);
-            LogAndUpdateIfChanged("ContactEmail", farm.ContactEmail, dto.ContactEmail, async () => 
-            {
-                string token = await JwtService.EmailConfirmationToken(farm.Id, dto.ContactEmail);
-                string message = EmailContentBuilder.FarmEmailConfirmationMessageBody(farm.Name, farm.Owner.Name, farm.Owner.Surname, dto.ContactEmail, token);
-                await EmailHelper.SendEmail(message, dto.ContactEmail, "Farm Email Confirmation");
-            }, farm.Id);
             LogAndUpdateIfChanged("ContactPhone", farm.Phone, dto.ContactPhone, () => farm.Phone = dto.ContactPhone, farm.Id);
             LogAndUpdateIfChanged("SocialPageUrl", farm.FirstSocialPageUrl, dto.FirstSocialPageUrl, () => farm.FirstSocialPageUrl = dto.FirstSocialPageUrl, farm.Id);
             LogAndUpdateIfChanged("SocialPageUrl", farm.SecondSocialPageUrl, dto.SecondSocialPageUrl, () => farm.SecondSocialPageUrl = dto.SecondSocialPageUrl, farm.Id);
