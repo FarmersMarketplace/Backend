@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
-using ProjectForFarmers.Application.Exceptions;
+using FarmersMarketplace.Application.Exceptions;
 
-namespace ProjectForFarmers.Application.Helpers
+namespace FarmersMarketplace.Application.Helpers
 {
     public class FileHelper
     {
@@ -57,7 +57,7 @@ namespace ProjectForFarmers.Application.Helpers
             {
                 string fileName = Path.GetFileName(sourceFilePath);
                 string message = $"Directory with path {sourceFilePath} was not found.";
-                string userFacingMessage = CultureHelper.Exception("An error occurred while creating the file.");
+                string userFacingMessage = CultureHelper.Exception("FileCreatingError");
 
                 throw new NotFoundException(message, userFacingMessage);
             }

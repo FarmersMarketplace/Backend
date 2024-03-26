@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
-using ProjectForFarmers.Domain;
+using FarmersMarketplace.Domain;
 
-namespace ProjectForFarmers.Application.DataTransferObjects.Farm
+namespace FarmersMarketplace.Application.DataTransferObjects.Farm
 {
     public class UpdateFarmDto
     {
@@ -10,7 +10,9 @@ namespace ProjectForFarmers.Application.DataTransferObjects.Farm
         public string Description { get; set; }
         public string ContactEmail { get; set; }
         public string ContactPhone { get; set; }
-        public string? SocialPageUrl { get; set; }
+        public string? AdditionalPhone { get; set; }
+        public string? FirstSocialPageUrl { get; set; }
+        public string? SecondSocialPageUrl { get; set; }
         public AddressDto Address { get; set; }
         public ScheduleDto Schedule { get; set; }
         public List<IFormFile> Images { get; set; }

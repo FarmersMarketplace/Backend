@@ -1,4 +1,4 @@
-﻿namespace ProjectForFarmers.Domain
+﻿namespace FarmersMarketplace.Domain
 {
     public class Order
     {
@@ -11,7 +11,7 @@
         public PaymentStatus PaymentStatus { get; set; }
         public ReceivingMethod ReceivingType { get; set; }
         public Guid? DeliveryPointId { get; set; }
-        public Address? DeliveryPoint { get; set; }
+        public CustomerAddress? DeliveryPoint { get; set; }
         public Producer Producer { get; set; }
         public OrderStatus Status { get; set; }
         public Guid ProducerId { get; set; }

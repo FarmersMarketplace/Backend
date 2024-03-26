@@ -1,7 +1,7 @@
-﻿using ProjectForFarmers.Application.Filters;
-using ProjectForFarmers.Domain;
+﻿using FarmersMarketplace.Application.Filters;
+using FarmersMarketplace.Domain;
 
-namespace ProjectForFarmers.Application.DataTransferObjects.Product
+namespace FarmersMarketplace.Application.DataTransferObjects.Product
 {
     public class ExportProductsDto
     {

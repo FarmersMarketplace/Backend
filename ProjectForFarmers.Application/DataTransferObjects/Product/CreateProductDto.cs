@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
-using ProjectForFarmers.Domain;
+using FarmersMarketplace.Domain;
 
-namespace ProjectForFarmers.Application.DataTransferObjects.Product
+namespace FarmersMarketplace.Application.DataTransferObjects.Product
 {
     public class CreateProductDto
     {
@@ -18,6 +18,7 @@ namespace ProjectForFarmers.Application.DataTransferObjects.Product
         public int Count { get; set; }
         public List<IFormFile>? Images { get; set; }
         public DateTime ExpirationDate { get; set; }
+        public DateTime CreationDate { get; set; }
         public List<IFormFile>? Documents { get; set; }
         public ProductStatus Status { get; set; }
     }

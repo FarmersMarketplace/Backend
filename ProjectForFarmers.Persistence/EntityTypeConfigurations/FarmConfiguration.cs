@@ -1,4 +1,4 @@
-﻿using ProjectForFarmers.Domain;
+﻿using FarmersMarketplace.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ProjectForFarmers.Persistence.EntityTypeConfigurations
+namespace FarmersMarketplace.Persistence.EntityTypeConfigurations
 {
     public class FarmConfiguration : IEntityTypeConfiguration<Farm>
     {
@@ -25,7 +25,6 @@ namespace ProjectForFarmers.Persistence.EntityTypeConfigurations
             builder.HasOne(f => f.Address)
                  .WithOne()
                  .HasForeignKey<Farm>(f => f.AddressId)
-                 .IsRequired()
                  .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasOne(f => f.Owner)
@@ -36,12 +35,11 @@ namespace ProjectForFarmers.Persistence.EntityTypeConfigurations
             builder.HasOne(f => f.Schedule)
                  .WithOne()
                  .HasForeignKey<Farm>(f => f.ScheduleId)
-                 .IsRequired()
                  .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasOne(f => f.PaymentData)
-                 .WithMany()
-                 .HasForeignKey(f => f.PaymentDataId)
+                 .WithOne()
+                 .HasForeignKey<Farm>(f => f.PaymentDataId)
                  .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasIndex(farm => farm.Id).IsUnique();

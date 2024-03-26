@@ -1,11 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using ProjectForFarmers.Application.DataTransferObjects.Catefory;
-using ProjectForFarmers.Application.DataTransferObjects.Farm;
-using ProjectForFarmers.Application.Services.Business;
-using ProjectForFarmers.Application.ViewModels.Category;
-using ProjectForFarmers.Application.ViewModels.Farm;
+using FarmersMarketplace.Application.DataTransferObjects.Catefory;
+using FarmersMarketplace.Application.DataTransferObjects.Farm;
+using FarmersMarketplace.Application.Services.Business;
+using FarmersMarketplace.Application.ViewModels.Category;
+using FarmersMarketplace.Application.ViewModels.Farm;
 
-namespace ProjectForFarmers.WebApi.Controllers
+namespace FarmersMarketplace.WebApi.Controllers
 {
     [ApiController]
     [Route("api/[controller]/[action]")]
@@ -20,17 +20,17 @@ namespace ProjectForFarmers.WebApi.Controllers
 
         [HttpPost]
         [ProducesResponseType(204)]
-        public async Task<IActionResult> Create(CategoryDto categoryDto)
+        public async Task<IActionResult> Create([FromBody] CategoryDto dto)
         {
-            await CategoryService.Create(categoryDto);
+            await CategoryService.Create(dto);
             return NoContent();
         }
 
         [HttpPut("{categoryId}")]
         [ProducesResponseType(204)]
-        public async Task<IActionResult> Update(Guid categoryId, CategoryDto categoryDto)
+        public async Task<IActionResult> Update([FromRoute] Guid categoryId,[FromBody] CategoryDto dto)
         {
-            await CategoryService.Update(categoryId, categoryDto);
+            await CategoryService.Update(categoryId, dto);
             return NoContent();
 
         }

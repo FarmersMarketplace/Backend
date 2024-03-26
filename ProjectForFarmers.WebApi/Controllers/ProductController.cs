@@ -1,15 +1,13 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using ProjectForFarmers.Application.DataTransferObjects.Order;
-using ProjectForFarmers.Application.DataTransferObjects.Product;
-using ProjectForFarmers.Application.Services.Business;
-using ProjectForFarmers.Application.ViewModels.Dashboard;
-using ProjectForFarmers.Application.ViewModels.Product;
-using ProjectForFarmers.Domain;
+using FarmersMarketplace.Application.DataTransferObjects.Product;
+using FarmersMarketplace.Application.Services.Business;
+using FarmersMarketplace.Application.ViewModels.Dashboard;
+using FarmersMarketplace.Application.ViewModels.Product;
+using FarmersMarketplace.Domain;
 using System.Security.Claims;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
-namespace ProjectForFarmers.WebApi.Controllers
+namespace FarmersMarketplace.WebApi.Controllers
 {
     [ApiController]
     [Route("api/[controller]/[action]")]
@@ -42,64 +40,73 @@ namespace ProjectForFarmers.WebApi.Controllers
         [HttpGet]
         [ProducesResponseType(typeof(DashboardVm), 200)]
         [Produces("application/octet-stream")]
-        public async Task<IActionResult> ExportToExcel([FromQuery] ExportProductsDto exportProductsDto)
+        public async Task<IActionResult> ExportToExcel([FromQuery] ExportProductsDto dto)
         {
             string contentType = "application/octet-stream";
 
-            (string fileName, byte[] bytes) file = await ProductService.ExportToExcel(exportProductsDto);
+            (string fileName, byte[] bytes) file = await ProductService.ExportToExcel(dto);
 
             return File(file.bytes, contentType, file.fileName);
         }
 
         [HttpGet]
-        [Authorize(Roles = "FarmOwner, Seller")]
+        [Authorize(Roles = "Farmer, Seller")]
         [ProducesResponseType(typeof(ProductListVm), 200)]
-        public async Task<IActionResult> GetAll([FromQuery] GetProductListDto getProductListDto)
+        public async Task<IActionResult> GetAll([FromQuery] GetProductListDto dto)
         {
-            var request = await ProductService.GetAll(getProductListDto);
+            var request = await ProductService.GetAll(dto);
             return Ok(request);
         }
 
         [HttpPut]
-        [Authorize(Roles = "FarmOwner, Seller")]
+        [Authorize(Roles = "Farmer, Seller")]
         [ProducesResponseType(204)]
-        public async Task<IActionResult> Duplicate([FromQuery] ProductListDto productListDto)
+        public async Task<IActionResult> Duplicate([FromBody] ProductListDto dto)
         {
-            await ProductService.Duplicate(productListDto, AccountId);
+            await ProductService.Duplicate(dto, AccountId);
+            return NoContent();
+        }
+
+        [HttpPut("{status}")]
+        [Authorize(Roles = "Farmer, Seller")]
+        [ProducesResponseType(204)]
+        public async Task<IActionResult> ChangeStatus([FromBody] ProductListDto dto, [FromRoute] ProductStatus status)
+        {
+            await ProductService.ChangeStatus(dto, status, AccountId);
             return NoContent();
         }
 
         [HttpPost]
-        [Authorize(Roles = "FarmOwner, Seller")]
+        [Authorize(Roles = "Farmer, Seller")]
         [ProducesResponseType(204)]
-        public async Task<IActionResult> Create([FromForm] CreateProductDto createProductDto)
+        public async Task<IActionResult> Create([FromForm] CreateProductDto dto)
         {
-            await ProductService.Create(createProductDto);
+            await ProductService.Create(dto);
             return NoContent();
         }
 
         [HttpDelete]
-        [Authorize(Roles = "FarmOwner, Seller")]
+        [Authorize(Roles = "Farmer, Seller")]
         [ProducesResponseType(204)]
-        public async Task<IActionResult> Delete([FromQuery] ProductListDto productListDto)
+        public async Task<IActionResult> Delete([FromQuery] ProductListDto dto)
         {
-            await ProductService.Delete(productListDto, AccountId);
+            await ProductService.Delete(dto, AccountId);
             return NoContent();
         }
 
         [HttpPut]
-        [Authorize(Roles = "FarmOwner, Seller")]
-        public async Task<IActionResult> Update([FromForm] UpdateProductDto updateProductDto)
+        [Authorize(Roles = "Farmer, Seller")]
+        public async Task<IActionResult> Update([FromForm] UpdateProductDto dto)
         {
-            await ProductService.Update(updateProductDto, AccountId);
+            await ProductService.Update(dto, AccountId);
             return NoContent();
         }
 
         [HttpGet]
         [ProducesResponseType(typeof(ProductVm), 200)]
-        public async Task<IActionResult> Autocomplete([FromQuery] ProductAutocompleteDto productAutocompleteDto)
+        public async Task<IActionResult> Autocomplete([FromQuery] ProductAutocompleteDto dto)
         {
-            var request = await ProductService.Autocomplete(productAutocompleteDto);
+            var request = await ProductService.Autocomplete(dto);
             return Ok(request);
         }
     }

@@ -1,12 +1,12 @@
 ﻿using AutoMapper;
 using Microsoft.Extensions.Configuration;
-using ProjectForFarmers.Application.DataTransferObjects.Subcategory;
-using ProjectForFarmers.Application.Exceptions;
-using ProjectForFarmers.Application.Helpers;
-using ProjectForFarmers.Application.Interfaces;
-using ProjectForFarmers.Domain;
+using FarmersMarketplace.Application.DataTransferObjects.Subcategory;
+using FarmersMarketplace.Application.Exceptions;
+using FarmersMarketplace.Application.Helpers;
+using FarmersMarketplace.Application.Interfaces;
+using FarmersMarketplace.Domain;
 
-namespace ProjectForFarmers.Application.Services.Business
+namespace FarmersMarketplace.Application.Services.Business
 {
     public class SubcategoryService : Service, ISubcategoryService
     {
@@ -14,14 +14,14 @@ namespace ProjectForFarmers.Application.Services.Business
         {
         }
 
-        public async Task Create(CreateSubcategoryDto createSubcategoryDto)
+        public async Task Create(CreateSubcategoryDto dto)
         {
-            var category = DbContext.Categories.FirstOrDefault(c => c.Id == createSubcategoryDto.CategoryId);
+            var category = DbContext.Categories.FirstOrDefault(c => c.Id == dto.CategoryId);
 
             if (category == null)
             {
-                string message = $"Category with Id {createSubcategoryDto.CategoryId} was not found.";
-                string userFacingMessage = CultureHelper.Exception("CategoryWithIdNotFound", createSubcategoryDto.CategoryId.ToString());
+                string message = $"Category with Id {dto.CategoryId} was not found.";
+                string userFacingMessage = CultureHelper.Exception("CategoryWithIdNotFound", dto.CategoryId.ToString());
 
                 throw new NotFoundException(message, userFacingMessage);
             }
@@ -30,8 +30,8 @@ namespace ProjectForFarmers.Application.Services.Business
             var subcategory = new Subcategory
             {
                 Id = id,
-                Name = createSubcategoryDto.Name,
-                CategoryId = createSubcategoryDto.CategoryId
+                Name = dto.Name,
+                CategoryId = dto.CategoryId
             };
 
             DbContext.Subcategories.Add(subcategory);
@@ -53,18 +53,18 @@ namespace ProjectForFarmers.Application.Services.Business
             await DbContext.SaveChangesAsync();
         }
 
-        public async Task Update(UpdateSubcategoryDto updateSubcategoryDto)
+        public async Task Update(UpdateSubcategoryDto dto)
         {
-            var subcategory = DbContext.Categories.FirstOrDefault(c => c.Id == updateSubcategoryDto.Id);
+            var subcategory = DbContext.Categories.FirstOrDefault(c => c.Id == dto.Id);
 
             if (subcategory == null)
             {
-                string message = $"Subcategory with Id {updateSubcategoryDto.Id} was not found.";
-                string userFacingMessage = CultureHelper.Exception("SubcategoryWithIdNotFound", updateSubcategoryDto.Id.ToString());
+                string message = $"Subcategory with Id {dto.Id} was not found.";
+                string userFacingMessage = CultureHelper.Exception("SubcategoryWithIdNotFound", dto.Id.ToString());
                 throw new NotFoundException(message, userFacingMessage);
             }
 
-            subcategory.Name = updateSubcategoryDto.Name;
+            subcategory.Name = dto.Name;
 
             await DbContext.SaveChangesAsync();
         }

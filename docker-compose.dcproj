@@ -4,7 +4,7 @@
     <ProjectVersion>2.1</ProjectVersion>
     <DockerTargetOS>Linux</DockerTargetOS>
     <DockerPublishLocally>False</DockerPublishLocally>
-    <ProjectGuid>f16fbc38-006c-43b6-adaa-a91b900fdea6</ProjectGuid>
+    <ProjectGuid>45a56956-a7ae-4716-ba5d-8b192b43770d</ProjectGuid>
     <DockerLaunchAction>LaunchBrowser</DockerLaunchAction>
     <DockerServiceUrl>{Scheme}://localhost:{ServicePort}</DockerServiceUrl>
     <DockerServiceName>projectforfarmers.webapi</DockerServiceName>

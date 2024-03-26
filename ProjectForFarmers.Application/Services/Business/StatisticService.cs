@@ -1,12 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using ProjectForFarmers.Application.DataTransferObjects.Dashboard;
-using ProjectForFarmers.Application.Exceptions;
-using ProjectForFarmers.Application.Helpers;
-using ProjectForFarmers.Application.Interfaces;
-using ProjectForFarmers.Application.ViewModels.Dashboard;
-using ProjectForFarmers.Domain;
+using FarmersMarketplace.Application.DataTransferObjects.Dashboard;
+using FarmersMarketplace.Application.Exceptions;
+using FarmersMarketplace.Application.Helpers;
+using FarmersMarketplace.Application.Interfaces;
+using FarmersMarketplace.Application.ViewModels.Dashboard;
+using FarmersMarketplace.Domain;
 
-namespace ProjectForFarmers.Application.Services.Business
+namespace FarmersMarketplace.Application.Services.Business
 {
     public class StatisticService
     {
@@ -27,7 +27,7 @@ namespace ProjectForFarmers.Application.Services.Business
                 DbContext.MonthesStatistics.Add(farmMonthStatistic);
             }
 
-            var sellers = DbContext.Accounts.Where(a => a.Role == Role.Seller).ToArray();
+            var sellers = DbContext.Sellers.ToArray();
 
             foreach (var seller in sellers)
             {
@@ -161,7 +161,7 @@ namespace ProjectForFarmers.Application.Services.Business
             return (float)((sum*100)/totalRevenu);
         }
 
-        private async Task<MonthStatistic> CalculateMonthStatisticForFirstMonth(Guid producerId, Producer producer, DateTimeOffset lastDateOfMonth)
+        private async Task<MonthStatistic> CalculateMonthStatisticForFirstMonth(Guid producerId, Producer producer, DateTime lastDateOfMonth)
         {
             var orders = DbContext.Orders.Where(o => o.Producer == producer
                 && o.ProducerId == producerId
@@ -252,7 +252,7 @@ namespace ProjectForFarmers.Application.Services.Business
             return result;
         }
 
-        private async Task<MonthStatistic> GetPreviousStatistic(Guid producerId, Producer producer, DateTimeOffset lastDayOfPreviousMonth)
+        private async Task<MonthStatistic> GetPreviousStatistic(Guid producerId, Producer producer, DateTime lastDayOfPreviousMonth)
         {
             var previousStatistic = await DbContext.MonthesStatistics
                 .Include(m => m.BookedOrdersStatistic)
@@ -286,7 +286,7 @@ namespace ProjectForFarmers.Application.Services.Business
             }
         }
 
-        private async Task<bool> ExistsOrdersForPeriodOfTime(Guid producerId, DateTimeOffset startDate, DateTimeOffset endDate)
+        private async Task<bool> ExistsOrdersForPeriodOfTime(Guid producerId, DateTime startDate, DateTime endDate)
         {
             var existsOrdersForPreviousMonth = DbContext.Orders.Any(o => o.CreationDate.Year >= startDate.Year 
                 && o.ProducerId == producerId
@@ -307,7 +307,7 @@ namespace ProjectForFarmers.Application.Services.Business
                  .Select(o => o.CustomerId)
                  .ToListAsync());
 
-            var customer = await DbContext.Accounts.FirstOrDefaultAsync(a => $"{a.Name} {a.Surname}" == getCustomerDto.CustomerName
+            var customer = await DbContext.Customers.FirstOrDefaultAsync(a => $"{a.Name} {a.Surname}" == getCustomerDto.CustomerName
                 && customerIdsHashSet.Contains(a.Id));
 
             if (customer == null)

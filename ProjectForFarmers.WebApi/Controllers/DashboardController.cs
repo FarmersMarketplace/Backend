@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using ProjectForFarmers.Application.DataTransferObjects.Dashboard;
-using ProjectForFarmers.Application.Services.Business;
-using ProjectForFarmers.Application.ViewModels.Dashboard;
-using ProjectForFarmers.Domain;
+using FarmersMarketplace.Application.DataTransferObjects.Dashboard;
+using FarmersMarketplace.Application.Services.Business;
+using FarmersMarketplace.Application.ViewModels.Dashboard;
+using FarmersMarketplace.Domain;
 
-namespace ProjectForFarmers.WebApi.Controllers
+namespace FarmersMarketplace.WebApi.Controllers
 {
     [ApiController]
     [Route("api/[controller]/[action]")]
@@ -52,9 +52,9 @@ namespace ProjectForFarmers.WebApi.Controllers
 
         [HttpGet]
         [ProducesResponseType(typeof(CustomerInfoVm), 200)]
-        public async Task<IActionResult> GetCustomer([FromQuery] GetCustomerDto getCustomerDto)
+        public async Task<IActionResult> GetCustomer([FromQuery] GetCustomerDto dto)
         {
-            var vm = await DashboardService.SearchCustomer(getCustomerDto);
+            var vm = await DashboardService.SearchCustomer(dto);
             return Ok(vm);
         }
     }

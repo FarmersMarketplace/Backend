@@ -2,15 +2,15 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
-using ProjectForFarmers.Application.DataTransferObjects.Dashboard;
-using ProjectForFarmers.Application.Exceptions;
-using ProjectForFarmers.Application.Helpers;
-using ProjectForFarmers.Application.Interfaces;
-using ProjectForFarmers.Application.ViewModels.Dashboard;
-using ProjectForFarmers.Application.ViewModels.Order;
-using ProjectForFarmers.Domain;
+using FarmersMarketplace.Application.DataTransferObjects.Dashboard;
+using FarmersMarketplace.Application.Exceptions;
+using FarmersMarketplace.Application.Helpers;
+using FarmersMarketplace.Application.Interfaces;
+using FarmersMarketplace.Application.ViewModels.Dashboard;
+using FarmersMarketplace.Application.ViewModels.Order;
+using FarmersMarketplace.Domain;
 
-namespace ProjectForFarmers.Application.Services.Business
+namespace FarmersMarketplace.Application.Services.Business
 {
     public class DashboardService : Service, IDashboardService
     {
@@ -44,7 +44,7 @@ namespace ProjectForFarmers.Application.Services.Business
                 .Select(o => o.CustomerId)
                 .ToListAsync());
 
-            var customerNames = await DbContext.Accounts
+            var customerNames = await DbContext.Customers
                 .Where(a => customerIdsHashSet.Contains(a.Id))
                 .Select(a => $"{a.Name} {a.Surname}")
                 .Distinct()
@@ -88,7 +88,7 @@ namespace ProjectForFarmers.Application.Services.Business
                 currentMonthDashboardVm.CustomerInfo.Name = "Customer with highest payment was not found";
             }
 
-            var customerWithHighestPayment = await DbContext.Accounts.FirstOrDefaultAsync(a => a.Id == currentMonthStatistic.CustomerWithHighestPaymentId);
+            var customerWithHighestPayment = await DbContext.Customers.FirstOrDefaultAsync(a => a.Id == currentMonthStatistic.CustomerWithHighestPaymentId);
             if (customerWithHighestPayment != null)
             {
                 currentMonthDashboardVm.CustomerInfo.Name = $"{customerWithHighestPayment.Surname} {customerWithHighestPayment.Name}";
@@ -101,9 +101,9 @@ namespace ProjectForFarmers.Application.Services.Business
             return currentMonthDashboardVm;
         }
 
-        public async Task<CustomerInfoVm> SearchCustomer(GetCustomerDto getCustomerDto)
+        public async Task<CustomerInfoVm> SearchCustomer(GetCustomerDto dto)
         {
-            var vm = await StatisticService.GetCustomerInfo(getCustomerDto);
+            var vm = await StatisticService.GetCustomerInfo(dto);
 
             return vm;
         }
@@ -124,7 +124,7 @@ namespace ProjectForFarmers.Application.Services.Business
             }).ToList();
 
             var currentMonthDashboardVm = Mapper.Map<DashboardVm>(currentMonthStatistic);
-            var customerWithHighestPayment = await DbContext.Accounts.FirstOrDefaultAsync(a => a.Id == currentMonthStatistic.CustomerWithHighestPaymentId);
+            var customerWithHighestPayment = await DbContext.Customers.FirstOrDefaultAsync(a => a.Id == currentMonthStatistic.CustomerWithHighestPaymentId);
 
             if (customerWithHighestPayment != null)
             {

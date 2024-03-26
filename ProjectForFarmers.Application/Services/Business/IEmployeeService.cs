@@ -1,17 +1,17 @@
-﻿using ProjectForFarmers.Application.DataTransferObjects.Employee;
-using ProjectForFarmers.Application.ViewModels.Employee;
+﻿using FarmersMarketplace.Application.DataTransferObjects.Employee;
+using FarmersMarketplace.Application.ViewModels.Employee;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ProjectForFarmers.Application.Services.Business
+namespace FarmersMarketplace.Application.Services.Business
 {
     public interface IEmployeeService
     {
-        Task Add(AddPermissionsDto addPermissionsDto);
-        Task Update(UpdatePermissionsDto updatePermissionsDto);
+        Task Add(AddPermissionsDto dto);
+        Task Update(UpdatePermissionsDto dto);
         Task Delete(Guid permissionsId);
         Task<PermissionsVm> Get(Guid permissionsId);
         Task<EmployeeListVm> GetAll(Guid farmId);

@@ -1,12 +1,13 @@
-﻿using ProjectForFarmers.Application.DataTransferObjects.Auth;
-using ProjectForFarmers.Application.Services;
-using ProjectForFarmers.Application.ViewModels;
-using ProjectForFarmers.Application.ViewModels.Auth;
+﻿using FarmersMarketplace.Application.DataTransferObjects.Auth;
+using FarmersMarketplace.Application.Services;
+using FarmersMarketplace.Application.ViewModels;
+using FarmersMarketplace.Application.ViewModels.Auth;
+using FarmersMarketplace.Domain;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
-namespace ProjectForFarmers.WebApi.Controllers
+namespace FarmersMarketplace.WebApi.Controllers
 {
     [ApiController]
     [Route("api/[controller]/[action]")]
@@ -21,9 +22,9 @@ namespace ProjectForFarmers.WebApi.Controllers
 
         [HttpPost]
         [ProducesResponseType(204)]
-        public async Task<IActionResult> Register([FromBody] RegisterDto accountDto)
+        public async Task<IActionResult> Register([FromBody] RegisterDto dto)
         {
-            await AuthService.Register(accountDto);
+            await AuthService.Register(dto);
             return NoContent();
         }
 
@@ -41,36 +42,36 @@ namespace ProjectForFarmers.WebApi.Controllers
         
         [HttpGet]
         [ProducesResponseType(typeof(LoginVm), 200)]
-        public async Task<IActionResult> Login([FromQuery] LoginDto loginDto)
+        public async Task<IActionResult> Login([FromQuery] LoginDto dto)
         {
-            var response = await AuthService.Login(loginDto);
+            var response = await AuthService.Login(dto);
             return Ok(response);
         }
 
         [HttpPut]
         [ProducesResponseType(typeof(LoginVm), 200)]
-        public async Task<IActionResult> AuthenticateWithGoogle([FromBody] AuthenticateWithGoogleDto authenticateWithGoogleDto)
+        public async Task<IActionResult> AuthenticateWithGoogle([FromBody] AuthenticateWithGoogleDto dto)
         {
-            var response = await AuthService.AuthenticateWithGoogle(authenticateWithGoogleDto);
+            var response = await AuthService.AuthenticateWithGoogle(dto);
             return Ok(response);
         }
 
         [HttpPut]
         [ProducesResponseType(204)]
-        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDto forgotPasswordDto)
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDto dto)
         {
-            await AuthService.ForgotPassword(forgotPasswordDto);
+            await AuthService.ForgotPassword(dto);
             return NoContent();
         }
 
         [HttpPut]
         [Authorize]
         [ProducesResponseType(204)]
-        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto resetPasswordDto)
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto dto)
         {
             var accountId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
             var email = User.FindFirst(ClaimTypes.Email)?.Value;
-            await AuthService.ResetPassword(accountId, email, resetPasswordDto);
+            await AuthService.ResetPassword(accountId, email, dto);
 
             return NoContent();
         }

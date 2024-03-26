@@ -1,21 +1,22 @@
-﻿using ProjectForFarmers.Application.DataTransferObjects.Auth;
-using ProjectForFarmers.Application.ViewModels.Auth;
+﻿using FarmersMarketplace.Application.DataTransferObjects.Auth;
+using FarmersMarketplace.Application.ViewModels.Auth;
+using FarmersMarketplace.Domain;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ProjectForFarmers.Application.Services
+namespace FarmersMarketplace.Application.Services
 {
     public interface IAuthService
     {
-        Task Register(RegisterDto accountDto);
+        Task Register(RegisterDto dto);
         Task ConfirmEmail(Guid userId, string email);
-        Task<LoginVm> Login(LoginDto loginDto);
-        Task ResetPassword(Guid accountId, string? email, ResetPasswordDto resetPasswordDto);
-        Task ForgotPassword(ForgotPasswordDto forgotPasswordDto);
-        Task<LoginVm> AuthenticateWithGoogle(AuthenticateWithGoogleDto authenticateWithGoogleDto);
+        Task<LoginVm> Login(LoginDto dto);
+        Task ResetPassword(Guid accountId, string? email, ResetPasswordDto dto);
+        Task ForgotPassword(ForgotPasswordDto dto);
+        Task<LoginVm> AuthenticateWithGoogle(AuthenticateWithGoogleDto dto);
         Task ConfirmFarmEmail(Guid farmId, string email);
     }
 }

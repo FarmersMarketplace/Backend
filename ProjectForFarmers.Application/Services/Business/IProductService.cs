@@ -1,21 +1,22 @@
-﻿using ProjectForFarmers.Application.DataTransferObjects.Product;
-using ProjectForFarmers.Application.ViewModels.Dashboard;
-using ProjectForFarmers.Application.ViewModels.Product;
-using ProjectForFarmers.Domain;
+﻿using FarmersMarketplace.Application.DataTransferObjects.Product;
+using FarmersMarketplace.Application.ViewModels.Dashboard;
+using FarmersMarketplace.Application.ViewModels.Product;
+using FarmersMarketplace.Domain;
 
-namespace ProjectForFarmers.Application.Services.Business
+namespace FarmersMarketplace.Application.Services.Business
 {
     public interface IProductService
     {
-        Task Create(CreateProductDto createProductDto);
-        Task Update(UpdateProductDto updateProductDto, Guid accountId);
-        Task Delete(ProductListDto productListDto, Guid accountId);
-        Task Duplicate(ProductListDto productListDto, Guid accountId);
+        Task Create(CreateProductDto dto);
+        Task Update(UpdateProductDto dto, Guid accountId);
+        Task Delete(ProductListDto dto, Guid accountId);
+        Task ChangeStatus(ProductListDto dto, ProductStatus status, Guid accountId);
+        Task Duplicate(ProductListDto dto, Guid accountId);
         Task<ProductVm> Get(Guid productId);
-        Task<ProductListVm> GetAll (GetProductListDto getProductListDto);
-        Task<OptionListVm> Autocomplete(ProductAutocompleteDto productAutocompleteDto);
+        Task<ProductListVm> GetAll (GetProductListDto dto);
+        Task<OptionListVm> Autocomplete(ProductAutocompleteDto dto);
         Task<FilterData> GetFilterData(Producer producer, Guid producerId);
-        Task<(string fileName, byte[] bytes)> ExportToExcel(ExportProductsDto exportProductsDto);
+        Task<(string fileName, byte[] bytes)> ExportToExcel(ExportProductsDto dto);
     }
 
 }

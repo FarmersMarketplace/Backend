@@ -1,15 +1,15 @@
 ﻿using AutoMapper;
+using FarmersMarketplace.Application.DataTransferObjects.Catefory;
+using FarmersMarketplace.Application.Exceptions;
+using FarmersMarketplace.Application.Helpers;
+using FarmersMarketplace.Application.Interfaces;
+using FarmersMarketplace.Application.ViewModels.Category;
+using FarmersMarketplace.Application.ViewModels.Subcategory;
+using FarmersMarketplace.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using ProjectForFarmers.Application.DataTransferObjects.Catefory;
-using ProjectForFarmers.Application.Exceptions;
-using ProjectForFarmers.Application.Helpers;
-using ProjectForFarmers.Application.Interfaces;
-using ProjectForFarmers.Application.ViewModels.Category;
-using ProjectForFarmers.Application.ViewModels.Subcategory;
-using ProjectForFarmers.Domain;
 
-namespace ProjectForFarmers.Application.Services.Business
+namespace FarmersMarketplace.Application.Services.Business
 {
     public class CategoryService : Service, ICategoryService
     {
@@ -17,13 +17,13 @@ namespace ProjectForFarmers.Application.Services.Business
         {
         }
 
-        public async Task Create(CategoryDto createCategoryDto)
+        public async Task Create(CategoryDto dto)
         {
             Guid id = Guid.NewGuid();
             var category = new Category 
             { 
                 Id = id,
-                Name = createCategoryDto.Name
+                Name = dto.Name
             };
 
             DbContext.Categories.Add(category);
@@ -55,10 +55,6 @@ namespace ProjectForFarmers.Application.Services.Business
             foreach (var category in categories)
             {
                 var categoryVm = Mapper.Map<CategoryVm>(category);
-                foreach (var subcategory in category.Subcategories)
-                {
-                    categoryVm.Subcategories.Add(Mapper.Map<SubcategoryVm>(subcategory));
-                }
 
                 vm.Categories.Add(categoryVm);
             }
@@ -66,7 +62,7 @@ namespace ProjectForFarmers.Application.Services.Business
             return vm;
         }
 
-        public async Task Update(Guid categoryId, CategoryDto categoryDto)
+        public async Task Update(Guid categoryId, CategoryDto dto)
         {
             var category = DbContext.Categories.FirstOrDefault(c => c.Id == categoryId);
 
@@ -78,7 +74,7 @@ namespace ProjectForFarmers.Application.Services.Business
                 throw new NotFoundException(message, userFacingMessage);
             }
 
-            category.Name = categoryDto.Name;
+            category.Name = dto.Name;
 
             await DbContext.SaveChangesAsync();
         }

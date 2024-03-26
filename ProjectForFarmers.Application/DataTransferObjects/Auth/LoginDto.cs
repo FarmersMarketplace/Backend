@@ -1,4 +1,4 @@
-﻿namespace ProjectForFarmers.Application.DataTransferObjects.Auth
+﻿namespace FarmersMarketplace.Application.DataTransferObjects.Auth
 {
     public class LoginDto
     {

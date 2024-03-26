@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ProjectForFarmers.Application.DataTransferObjects.Subcategory
+namespace FarmersMarketplace.Application.DataTransferObjects.Subcategory
 {
     public class UpdateSubcategoryDto
     {

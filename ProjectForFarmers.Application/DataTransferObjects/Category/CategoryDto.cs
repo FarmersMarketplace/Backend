@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ProjectForFarmers.Application.DataTransferObjects.Catefory
+namespace FarmersMarketplace.Application.DataTransferObjects.Catefory
 {
     public class CategoryDto
     {

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ProjectForFarmers.Application.DataTransferObjects.Product
+namespace FarmersMarketplace.Application.DataTransferObjects.Product
 {
     public class ProductListDto
     {

@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
-using ProjectForFarmers.Application.DataTransferObjects.Auth;
-using ProjectForFarmers.Application.Interfaces;
-using ProjectForFarmers.Domain;
+using FarmersMarketplace.Application.DataTransferObjects.Auth;
+using FarmersMarketplace.Application.Interfaces;
+using FarmersMarketplace.Domain;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +9,7 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ProjectForFarmers.Application.DataTransferObjects.Farm
+namespace FarmersMarketplace.Application.DataTransferObjects
 {
     public class AddressDto
     {

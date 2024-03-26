@@ -1,15 +1,19 @@
-﻿using ProjectForFarmers.Application.Interfaces;
-using ProjectForFarmers.Domain;
-using ProjectForFarmers.Persistence.EntityTypeConfigurations;
+﻿using FarmersMarketplace.Application.Interfaces;
+using FarmersMarketplace.Domain;
+using FarmersMarketplace.Persistence.EntityTypeConfigurations;
 using Microsoft.EntityFrameworkCore;
-using DayOfWeek = ProjectForFarmers.Domain.DayOfWeek;
+using DayOfWeek = FarmersMarketplace.Domain.DayOfWeek;
 
-namespace ProjectForFarmers.Persistence.DbContexts
+namespace FarmersMarketplace.Persistence.DbContexts
 {
     public class MainDbContext : DbContext, IApplicationDbContext
     {
-        public DbSet<Account> Accounts { get; set; }
-        public DbSet<Address> Addresses { get; set; }
+        //public DbSet<Account> Accounts { get; set; }
+        public DbSet<Customer> Customers { get; set; }
+        public DbSet<Seller> Sellers { get; set; }
+        public DbSet<Farmer> Farmers { get; set; }
+        public DbSet<Address> ProducerAddresses { get; set; }
+        public DbSet<CustomerAddress> CustomerAddresses { get; set; }
         public DbSet<Farm> Farms { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<DayOfWeek> DaysOfWeek { get; set; }
@@ -19,7 +23,8 @@ namespace ProjectForFarmers.Persistence.DbContexts
         public DbSet<Category> Categories { get; set; }
         public DbSet<Subcategory> Subcategories { get; set; }
         public DbSet<Product> Products { get; set; }
-        public DbSet<PaymentData> PaymentData { get; set; }
+        public DbSet<ProducerPaymentData> ProducerPaymentData { get; set; }
+        public DbSet<CustomerPaymentData> CustomerPaymentData { get; set; }
         public DbSet<FarmLog> FarmsLogs { get; set; }
 
         public MainDbContext(DbContextOptions<MainDbContext> options) : base(options)
@@ -29,7 +34,11 @@ namespace ProjectForFarmers.Persistence.DbContexts
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfiguration(new AccountConfiguration());
+            modelBuilder.ApplyConfiguration(new CustomerConfiguration());
+            modelBuilder.ApplyConfiguration(new FarmerConfiguration());
+            modelBuilder.ApplyConfiguration(new SellerConfiguration());
             modelBuilder.ApplyConfiguration(new AddressConfiguration());
+            modelBuilder.ApplyConfiguration(new CustomerAddressConfiguration());
             modelBuilder.ApplyConfiguration(new DayOfWeekConfiguration());
             modelBuilder.ApplyConfiguration(new ScheduleConfiguration());
             modelBuilder.ApplyConfiguration(new FarmConfiguration());
@@ -38,7 +47,9 @@ namespace ProjectForFarmers.Persistence.DbContexts
             modelBuilder.ApplyConfiguration(new MonthStatisticConfiguration());
             modelBuilder.ApplyConfiguration(new CategoryConfiguration());
             modelBuilder.ApplyConfiguration(new SubcategoryConfiguration());
-            modelBuilder.ApplyConfiguration(new PaymentDataConfiguration());
+            modelBuilder.ApplyConfiguration(new ProducerPaymentDataConfiguration());
+            modelBuilder.ApplyConfiguration(new ProductConfiguration());
+            modelBuilder.ApplyConfiguration(new CustomerPaymentDataConfiguration());
             modelBuilder.ApplyConfiguration(new FarmLogConfiguration());
 
             base.OnModelCreating(modelBuilder);

@@ -1,9 +1,9 @@
 ﻿using Serilog;
 using System.Net;
 using System.Text.Json;
-using ApplicationException = ProjectForFarmers.Application.Exceptions.ApplicationException;
+using ApplicationException = FarmersMarketplace.Application.Exceptions.ApplicationException;
 
-namespace ProjectForFarmers.WebApi.Middlewares
+namespace FarmersMarketplace.WebApi.Middlewares
 {
     public class ExceptionHandlerMiddleware
     {

@@ -1,30 +1,25 @@
-﻿using ProjectForFarmers.Domain;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
+﻿using FarmersMarketplace.Domain;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Newtonsoft.Json;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ProjectForFarmers.Persistence.EntityTypeConfigurations
+namespace FarmersMarketplace.Persistence.EntityTypeConfigurations
 {
     public class AccountConfiguration : IEntityTypeConfiguration<Account>
     {
         public void Configure(EntityTypeBuilder<Account> builder)
         {
-            builder.ToTable("Accounts");
+            builder.UseTpcMappingStrategy();
 
             builder.HasKey(account => account.Id);
-            builder.Property(account => account.Name).HasMaxLength(30).IsRequired();
-            builder.Property(account => account.Surname).HasMaxLength(30).IsRequired();
-            builder.Property(account => account.Password).HasMaxLength(64);
+            builder.Property(account => account.Id).ValueGeneratedNever();
 
             builder.HasIndex(account => account.Id).IsUnique();
         }
     }
+
 }

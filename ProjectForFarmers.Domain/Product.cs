@@ -4,12 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ProjectForFarmers.Domain
+namespace FarmersMarketplace.Domain
 {
     public class Product
     {
         public Guid Id { get; set; }
-        public string Name { get; set; }
+        public string Name { get; set; } 
         public string Description { get; set; }
         public string ArticleNumber { get; set; }
         public Guid CategoryId { get; set; }

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ProjectForFarmers.Application.DataTransferObjects.Order
+namespace FarmersMarketplace.Application.DataTransferObjects.Order
 {
     public class AddOrderItemDto
     {

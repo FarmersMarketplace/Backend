@@ -1,11 +1,11 @@
-﻿using ProjectForFarmers.Application.Services;
-using ProjectForFarmers.Application.Services.Auth;
-using ProjectForFarmers.Application.Services.Business;
+﻿using FarmersMarketplace.Application.Services;
+using FarmersMarketplace.Application.Services.Auth;
+using FarmersMarketplace.Application.Services.Business;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using ProjectForFarmers.Application.Mappings;
+using FarmersMarketplace.Application.Mappings;
 
-namespace ProjectForFarmers.Application
+namespace FarmersMarketplace.Application
 {
     public static class DependencyInjection
     {
@@ -18,14 +18,16 @@ namespace ProjectForFarmers.Application
             services.AddTransient<ISubcategoryService, SubcategoryService>();
             services.AddTransient<IProductService, ProductService>();
             services.AddTransient<IDashboardService, DashboardService>();
+            services.AddTransient<IAccountService, AccountService>();
 
             services.AddAutoMapper(config =>
             {
-                config.AddProfile(new AuthMappingProfile());
                 config.AddProfile(new FarmMappingProfile());
                 config.AddProfile(new OrderMappingProfile());
                 config.AddProfile(new CategoryMappingProfile());
                 config.AddProfile(new ProductMappingProfile());
+                config.AddProfile(new DataMappingProfile());
+                config.AddProfile(new AccountMappingProfile());
             });
 
             return services;

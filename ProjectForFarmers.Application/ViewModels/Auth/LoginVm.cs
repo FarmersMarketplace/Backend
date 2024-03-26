@@ -1,6 +1,6 @@
-﻿using ProjectForFarmers.Domain;
+﻿using FarmersMarketplace.Domain;
 
-namespace ProjectForFarmers.Application.ViewModels.Auth
+namespace FarmersMarketplace.Application.ViewModels.Auth
 {
     public class LoginVm
     {

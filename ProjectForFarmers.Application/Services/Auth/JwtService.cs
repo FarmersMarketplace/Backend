@@ -1,5 +1,5 @@
-﻿using ProjectForFarmers.Application.ViewModels.Auth;
-using ProjectForFarmers.Domain;
+﻿using FarmersMarketplace.Application.ViewModels.Auth;
+using FarmersMarketplace.Domain;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -11,7 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Data;
 
-namespace ProjectForFarmers.Application.Services.Auth
+namespace FarmersMarketplace.Application.Services.Auth
 {
     public class JwtService
     {
@@ -22,14 +22,14 @@ namespace ProjectForFarmers.Application.Services.Auth
             Configuration = configuration;
         }
 
-        public async Task<string> Authenticate(Account account)
+        public async Task<string> Authenticate(Guid accountId, Role role)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.UTF8.GetBytes(Configuration["Auth:Secret"]);
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.NameIdentifier, account.Id.ToString()),
-                new Claim(ClaimTypes.Role, account.Role.ToString())
+                new Claim(ClaimTypes.NameIdentifier, accountId.ToString()),
+                new Claim(ClaimTypes.Role, role.ToString())
             };
 
             var notBefore = DateTime.UtcNow;
@@ -62,7 +62,7 @@ namespace ProjectForFarmers.Application.Services.Auth
                 Subject = new ClaimsIdentity(new Claim[]
                 {
                     new Claim(ClaimTypes.NameIdentifier, id.ToString()),
-                    new Claim(ClaimTypes.Email, email)
+                    new Claim(ClaimTypes.Email, email),
                 }),
                 NotBefore = notBefore,
                 Expires = expires,

@@ -1,10 +1,11 @@
-﻿using System;
+﻿using FarmersMarketplace.Domain;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ProjectForFarmers.Application.ViewModels.Product
+namespace FarmersMarketplace.Application.ViewModels.Product
 {
     public class ProductLookupVm
     {
@@ -17,6 +18,7 @@ namespace ProjectForFarmers.Application.ViewModels.Product
         public string UnitOfMeasurement {  get; set; }
         public decimal PricePerOne { get; set; }
         public DateTime CreationDate { get; set; }
+        public ProductStatus Status { get; set; }
     }
 
 }

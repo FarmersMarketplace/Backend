@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using ProjectForFarmers.Application.DataTransferObjects.Subcategory;
-using ProjectForFarmers.Application.Services.Business;
+using FarmersMarketplace.Application.DataTransferObjects.Subcategory;
+using FarmersMarketplace.Application.Services.Business;
 
-namespace ProjectForFarmers.WebApi.Controllers
+namespace FarmersMarketplace.WebApi.Controllers
 {
     [ApiController]
     [Route("api/[controller]/[action]")]
@@ -17,17 +17,17 @@ namespace ProjectForFarmers.WebApi.Controllers
 
         [HttpPost]
         [ProducesResponseType(204)]
-        public async Task<IActionResult> Create(CreateSubcategoryDto createSubcategoryDto)
+        public async Task<IActionResult> Create([FromBody] CreateSubcategoryDto dto)
         {
-            await SubcategoryService.Create(createSubcategoryDto);
+            await SubcategoryService.Create(dto);
             return NoContent();
         }
 
         [HttpPut]
         [ProducesResponseType(204)]
-        public async Task<IActionResult> Update(UpdateSubcategoryDto updateSubcategoryDto)
+        public async Task<IActionResult> Update([FromBody] UpdateSubcategoryDto dto)
         {
-            await SubcategoryService.Update(updateSubcategoryDto);
+            await SubcategoryService.Update(dto);
             return NoContent();
         }
 

@@ -132,6 +132,12 @@
   <data name="BIC" xml:space="preserve">
     <value>BIC</value>
   </data>
+  <data name="CardExpirationMonth" xml:space="preserve">
+    <value>Expiration month of card</value>
+  </data>
+  <data name="CardExpirationYear" xml:space="preserve">
+    <value>Expiration year of card</value>
+  </data>
   <data name="CardNumber" xml:space="preserve">
     <value>Card number</value>
   </data>

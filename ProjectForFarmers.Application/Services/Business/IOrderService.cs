@@ -1,17 +1,19 @@
-﻿using ProjectForFarmers.Application.DataTransferObjects.Order;
-using ProjectForFarmers.Application.ViewModels.Order;
+﻿using FarmersMarketplace.Application.DataTransferObjects.Order;
+using FarmersMarketplace.Application.ViewModels.Order;
+using FarmersMarketplace.Domain;
 
-namespace ProjectForFarmers.Application.Services.Business
+namespace FarmersMarketplace.Application.Services.Business
 {
     public interface IOrderService
     {
        Task<OrderVm> Get(Guid orderId);
-       Task<OrderListVm> GetAll(GetOrderListDto getOrderListDto);
-       Task<(string fileName, byte[] bytes)> ExportToExcel(ExportOrdersDto exportOrdersDto);
-       Task Duplicate(OrderListDto orderListDto, Guid accountId);
-       Task Delete(OrderListDto orderListDto, Guid accountId);
-       Task Update(UpdateOrderDto updateOrderDto, Guid accountId);
-       Task AddOrderItem(AddOrderItemDto addOrderItemDto, Guid accountId);
+       Task<OrderListVm> GetAll(GetOrderListDto dto);
+       Task<(string fileName, byte[] bytes)> ExportToExcel(ExportOrdersDto dto);
+       Task Duplicate(OrderListDto dto, Guid accountId);
+       Task Delete(OrderListDto dto, Guid accountId);
+       Task ChangeStatus(OrderListDto dto, OrderStatus status, Guid accountId);
+       Task Update(UpdateOrderDto dto, Guid accountId);
+       Task AddOrderItem(AddOrderItemDto dto, Guid accountId);
     }
 
 }

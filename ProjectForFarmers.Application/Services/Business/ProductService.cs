@@ -5,18 +5,18 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using ProjectForFarmers.Application.DataTransferObjects.Product;
-using ProjectForFarmers.Application.Exceptions;
-using ProjectForFarmers.Application.Filters;
-using ProjectForFarmers.Application.Helpers;
-using ProjectForFarmers.Application.Interfaces;
-using ProjectForFarmers.Application.ViewModels.Dashboard;
-using ProjectForFarmers.Application.ViewModels.Product;
-using ProjectForFarmers.Domain;
+using FarmersMarketplace.Application.DataTransferObjects.Product;
+using FarmersMarketplace.Application.Exceptions;
+using FarmersMarketplace.Application.Filters;
+using FarmersMarketplace.Application.Helpers;
+using FarmersMarketplace.Application.Interfaces;
+using FarmersMarketplace.Application.ViewModels.Dashboard;
+using FarmersMarketplace.Application.ViewModels.Product;
+using FarmersMarketplace.Domain;
 using System.Data;
-using InvalidDataException = ProjectForFarmers.Application.Exceptions.InvalidDataException;
+using InvalidDataException = FarmersMarketplace.Application.Exceptions.InvalidDataException;
 
-namespace ProjectForFarmers.Application.Services.Business
+namespace FarmersMarketplace.Application.Services.Business
 {
     public class ProductService : Service, IProductService
     {
@@ -24,6 +24,7 @@ namespace ProjectForFarmers.Application.Services.Business
         private readonly IMemoryCache MemoryCache;
         private readonly string ProductsImagesFolder;
         private readonly string DocumentsFolder;
+        private readonly ValidateService Validator;
 
         public ProductService(IMapper mapper, IApplicationDbContext dbContext, IConfiguration configuration, IMemoryCache memoryCache) : base(mapper, dbContext, configuration)
         {
@@ -31,11 +32,12 @@ namespace ProjectForFarmers.Application.Services.Business
             MemoryCache = memoryCache;
             ProductsImagesFolder = Configuration["File:Images:Product"];
             DocumentsFolder = Configuration["File:Documents"];
+            Validator = new ValidateService(DbContext);
         }
 
-        public async Task<OptionListVm> Autocomplete(ProductAutocompleteDto productAutocompleteDto)
+        public async Task<OptionListVm> Autocomplete(ProductAutocompleteDto dto)
         {
-            var cacheKey = CacheHelper.GenerateCacheKey<ProductFilter>(productAutocompleteDto.ProducerId, productAutocompleteDto.Producer, "products");
+            var cacheKey = CacheHelper.GenerateCacheKey<ProductFilter>(dto.ProducerId, dto.Producer, "products");
 
             var vm = new OptionListVm();
             var productsInfo = new List<ProductInfo>();
@@ -43,7 +45,7 @@ namespace ProjectForFarmers.Application.Services.Business
             if (!MemoryCache.TryGetValue(cacheKey, out productsInfo))
             {
                 productsInfo = await DbContext.Products
-                    .Where(p => p.ProducerId == productAutocompleteDto.ProducerId && p.Producer == productAutocompleteDto.Producer)
+                    .Where(p => p.ProducerId == dto.ProducerId && p.Producer == dto.Producer)
                     .Select(p => new ProductInfo { Name = p.Name, ArticleNumber = p.ArticleNumber })
                     .Distinct()
                     .ToListAsync();
@@ -53,18 +55,18 @@ namespace ProjectForFarmers.Application.Services.Business
 
             int added = 0;
 
-            if(!productAutocompleteDto.Query.IsNullOrEmpty()) productAutocompleteDto.Query = productAutocompleteDto.Query.Trim();
+            if(!dto.Query.IsNullOrEmpty()) dto.Query = dto.Query.Trim();
 
-            for (int i = 0; i < productsInfo.Count && added < productAutocompleteDto.Count; i++)
+            for (int i = 0; i < productsInfo.Count && added < dto.Count; i++)
             {
-                if (productsInfo[i].Name.Contains(productAutocompleteDto.Query, StringComparison.OrdinalIgnoreCase)
+                if (productsInfo[i].Name.Contains(dto.Query, StringComparison.OrdinalIgnoreCase)
                      && !vm.Options.Contains(productsInfo[i].Name))
                 {
                     vm.Options.Add(productsInfo[i].Name);
                     added++;
                 }
 
-                if (productsInfo[i].ArticleNumber.Contains(productAutocompleteDto.Query, StringComparison.OrdinalIgnoreCase)
+                if (productsInfo[i].ArticleNumber.Contains(dto.Query, StringComparison.OrdinalIgnoreCase)
                     && !vm.Options.Contains(productsInfo[i].ArticleNumber))
                 {
                     vm.Options.Add(productsInfo[i].ArticleNumber);
@@ -75,15 +77,15 @@ namespace ProjectForFarmers.Application.Services.Business
             return vm;
         }
 
-        public async Task Create(CreateProductDto createProductDto)
+        public async Task Create(CreateProductDto dto)
         {
-            var product = Mapper.Map<Product>(createProductDto);
+            var product = Mapper.Map<Product>(dto);
 
             var category = await DbContext.Categories.FirstOrDefaultAsync(c => c.Id == product.CategoryId);
             if (category == null)
             {
                 string message = $"Category with Id {product.CategoryId} was not found.";
-                string userFacingMessage = CultureHelper.Exception("CategoryWithIdNotFound", product.CategoryId.ToString());
+                string userFacingMessage = CultureHelper.Exception("CategoryNotFound", product.CategoryId.ToString());
 
                 throw new NotFoundException(message, userFacingMessage);
             }
@@ -92,7 +94,7 @@ namespace ProjectForFarmers.Application.Services.Business
             if (subcategory == null)
             {
                 string message = $"Subcategory with Id {product.SubcategoryId} was not found.";
-                string userFacingMessage = CultureHelper.Exception("SubcategoryWithIdNotFound", product.SubcategoryId.ToString());
+                string userFacingMessage = CultureHelper.Exception("SubcategoryNotFound", product.SubcategoryId.ToString());
 
                 throw new NotFoundException(message, userFacingMessage);
             }
@@ -105,70 +107,34 @@ namespace ProjectForFarmers.Application.Services.Business
             }
 
             product.ArticleNumber = GenerateArticleNumber();
-            product.ImagesNames = await FileHelper.SaveImages(createProductDto.Images, ProductsImagesFolder);
-            product.DocumentsNames = await FileHelper.SaveFiles(createProductDto.Documents, DocumentsFolder);
+            product.ImagesNames = await FileHelper.SaveImages(dto.Images, ProductsImagesFolder);
+            product.DocumentsNames = await FileHelper.SaveFiles(dto.Documents, DocumentsFolder);
 
             DbContext.Products.Add(product);
             await DbContext.SaveChangesAsync();
         }
 
-        public void Validate(Guid accountId, Guid producerId, Producer producer)
+        public async Task Delete(ProductListDto dto, Guid accountId)
         {
-            if (producer == Producer.Seller)
-            {
-                if (producerId != accountId)
-                {
-                    string message = $"Access denied: Permission denied to modify data.";
-                    string userFacingMessage = CultureHelper.Exception("AccessDenied");
-
-                    throw new AuthorizationException(message, userFacingMessage);
-                }
-            }
-            else if (producer == Producer.Farm)
-            {
-                var farm = DbContext.Farms.FirstOrDefault(f => f.Id == producerId);
-                if (farm == null)
-                {
-                    string message = $"Farm with Id {producerId} was not found.";
-                    string userFacingMessage = CultureHelper.Exception("FarmWithIdNotFound", producerId.ToString());
-
-                    throw new NotFoundException(message, userFacingMessage);
-                }
-                if (farm.OwnerId != accountId)
-                {
-                    string message = $"Access denied: Permission denied to modify data.";
-                    string userFacingMessage = CultureHelper.Exception("AccessDenied");
-
-                    throw new AuthorizationException(message, userFacingMessage);
-                }
-            }
-            else
-            {
-                throw new Exception("Producer is not validated.");
-            }
-        }
-
-        public async Task Delete(ProductListDto productListDto, Guid accountId)
-        {
-            foreach (var productId in productListDto.Products)
+            foreach (var productId in dto.Products)
             {
                 var product = await DbContext.Products.FirstAsync(p => p.Id == productId);
 
                 if (product == null)
                 {
                     string message = $"Product with Id {productId} was not found.";
-                    string userFacingMessage = CultureHelper.Exception("ProductWithIdNotFound", productId.ToString());
+                    string userFacingMessage = CultureHelper.Exception("ProductNotFound");
 
                     throw new NotFoundException(message, userFacingMessage);
                 }
-                Validate(accountId, product.ProducerId, product.Producer);
+                Validator.ValidateProducer(accountId, product.ProducerId, product.Producer);
 
                 bool hasOrdersWithProduct = await DbContext.OrdersItems.AnyAsync(oi => oi.ProductId == productId);
 
                 if (hasOrdersWithProduct)
                 {
                     string message = $"Product with Id {productId} is used in existing orders.";
-                    string userFacingMessage = CultureHelper.Exception("ProductIsUsed", productId.ToString());
+                    string userFacingMessage = CultureHelper.Exception("ProductIsUsed");
 
                     throw new NotFoundException(message, userFacingMessage);
                 }
@@ -207,7 +173,7 @@ namespace ProjectForFarmers.Application.Services.Business
             if (product == null)
             {
                 string message = $"Product with Id {productId} was not found.";
-                string userFacingMessage = CultureHelper.Exception("ProductWithIdNotFound", productId.ToString());
+                string userFacingMessage = CultureHelper.Exception("ProductNotFound");
 
                 throw new NotFoundException(message, userFacingMessage);
             }
@@ -217,26 +183,26 @@ namespace ProjectForFarmers.Application.Services.Business
             return vm;
         }
 
-        public async Task<ProductListVm> GetAll(GetProductListDto getProductListDto)
+        public async Task<ProductListVm> GetAll(GetProductListDto dto)
         {
             var productsQuery = DbContext.Products.Include(p => p.Category)
                 .Include(p => p.Subcategory)
-                .Where(p => p.CreationDate < getProductListDto.Cursor 
-                && p.ProducerId == getProductListDto.ProducerId
-                && p.Producer == getProductListDto.Producer);
+                .Where(p => p.CreationDate < dto.Cursor 
+                && p.ProducerId == dto.ProducerId
+                && p.Producer == dto.Producer);
 
-            if (!getProductListDto.Query.IsNullOrEmpty())
+            if (!dto.Query.IsNullOrEmpty())
             {
-                getProductListDto.Query = getProductListDto.Query.Trim().ToLower();
+                dto.Query = dto.Query.Trim().ToLower();
                 productsQuery = productsQuery.Where(p =>
-                    p.Name.ToLower().Contains(getProductListDto.Query) ||
-                    p.ArticleNumber.ToLower().Contains(getProductListDto.Query));
+                    p.Name.ToLower().Contains(dto.Query) ||
+                    p.ArticleNumber.ToLower().Contains(dto.Query));
 
             }
 
-            if (getProductListDto.Filter != null)
+            if (dto.Filter != null)
             {
-                productsQuery = await getProductListDto.Filter.ApplyFilter(productsQuery);
+                productsQuery = await dto.Filter.ApplyFilter(productsQuery);
             }
 
             var products = await productsQuery.OrderByDescending(product => product.CreationDate)
@@ -248,7 +214,7 @@ namespace ProjectForFarmers.Application.Services.Business
                 Count = products.Count
             };
 
-            products = products.Take(getProductListDto.PageSize).ToList();
+            products = products.Take(dto.PageSize).ToList();
 
             foreach (var product in products)
             {
@@ -259,75 +225,66 @@ namespace ProjectForFarmers.Application.Services.Business
             return vm;
         }
 
-        public async Task Update(UpdateProductDto updateProductDto, Guid accountId)
+        public async Task Update(UpdateProductDto dto, Guid accountId)
         {
-            var category = await DbContext.Categories.FirstOrDefaultAsync(c => c.Id == updateProductDto.CategoryId);
+            var category = await DbContext.Categories.FirstOrDefaultAsync(c => c.Id == dto.CategoryId);
             if (category == null)
             {
-                string message = $"Category with Id {updateProductDto.CategoryId} was not found.";
-                string userFacingMessage = CultureHelper.Exception("CategoryWithIdNotFound", updateProductDto.CategoryId.ToString());
+                string message = $"Category with Id {dto.CategoryId} was not found.";
+                string userFacingMessage = CultureHelper.Exception("CategoryNotFound");
 
                 throw new NotFoundException(message, userFacingMessage);
             }
 
-            var subcategory = await DbContext.Subcategories.FirstOrDefaultAsync(c => c.Id == updateProductDto.SubcategoryId);
+            var subcategory = await DbContext.Subcategories.FirstOrDefaultAsync(c => c.Id == dto.SubcategoryId);
             if (subcategory == null)
             {
-                string message = $"Subcategory with Id {updateProductDto.SubcategoryId} was not found.";
-                string userFacingMessage = CultureHelper.Exception("SubcategoryWithIdNotFound", updateProductDto.SubcategoryId.ToString());
+                string message = $"Subcategory with Id {dto.SubcategoryId} was not found.";
+                string userFacingMessage = CultureHelper.Exception("SubcategoryNotFound");
 
                 throw new NotFoundException(message, userFacingMessage);
             }
             else if (subcategory.CategoryId != category.Id)
             {
-                string message = $"Subcategory does not belong to the category.";
-                string userFacingMessage = CultureHelper.Exception("SubcategoryNotBelongsToCategory", updateProductDto.SubcategoryId.ToString(), updateProductDto.CategoryId.ToString());
+                string message = $"Subcategory with Id {dto.SubcategoryId} does not belong to the category with Id {dto.CategoryId}.";
+                string userFacingMessage = CultureHelper.Exception("SubcategoryNotBelongsToCategory");
 
                 throw new InvalidDataException(message, userFacingMessage);
             }
 
-            var product = await DbContext.Products.FirstAsync(p => p.Id == updateProductDto.Id);
+            var product = await DbContext.Products.FirstAsync(p => p.Id == dto.Id);
 
             if (product == null)
             {
-                string message = $"Product with Id {updateProductDto.Id} was not found.";
-                string userFacingMessage = CultureHelper.Exception("ProductWithIdNotFound", updateProductDto.Id.ToString());
+                string message = $"Product with Id {dto.Id} was not found.";
+                string userFacingMessage = CultureHelper.Exception("ProductNotFound");
 
                 throw new NotFoundException(message, userFacingMessage);
             }
-            Validate(accountId, product.ProducerId, product.Producer);
+            Validator.ValidateProducer(accountId, product.ProducerId, product.Producer);
 
-            if (product.Producer != updateProductDto.Producer 
-                || product.ProducerId != updateProductDto.ProducerId)
-            {
-                string message = $"Access denied: Permission denied to modify data.";
-                string userFacingMessage = CultureHelper.Exception("AccessDenied");
+            product.Name = dto.Name;
+            product.Description = dto.Description;
+            product.CategoryId = dto.CategoryId;
+            product.SubcategoryId = dto.SubcategoryId;
+            product.PackagingType = dto.PackagingType;
+            product.Status = dto.Status;
+            product.UnitOfMeasurement = dto.UnitOfMeasurement;
+            product.PricePerOne = dto.PricePerOne;
+            product.MinPurchaseQuantity = dto.MinPurchaseQuantity;
+            product.Count = dto.Count;
+            product.ExpirationDate = dto.ExpirationDate;
+            product.CreationDate = dto.CreationDate;
 
-                throw new AuthorizationException(message, userFacingMessage);
-            }
-
-            product.Name = updateProductDto.Name;
-            product.Description = updateProductDto.Description;
-            product.CategoryId = updateProductDto.CategoryId;
-            product.SubcategoryId = updateProductDto.SubcategoryId;
-            product.PackagingType = updateProductDto.PackagingType;
-            product.Status = updateProductDto.Status;
-            product.UnitOfMeasurement = updateProductDto.UnitOfMeasurement;
-            product.PricePerOne = updateProductDto.PricePerOne;
-            product.MinPurchaseQuantity = updateProductDto.MinPurchaseQuantity;
-            product.Count = updateProductDto.Count;
-            product.ExpirationDate = updateProductDto.ExpirationDate;
-            product.CreationDate = updateProductDto.CreationDate;
-
-            if (updateProductDto.Images == null) updateProductDto.Images = new List<IFormFile>();
-            if (updateProductDto.Documents == null) updateProductDto.Documents = new List<IFormFile>();
+            if (dto.Images == null) dto.Images = new List<IFormFile>();
+            if (dto.Documents == null) dto.Documents = new List<IFormFile>();
 
             if (product.ImagesNames == null) product.ImagesNames = new List<string>();
             if (product.DocumentsNames == null) product.DocumentsNames = new List<string>();
 
             foreach (var imageName in product.ImagesNames.ToList())
             {
-                if (!updateProductDto.Images.Any(file => file.FileName == imageName))
+                if (!dto.Images.Any(file => file.FileName == imageName))
                 {
                     FileHelper.DeleteFile(imageName, ProductsImagesFolder);
                     product.ImagesNames.Remove(imageName);
@@ -336,14 +293,14 @@ namespace ProjectForFarmers.Application.Services.Business
 
             foreach (var documentName in product.DocumentsNames.ToList())
             {
-                if (!updateProductDto.Documents.Any(file => file.FileName == documentName))
+                if (!dto.Documents.Any(file => file.FileName == documentName))
                 {
                     FileHelper.DeleteFile(documentName, DocumentsFolder);
                     product.DocumentsNames.Remove(documentName);
                 }
             }
 
-            foreach (var newImage in updateProductDto.Images)
+            foreach (var newImage in dto.Images)
             {
                 if (!product.ImagesNames.Contains(newImage.FileName))
                 {
@@ -352,7 +309,7 @@ namespace ProjectForFarmers.Application.Services.Business
                 }
             }
 
-            foreach (var newDocument in updateProductDto.Documents)
+            foreach (var newDocument in dto.Documents)
             {
                 if (!product.DocumentsNames.Contains(newDocument.FileName))
                 {
@@ -364,20 +321,20 @@ namespace ProjectForFarmers.Application.Services.Business
             await DbContext.SaveChangesAsync();
         }
 
-        public async Task Duplicate(ProductListDto productListDto, Guid accountId)
+        public async Task Duplicate(ProductListDto dto, Guid accountId)
         {
-            foreach(var productId in productListDto.Products)
+            foreach(var productId in dto.Products)
             {
                 var product = await DbContext.Products.FirstOrDefaultAsync(p => p.Id == productId);
 
                 if (product == null)
                 {
                     string message = $"Product with Id {productId} was not found.";
-                    string userFacingMessage = CultureHelper.Exception("ProductWithIdNotFound", productId.ToString());
+                    string userFacingMessage = CultureHelper.Exception("ProductNotFound");
 
                     throw new NotFoundException(message, userFacingMessage);
                 }
-                Validate(accountId, product.ProducerId, product.Producer);
+                Validator.ValidateProducer(accountId, product.ProducerId, product.Producer);
 
                 var newProduct = new Product
                 {
@@ -432,21 +389,21 @@ namespace ProjectForFarmers.Application.Services.Business
             return vm;
         }
 
-        public async Task<(string fileName, byte[] bytes)> ExportToExcel(ExportProductsDto exportProductsDto)
+        public async Task<(string fileName, byte[] bytes)> ExportToExcel(ExportProductsDto dto)
         {
             var productsQuery = DbContext.Products.Include(p => p.Category)
                 .Include(p => p.Subcategory)
-                .Where(p => p.ProducerId == exportProductsDto.ProducerId 
-                && p.Producer == exportProductsDto.Producer);
+                .Where(p => p.ProducerId == dto.ProducerId 
+                && p.Producer == dto.Producer);
 
-            if(exportProductsDto.Filter != null)
+            if(dto.Filter != null)
             {
-                productsQuery = await exportProductsDto.Filter.ApplyFilter(productsQuery);
+                productsQuery = await dto.Filter.ApplyFilter(productsQuery);
             }
 
             List<ProductLookupVm> products = await productsQuery.Select(p => Mapper.Map<ProductLookupVm>(p)).ToListAsync();
 
-            string fileName = await GetFileName(exportProductsDto.ProducerId, exportProductsDto.Producer);
+            string fileName = await GetFileName(dto.ProducerId, dto.Producer);
             string filePath = Path.Combine(Configuration["File:Temporary"], fileName);
             string templatePath = Path.Combine(Configuration["File:Temporary"], "template.xlsx");
 
@@ -501,13 +458,12 @@ namespace ProjectForFarmers.Application.Services.Business
 
             if (producer == Producer.Seller)
             {
-                var account = await DbContext.Accounts.FirstOrDefaultAsync(a => a.Id == producerId
-                    && a.Role == Role.Seller);
+                var account = await DbContext.Sellers.FirstOrDefaultAsync(a => a.Id == producerId);
 
                 if (account == null)
                 {
                     string message = $"Account with Id {producerId} was not found.";
-                    string userFacingMessage = CultureHelper.Exception("AccountWithIdNotFound", producerId.ToString());
+                    string userFacingMessage = CultureHelper.Exception("AccountNotFound");
 
                     throw new NotFoundException(message, userFacingMessage);
                 }
@@ -521,7 +477,7 @@ namespace ProjectForFarmers.Application.Services.Business
                 if (farm == null)
                 {
                     string message = $"Farm with Id {producerId} was not found.";
-                    string userFacingMessage = CultureHelper.Exception("FarmWithIdNotFound", producerId.ToString());
+                    string userFacingMessage = CultureHelper.Exception("FarmNotFound");
 
                     throw new NotFoundException(message, userFacingMessage);
                 }
@@ -532,6 +488,27 @@ namespace ProjectForFarmers.Application.Services.Business
             string fileName = producerName.Replace(' ', '_') + "_" + DateTime.UtcNow.ToString("yyyy-MM-dd_HH-mm-ss") + "_" + "products.xlsx";
 
             return fileName;
+        }
+
+        public async Task ChangeStatus(ProductListDto dto, ProductStatus status, Guid accountId)
+        {
+            foreach (var productId in dto.Products)
+            {
+                var product = await DbContext.Products.FirstAsync(p => p.Id == productId);
+
+                if (product == null)
+                {
+                    string message = $"Product with Id {productId} was not found.";
+                    string userFacingMessage = CultureHelper.Exception("ProductNotFound");
+
+                    throw new NotFoundException(message, userFacingMessage);
+                }
+
+                Validator.ValidateProducer(accountId, product.ProducerId, product.Producer);
+
+                product.Status = status;
+            }
+            await DbContext.SaveChangesAsync();
         }
     }
     

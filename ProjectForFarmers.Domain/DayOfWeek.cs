@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ProjectForFarmers.Domain
+namespace FarmersMarketplace.Domain
 {
     public class DayOfWeek
     {
@@ -65,6 +65,16 @@ namespace ProjectForFarmers.Domain
 
         public DayOfWeek()
         {
+            IsOpened = false;
+            StartHour = null;
+            StartMinute = null;
+            EndHour = null;
+            EndMinute = null;
+        }
+
+        public DayOfWeek(Guid id)
+        {
+            Id = id;
             IsOpened = false;
             StartHour = null;
             StartMinute = null;

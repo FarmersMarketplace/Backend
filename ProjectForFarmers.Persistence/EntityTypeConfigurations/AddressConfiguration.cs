@@ -1,17 +1,19 @@
-﻿using ProjectForFarmers.Domain;
+﻿using FarmersMarketplace.Domain;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore;
 
 
-namespace ProjectForFarmers.Persistence.EntityTypeConfigurations
+namespace FarmersMarketplace.Persistence.EntityTypeConfigurations
 {
     public class AddressConfiguration : IEntityTypeConfiguration<Address>
     {
         public void Configure(EntityTypeBuilder<Address> builder)
         {
-            builder.ToTable("Addresses");
+            builder.UseTpcMappingStrategy().ToTable("ProducerAddresses");
 
             builder.HasKey(address => address.Id);
+            builder.Property(address => address.Id).ValueGeneratedNever();
+
             builder.Property(address => address.Region).HasMaxLength(30).IsRequired();
             builder.Property(address => address.District).HasMaxLength(30).IsRequired();
             builder.Property(address => address.Settlement).HasMaxLength(50).IsRequired();

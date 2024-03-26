@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore;
-using ProjectForFarmers.Domain;
+using FarmersMarketplace.Domain;
 
-namespace ProjectForFarmers.Persistence.EntityTypeConfigurations
+namespace FarmersMarketplace.Persistence.EntityTypeConfigurations
 {
     public class ProductConfiguration : IEntityTypeConfiguration<Product>
     {
@@ -16,7 +16,6 @@ namespace ProjectForFarmers.Persistence.EntityTypeConfigurations
             builder.Property(product => product.ArticleNumber).IsRequired();
             builder.Property(product => product.Producer).IsRequired();
             builder.Property(product => product.ProducerId).IsRequired();
-            builder.Property(product => product.PackagingType).IsRequired();
             builder.Property(product => product.UnitOfMeasurement).IsRequired();
             builder.Property(product => product.PricePerOne).IsRequired();
             builder.Property(product => product.MinPurchaseQuantity).IsRequired();

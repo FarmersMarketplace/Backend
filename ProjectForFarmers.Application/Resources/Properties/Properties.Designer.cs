@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace ProjectForFarmers.Application.Resources.Properties {
+namespace FarmersMarketplace.Application.Resources.Properties {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace ProjectForFarmers.Application.Resources.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("ProjectForFarmers.Application.Resources.Properties.Properties", typeof(Properties).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("FarmersMarketplace.Application.Resources.Properties.Properties", typeof(Properties).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -102,6 +102,24 @@ namespace ProjectForFarmers.Application.Resources.Properties {
         internal static string BIC {
             get {
                 return ResourceManager.GetString("BIC", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Expiration month of card.
+        /// </summary>
+        internal static string CardExpirationMonth {
+            get {
+                return ResourceManager.GetString("CardExpirationMonth", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Expiration year of card.
+        /// </summary>
+        internal static string CardExpirationYear {
+            get {
+                return ResourceManager.GetString("CardExpirationYear", resourceCulture);
             }
         }
         

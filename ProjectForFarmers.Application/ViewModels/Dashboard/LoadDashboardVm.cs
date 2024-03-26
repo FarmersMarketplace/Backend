@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using ProjectForFarmers.Application.ViewModels.Order;
+using FarmersMarketplace.Application.ViewModels.Order;
 
-namespace ProjectForFarmers.Application.ViewModels.Dashboard
+namespace FarmersMarketplace.Application.ViewModels.Dashboard
 {
     public class LoadDashboardVm
     {

@@ -1,6 +1,6 @@
-﻿using ProjectForFarmers.Domain;
+﻿using FarmersMarketplace.Domain;
 
-namespace ProjectForFarmers.Application.DataTransferObjects.Dashboard
+namespace FarmersMarketplace.Application.DataTransferObjects.Dashboard
 {
     public class GetCustomerDto
     {
