@@ -15,6 +15,7 @@ namespace FarmersMarketplace.Application.DataTransferObjects
         public string HolderFullName { get; set; }
         public string CardExpirationYear { get; set; }
         public string CardExpirationMonth { get; set; }
+        public string CVV { get; set; }
     }
 
 }
