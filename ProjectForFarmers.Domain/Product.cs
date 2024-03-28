@@ -25,9 +25,10 @@ namespace FarmersMarketplace.Domain
         public uint MinPurchaseQuantity { get; set; }
         public uint Count { get; set; }
         public List<string> ImagesNames { get; set; }
-        public DateTime ExpirationDate { get; set; }
+        public uint ExpirationDate { get; set; }
         public DateTime CreationDate { get; set; }
         public List<string> DocumentsNames { get; set; }
+        public List<ReceivingMethod> ReceivingMethods { get; set; }
     }
 
 }
