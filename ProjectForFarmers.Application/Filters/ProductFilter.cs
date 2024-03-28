@@ -25,14 +25,6 @@ namespace FarmersMarketplace.Application.Filters
                         (!MinRest.HasValue || p.Count >= MinRest) &&
                         (!MaxRest.HasValue || p.Count <= MaxRest));
         }
-
-        private bool IsCategoryValid(Guid productCategoryId) => CategoryIds == null || !CategoryIds.Any() || CategoryIds.Contains(productCategoryId);
-        private bool IsSubcategoryValid(Guid productSubcategoryId) => SubcategoryIds == null || !SubcategoryIds.Any() || SubcategoryIds.Contains(productSubcategoryId);
-        private bool IsStartDateValid(DateTime productCreationDate) => !StartDate.HasValue || productCreationDate >= StartDate;
-        private bool IsEndDateValid(DateTime productCreationDate) => !EndDate.HasValue || productCreationDate <= EndDate;
-        private bool IsUnitsOfMeasurementValid(string productUnitOfMeasurement) => UnitsOfMeasurement == null || !UnitsOfMeasurement.Any() || UnitsOfMeasurement.Contains(productUnitOfMeasurement);
-        private bool IsMinRestValid(uint productCount) => !MinRest.HasValue || productCount >= MinRest;
-        private bool IsMaxRestValid(uint productCount) => !MaxRest.HasValue || productCount <= MaxRest;
     }
 
 }

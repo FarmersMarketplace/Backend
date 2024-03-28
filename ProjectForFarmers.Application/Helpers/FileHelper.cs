@@ -5,13 +5,17 @@ namespace FarmersMarketplace.Application.Helpers
 {
     public class FileHelper
     {
-        private readonly string[] AllowedImagesExtensions;
-        private readonly string[] AllowedImagesMimeTypes;
+        public static readonly string[] AllowedImagesExtensions;
+        private static readonly string[] AllowedImagesMimeTypes;
 
-        public FileHelper()
+        static FileHelper()
         {
             AllowedImagesExtensions = new string[] { ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".tiff", ".webp", ".svg", ".heif", ".heic" };
             AllowedImagesMimeTypes = new string[] { "image/jpeg", "image/png", "image/gif", "image/bmp", "image/tiff", "image/webp", "image/svg+xml", "image/heif", "image/heic" };
+        }
+
+        public FileHelper()
+        {
         }
 
         public bool IsValidImage(IFormFile image)

@@ -1,4 +1,6 @@
-﻿using System;
+﻿using FarmersMarketplace.Application.ViewModels.Category;
+using FarmersMarketplace.Application.ViewModels.Subcategory;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,16 +10,18 @@ namespace FarmersMarketplace.Application.ViewModels.Product
 {
     public class FilterData
     {
-        public HashSet<string> UnitsOfMeasurement { get; set; }
+        public List<string> UnitsOfMeasurement { get; set; }
+        public List<CategoryLookupVm> Categories { get; set; }
+        public List<SubcategoryVm> Subcategories { get; set; }
 
-        public FilterData(HashSet<string> unitsOfMeasurement)
+        public FilterData(List<string> unitsOfMeasurement)
         {
             UnitsOfMeasurement = unitsOfMeasurement;
         }
 
         public FilterData()
         {
-            UnitsOfMeasurement = new HashSet<string>();
+            UnitsOfMeasurement = new List<string>();
         }
     }
 

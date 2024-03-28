@@ -13,6 +13,8 @@ namespace FarmersMarketplace.Application.Filters
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
         public List<PaymentType>? PaymentTypes { get; set; }
+        public decimal MinimumAmount { get; set; }
+        public decimal MaximumAmount { get; set; }
 
         public async Task<IQueryable<Order>> ApplyFilter(IQueryable<Order> query)
         {
@@ -20,7 +22,8 @@ namespace FarmersMarketplace.Application.Filters
                 (Statuses == null || !Statuses.Any() || Statuses.Contains(o.Status)) &&
                 (!StartDate.HasValue || o.CreationDate >= StartDate) &&
                 (!EndDate.HasValue || o.CreationDate <= EndDate) &&
-                (PaymentTypes == null || !PaymentTypes.Any() || PaymentTypes.Contains(o.PaymentType)));
+                (PaymentTypes == null || !PaymentTypes.Any() || PaymentTypes.Contains(o.PaymentType)) &&
+                (o.TotalPayment >= MinimumAmount && o.TotalPayment <= MaximumAmount));
         }
     }
 
