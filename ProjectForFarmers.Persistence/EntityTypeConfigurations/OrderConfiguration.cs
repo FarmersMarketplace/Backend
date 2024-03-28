@@ -23,7 +23,7 @@ namespace FarmersMarketplace.Persistence.EntityTypeConfigurations
             builder.Property(order => order.TotalPayment).IsRequired();
             builder.Property(order => order.PaymentType).IsRequired();
             builder.Property(order => order.PaymentStatus).IsRequired();
-            builder.Property(order => order.ReceivingType).IsRequired();
+            builder.Property(order => order.ReceivingMethod).IsRequired();
 
             builder.HasOne(order => order.Customer)
                 .WithMany() 

@@ -10,8 +10,11 @@ namespace FarmersMarketplace.Application.Services.Business
 {
     public class SubcategoryService : Service, ISubcategoryService
     {
+        private readonly FileHelper FileHelper;
+
         public SubcategoryService(IMapper mapper, IApplicationDbContext dbContext, IConfiguration configuration) : base(mapper, dbContext, configuration)
         {
+            FileHelper = new FileHelper();
         }
 
         public async Task Create(CreateSubcategoryDto dto)
@@ -33,6 +36,16 @@ namespace FarmersMarketplace.Application.Services.Business
                 Name = dto.Name,
                 CategoryId = dto.CategoryId
             };
+
+            if (!FileHelper.IsValidImage(dto.Image))
+            {
+                string acceptableFormats = string.Join(", ", FileHelper.AllowedImagesExtensions);
+                string message = $"Invalid format of image {dto.Image.FileName}. Acceptable formats: {acceptableFormats}.";
+                string userFacingMessage = CultureHelper.Exception("InvalidImageFormat", dto.Image.FileName, acceptableFormats);
+                throw new NotFoundException(message, userFacingMessage);
+            }
+
+            subcategory.ImageName = await FileHelper.SaveFile(dto.Image, Configuration["File:Images:Product"]);
 
             DbContext.Subcategories.Add(subcategory);
             await DbContext.SaveChangesAsync();
