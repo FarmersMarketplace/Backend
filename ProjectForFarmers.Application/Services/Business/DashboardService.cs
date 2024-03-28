@@ -1,7 +1,4 @@
 ﻿using AutoMapper;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Configuration;
 using FarmersMarketplace.Application.DataTransferObjects.Dashboard;
 using FarmersMarketplace.Application.Exceptions;
 using FarmersMarketplace.Application.Helpers;
@@ -9,6 +6,9 @@ using FarmersMarketplace.Application.Interfaces;
 using FarmersMarketplace.Application.ViewModels.Dashboard;
 using FarmersMarketplace.Application.ViewModels.Order;
 using FarmersMarketplace.Domain;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Configuration;
 
 namespace FarmersMarketplace.Application.Services.Business
 {
@@ -73,6 +73,28 @@ namespace FarmersMarketplace.Application.Services.Business
             }
 
             var vm = Mapper.Map<DashboardVm>(monthStatistic);
+
+            vm.CustomerInfo = new CustomerInfoVm
+            {
+                Payment = monthStatistic.HighestCustomerPayment,
+                PaymentPercentage = monthStatistic.HighestCustomerPaymentPercentage,
+                Name = ""
+            };
+
+            if (monthStatistic.CustomerWithHighestPaymentId != null)
+            {
+                var customer = await DbContext.Customers.FirstOrDefaultAsync(a => a.Id == monthStatistic.CustomerWithHighestPaymentId);
+
+                if (customer == null)
+                {
+                    string message = $"Account with Id {monthStatistic.CustomerWithHighestPaymentId} was not found.";
+                    string userFacingMessage = CultureHelper.Exception("AccountNotFound");
+
+                    throw new NotFoundException(message, userFacingMessage);
+                }
+
+                vm.CustomerInfo.Name = customer.Surname + " " + customer.Surname;
+            }
 
             return vm;
         }

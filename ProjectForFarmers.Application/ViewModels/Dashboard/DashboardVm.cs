@@ -10,6 +10,7 @@ namespace FarmersMarketplace.Application.ViewModels.Dashboard
         public OrderGroupStatisticVm NewOrders { get; set; }
         public OrderGroupStatisticVm TotalActivity { get; set; }
         public decimal TotalRevenue { get; set; }
+        public decimal PreviousMonthTotalRevenue { get; set; }
         public float TotalRevenueChangePercentage { get; set; }
         public CustomerInfoVm CustomerInfo { get; set; }
     }

@@ -12,6 +12,7 @@ namespace FarmersMarketplace.Domain
         public Guid ProductId { get; set; }
         public Guid OrderId { get; set; }
         public uint Count { get; set; }
+        public decimal PricePerOne { get; set; }
         public decimal TotalPrice { get; set; }
     }
 

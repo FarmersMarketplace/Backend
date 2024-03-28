@@ -15,6 +15,8 @@ using FarmersMarketplace.Application.ViewModels.Product;
 using FarmersMarketplace.Domain;
 using System.Data;
 using InvalidDataException = FarmersMarketplace.Application.Exceptions.InvalidDataException;
+using FarmersMarketplace.Application.ViewModels.Category;
+using FarmersMarketplace.Application.ViewModels.Subcategory;
 
 namespace FarmersMarketplace.Application.Services.Business
 {
@@ -82,6 +84,7 @@ namespace FarmersMarketplace.Application.Services.Business
             var product = Mapper.Map<Product>(dto);
 
             var category = await DbContext.Categories.FirstOrDefaultAsync(c => c.Id == product.CategoryId);
+
             if (category == null)
             {
                 string message = $"Category with Id {product.CategoryId} was not found.";
@@ -91,6 +94,7 @@ namespace FarmersMarketplace.Application.Services.Business
             }
 
             var subcategory = await DbContext.Subcategories.FirstOrDefaultAsync(c => c.Id == product.SubcategoryId);
+
             if (subcategory == null)
             {
                 string message = $"Subcategory with Id {product.SubcategoryId} was not found.";
@@ -107,9 +111,29 @@ namespace FarmersMarketplace.Application.Services.Business
             }
 
             product.ArticleNumber = GenerateArticleNumber();
-            product.ImagesNames = await FileHelper.SaveImages(dto.Images, ProductsImagesFolder);
-            product.DocumentsNames = await FileHelper.SaveFiles(dto.Documents, DocumentsFolder);
 
+            if(dto.Images.Count > 0)
+            {
+                product.ImagesNames = await FileHelper.SaveImages(dto.Images, ProductsImagesFolder);
+            }
+            else if (dto.UseSubcategoryImage)
+            {
+                product.ImagesNames = new List<string> { subcategory.ImageName };
+            }
+            else
+            {
+                product.ImagesNames = new List<string>();
+            }
+            
+            if(dto.Documents != null)
+            {
+                product.DocumentsNames = await FileHelper.SaveFiles(dto.Documents, DocumentsFolder);
+            }
+            else
+            {
+                product.DocumentsNames = new List<string>();
+            }
+            
             DbContext.Products.Add(product);
             await DbContext.SaveChangesAsync();
         }
@@ -384,7 +408,91 @@ namespace FarmersMarketplace.Application.Services.Business
                 .ToListAsync();
 
             var vm = new FilterData();
-            vm.UnitsOfMeasurement = new HashSet<string>(unitsOfMeasurement);
+
+            if (producer == Producer.Seller)
+            {
+                var seller = await DbContext.Sellers.FirstOrDefaultAsync(s => s.Id == producerId);
+
+                if (seller == null)
+                {
+                    string message = $"Account with Id {producerId} was not found.";
+                    string userFacingMessage = CultureHelper.Exception("AccountNotFound");
+
+                    throw new NotFoundException(message, userFacingMessage);
+                }
+
+                foreach (var categoryId in seller.Categories)
+                {
+                    var category = DbContext.Categories.FirstOrDefault(c => c.Id == categoryId);
+                    if (category == null)
+                    {
+                        string message = $"Category with Id {categoryId} was not found.";
+                        string userFacingMessage = CultureHelper.Exception("CategoryNotFound");
+
+                        throw new NotFoundException(message, userFacingMessage);
+                    }
+
+                    vm.Categories.Add(new CategoryLookupVm(category.Id, category.Name));
+                }
+
+                foreach (var subcategoryId in seller.Subcategories)
+                {
+                    var subcategory = DbContext.Subcategories.FirstOrDefault(c => c.Id == subcategoryId);
+                    if (subcategory == null)
+                    {
+                        string message = $"Subcategory with Id {subcategoryId} was not found.";
+                        string userFacingMessage = CultureHelper.Exception("SubcategoryNotFound");
+                        throw new NotFoundException(message, userFacingMessage);
+                    }
+
+                    vm.Subcategories.Add(new SubcategoryVm(subcategory.Id, subcategory.Name, subcategory.CategoryId));
+                }
+            }
+            else if (producer == Producer.Farm)
+            {
+                var farm = await DbContext.Farms.FirstOrDefaultAsync(f => f.Id == producerId);
+
+                if (farm == null)
+                {
+                    string message = $"Farm with Id {producerId} was not found.";
+                    string userFacingMessage = CultureHelper.Exception("FarmNotFound");
+
+                    throw new NotFoundException(message, userFacingMessage);
+                }
+
+                foreach (var categoryId in farm.Categories)
+                {
+                    var category = DbContext.Categories.FirstOrDefault(c => c.Id == categoryId);
+                    if (category == null)
+                    {
+                        string message = $"Category with Id {categoryId} was not found.";
+                        string userFacingMessage = CultureHelper.Exception("CategoryNotFound");
+
+                        throw new NotFoundException(message, userFacingMessage);
+                    }
+
+                    vm.Categories.Add(new CategoryLookupVm(category.Id, category.Name));
+                }
+
+                foreach (var subcategoryId in farm.Subcategories)
+                {
+                    var subcategory = DbContext.Subcategories.FirstOrDefault(c => c.Id == subcategoryId);
+                    if (subcategory == null)
+                    {
+                        string message = $"Subcategory with Id {subcategoryId} was not found.";
+                        string userFacingMessage = CultureHelper.Exception("SubcategoryNotFound");
+                        throw new NotFoundException(message, userFacingMessage);
+                    }
+
+                    vm.Subcategories.Add(new SubcategoryVm(subcategory.Id, subcategory.Name, subcategory.CategoryId));
+                }
+            }
+            else
+            {
+                throw new NotImplementedException();
+            }
+            
+            vm.UnitsOfMeasurement = unitsOfMeasurement;
 
             return vm;
         }

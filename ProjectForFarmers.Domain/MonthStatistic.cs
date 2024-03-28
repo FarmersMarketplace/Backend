@@ -24,6 +24,7 @@ namespace FarmersMarketplace.Domain
         public OrderGroupStatistic NewOrdersStatistic { get; set; }
         public OrderGroupStatistic TotalActivityStatistic { get; set; }
         public decimal TotalRevenue { get; set; }
+        public decimal PreviousMonthTotalRevenue { get; set; }
         public Guid? CustomerWithHighestPaymentId { get; set; }
         public float TotalRevenueChangePercentage { get; set; }
         public decimal HighestCustomerPayment { get; set; }

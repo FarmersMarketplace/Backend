@@ -86,15 +86,15 @@ namespace FarmersMarketplace.Application.Services.Business
                 var rows = new List<Row>();
                 var cells = new List<Cell>();
 
-                cells.Add(new Cell(1, CultureHelper.Property("Id"))); //Id
-                cells.Add(new Cell(2, CultureHelper.Property("Number"))); //Номер
-                cells.Add(new Cell(3, CultureHelper.Property("OrderDate"))); //Дата замовлення
-                cells.Add(new Cell(4, CultureHelper.Property("CustomerName"))); //Ім'я покупця
-                cells.Add(new Cell(5, CultureHelper.Property("CustomerEmail"))); //Email покупця
-                cells.Add(new Cell(6, CultureHelper.Property("Phone"))); //Телефон
-                cells.Add(new Cell(7, CultureHelper.Property("Amount"))); //Сума
-                cells.Add(new Cell(8, CultureHelper.Property("PaymentType"))); //Спосіб оплати
-                cells.Add(new Cell(9, CultureHelper.Property("Status"))); //Статус
+                cells.Add(new Cell(1, CultureHelper.Property("Id"))); 
+                cells.Add(new Cell(2, CultureHelper.Property("Number"))); 
+                cells.Add(new Cell(3, CultureHelper.Property("OrderDate"))); 
+                cells.Add(new Cell(4, CultureHelper.Property("CustomerName"))); 
+                cells.Add(new Cell(5, CultureHelper.Property("CustomerEmail"))); 
+                cells.Add(new Cell(6, CultureHelper.Property("Phone"))); 
+                cells.Add(new Cell(7, CultureHelper.Property("Amount"))); 
+                cells.Add(new Cell(8, CultureHelper.Property("PaymentType"))); 
+                cells.Add(new Cell(9, CultureHelper.Property("Status"))); 
 
                 rows.Add(new Row(1, cells));
 
@@ -227,7 +227,7 @@ namespace FarmersMarketplace.Application.Services.Business
                     TotalPayment = order.TotalPayment,
                     PaymentType = order.PaymentType,
                     PaymentStatus = order.PaymentStatus,
-                    ReceivingType = order.ReceivingType,
+                    ReceivingMethod = order.ReceivingMethod,
                     DeliveryPointId = deliveryPoint.Id,
                     DeliveryPoint = deliveryPoint,
                     Producer = order.Producer,
@@ -299,8 +299,10 @@ namespace FarmersMarketplace.Application.Services.Business
                     Name = product.Name,
                     Count = item.Count,
                     PhotoName = product.ImagesNames.Count > 0 ? product.ImagesNames[0] : null,
-                    PricePerOne = product.PricePerOne,
-                    TotalPrice = product.PricePerOne * item.Count
+                    PricePerOne = item.PricePerOne,
+                    TotalPrice = product.PricePerOne * item.Count,
+                    ArticleNumber = product.ArticleNumber,
+                    UnitOfMeasurement = product.UnitOfMeasurement,
                 };
 
                 items.Add(itemVm);
@@ -328,7 +330,7 @@ namespace FarmersMarketplace.Application.Services.Business
             order.ReceiveDate = dto.ReceiveDate;
             order.PaymentType = dto.PaymentType;
             order.PaymentStatus = dto.PaymentStatus;
-            order.ReceivingType = dto.ReceivingType;
+            order.ReceivingMethod = dto.ReceivingType;
             order.Status = dto.Status;
 
             await UpdateAddress(order.DeliveryPoint, dto.DeliveryAddress);

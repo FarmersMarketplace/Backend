@@ -9,7 +9,7 @@
         public decimal TotalPayment { get; set; }
         public PaymentType PaymentType { get; set; }
         public PaymentStatus PaymentStatus { get; set; }
-        public ReceivingMethod ReceivingType { get; set; }
+        public ReceivingMethod ReceivingMethod { get; set; }
         public Guid? DeliveryPointId { get; set; }
         public CustomerAddress? DeliveryPoint { get; set; }
         public Producer Producer { get; set; }

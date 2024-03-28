@@ -1,4 +1,5 @@
-﻿using FarmersMarketplace.Domain;
+﻿using FarmersMarketplace.Application.ViewModels.Account;
+using FarmersMarketplace.Domain;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,8 +17,8 @@ namespace FarmersMarketplace.Application.ViewModels.Order
         public decimal TotalPayment { get; set; }
         public PaymentType PaymentType { get; set; }
         public PaymentStatus PaymentStatus { get; set; }
-        public ReceivingMethod ReceivingType { get; set; }
-        public AddressVm? DeliveryPoint { get; set; }
+        public ReceivingMethod ReceivingMethod { get; set; }
+        public CustomerAddressVm? DeliveryPoint { get; set; }
         public OrderStatus Status { get; set; }
         public Guid CustomerId { get; set; }
         public string CustomerName { get; set; }
