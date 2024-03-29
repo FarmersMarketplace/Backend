@@ -5,7 +5,6 @@ using FarmersMarketplace.Application.Exceptions;
 using FarmersMarketplace.Application.Helpers;
 using FarmersMarketplace.Application.Interfaces;
 using FarmersMarketplace.Application.Services.Auth;
-using FarmersMarketplace.Application.ViewModels.Account;
 using FarmersMarketplace.Application.ViewModels.Category;
 using FarmersMarketplace.Application.ViewModels.Farm;
 using FarmersMarketplace.Application.ViewModels.Subcategory;
@@ -554,6 +553,62 @@ namespace FarmersMarketplace.Application.Services.Business
             }
 
             await DbContext.SaveChangesAsync();
+        }
+
+        public async Task<CardDataVm> CopyOwnerCardData(Guid ownerId)
+        {
+            var farmer = await DbContext.Farmers.Include(c => c.PaymentData)
+                .FirstOrDefaultAsync(a => a.Id == ownerId);
+
+            if (farmer == null)
+            {
+                string message = $"Account with Id {ownerId} was not found.";
+                string userFacingMessage = CultureHelper.Exception("AccountNotFound");
+
+                throw new NotFoundException(message, userFacingMessage);
+            }
+
+            var vm = new CardDataVm
+            {
+                CardNumber = farmer.PaymentData.CardNumber,
+                CardExpirationMonth = farmer.PaymentData.CardExpirationMonth,
+                CardExpirationYear = farmer.PaymentData.CardExpirationYear,
+            };
+
+            return vm;
+        }
+
+        public async Task<AccountNumberDataVm> CopyOwnerAccountNumberData(Guid ownerId)
+        {
+            var farmer = await DbContext.Farmers.Include(c => c.PaymentData)
+                .FirstOrDefaultAsync(a => a.Id == ownerId);
+
+            if (farmer == null)
+            {
+                string message = $"Account with Id {ownerId} was not found.";
+                string userFacingMessage = CultureHelper.Exception("AccountNotFound");
+
+                throw new NotFoundException(message, userFacingMessage);
+            }
+
+            var vm = new AccountNumberDataVm
+            {
+                AccountNumber = farmer.PaymentData.AccountNumber,
+                BankUSREOU = farmer.PaymentData.BankUSREOU,
+                BIC = farmer.PaymentData.BIC,
+            };
+
+            if (farmer.PaymentTypes != null
+                && farmer.PaymentTypes.Contains(PaymentType.Online))
+            {
+                vm.HasOnlinePayment = true;
+            }
+            else
+            {
+                vm.HasOnlinePayment = false;
+            }
+
+            return vm;
         }
     }
 }
