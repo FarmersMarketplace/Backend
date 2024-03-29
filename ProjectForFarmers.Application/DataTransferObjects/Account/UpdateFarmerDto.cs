@@ -1,4 +1,4 @@
-﻿using FarmersMarketplace.Domain.Account;
+﻿using FarmersMarketplace.Domain.Accounts;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;

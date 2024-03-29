@@ -5,7 +5,7 @@ using FarmersMarketplace.Application.Helpers;
 using FarmersMarketplace.Application.Services.Business;
 using FarmersMarketplace.Application.ViewModels.Account;
 using FarmersMarketplace.Application.ViewModels.Auth;
-using FarmersMarketplace.Domain.Account;
+using FarmersMarketplace.Domain.Accounts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;

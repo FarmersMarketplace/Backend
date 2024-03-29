@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FarmersMarketplace.Domain.Account
+namespace FarmersMarketplace.Domain.Accounts
 {
     public abstract class Account
     {

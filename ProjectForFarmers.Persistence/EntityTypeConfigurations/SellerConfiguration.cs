@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using FarmersMarketplace.Domain.Account;
+using FarmersMarketplace.Domain.Accounts;
 
 namespace FarmersMarketplace.Persistence.EntityTypeConfigurations
 {

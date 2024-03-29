@@ -1,5 +1,5 @@
 ﻿using FarmersMarketplace.Domain;
-using FarmersMarketplace.Domain.Account;
+using FarmersMarketplace.Domain.Accounts;
 using FarmersMarketplace.Domain.Orders;
 using FarmersMarketplace.Domain.Payment;
 using Microsoft.EntityFrameworkCore;

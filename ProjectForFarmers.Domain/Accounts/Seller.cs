@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using FarmersMarketplace.Domain.Feedbacks;
 using FarmersMarketplace.Domain.Payment;
 
-namespace FarmersMarketplace.Domain.Account
+namespace FarmersMarketplace.Domain.Accounts
 {
     public class Seller : Account
     {
@@ -24,6 +20,8 @@ namespace FarmersMarketplace.Domain.Account
         public List<Guid> Subcategories { get; set; }
         public virtual List<MonthStatistic> Statistics { get; set; }
         public virtual List<Product> Products { get; set; }
+        public float Rating { get; set; }
+        public virtual List<ProductFeedback>? Feedbacks { get; set; }
     }
 
 }

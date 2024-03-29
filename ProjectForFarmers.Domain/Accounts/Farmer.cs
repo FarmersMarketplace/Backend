@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using FarmersMarketplace.Domain.Payment;
 
-namespace FarmersMarketplace.Domain.Account
+namespace FarmersMarketplace.Domain.Accounts
 {
     public class Farmer : Account
     {

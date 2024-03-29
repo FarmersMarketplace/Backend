@@ -8,7 +8,7 @@ using FarmersMarketplace.Application.ViewModels;
 using FarmersMarketplace.Application.ViewModels.Account;
 using FarmersMarketplace.Application.ViewModels.Farm;
 using FarmersMarketplace.Domain;
-using FarmersMarketplace.Domain.Account;
+using FarmersMarketplace.Domain.Accounts;
 using FarmersMarketplace.Domain.Payment;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;

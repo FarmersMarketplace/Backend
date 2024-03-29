@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using FarmersMarketplace.Domain.Feedbacks;
 
 namespace FarmersMarketplace.Domain
 {
@@ -29,6 +25,8 @@ namespace FarmersMarketplace.Domain
         public DateTime CreationDate { get; set; }
         public List<string> DocumentsNames { get; set; }
         public List<ReceivingMethod> ReceivingMethods { get; set; }
+        public float Rating { get; set; }
+        public virtual List<ProductFeedback>? Feedbacks { get; set; }
     }
 
 }

@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using FarmersMarketplace.Application.ViewModels.Account;
-using FarmersMarketplace.Domain.Account;
+using FarmersMarketplace.Domain.Accounts;
 
 namespace FarmersMarketplace.Application.Mappings
 {

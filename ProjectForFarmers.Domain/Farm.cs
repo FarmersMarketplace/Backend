@@ -1,4 +1,6 @@
-﻿using FarmersMarketplace.Domain.Payment;
+﻿using FarmersMarketplace.Domain.Accounts;
+using FarmersMarketplace.Domain.Feedbacks;
+using FarmersMarketplace.Domain.Payment;
 
 namespace FarmersMarketplace.Domain
 {
@@ -14,7 +16,7 @@ namespace FarmersMarketplace.Domain
         public List<string> ImagesNames { get; set; }
         public DateTime CreationDate { get; set; }
         public virtual Guid OwnerId { get; set; }
-        public Account Owner { get; set; }
+        public Farmer Owner { get; set; }
         public Guid AddressId { get; set; }
         public virtual Address Address { get; set; }
         public Guid? ScheduleId { get; set; }
@@ -28,5 +30,7 @@ namespace FarmersMarketplace.Domain
         public List<PaymentType>? PaymentTypes { get; set; }
         public Guid? PaymentDataId { get; set; }
         public ProducerPaymentData? PaymentData { get; set; }
+        public float Rating { get; set; }
+        public virtual List<ProductFeedback>? Feedbacks { get; set; }
     }
 }

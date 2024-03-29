@@ -1,6 +1,6 @@
 ﻿using FarmersMarketplace.Domain.Payment;
 
-namespace FarmersMarketplace.Domain.Account
+namespace FarmersMarketplace.Domain.Accounts
 {
     public class Customer : Account
     {

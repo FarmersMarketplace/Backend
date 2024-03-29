@@ -2,7 +2,7 @@
 using FarmersMarketplace.Application.ViewModels.Category;
 using FarmersMarketplace.Application.ViewModels.Subcategory;
 using FarmersMarketplace.Domain;
-using FarmersMarketplace.Domain.Account;
+using FarmersMarketplace.Domain.Accounts;
 using FarmersMarketplace.Domain.Payment;
 using Microsoft.AspNetCore.Http;
 using System;
