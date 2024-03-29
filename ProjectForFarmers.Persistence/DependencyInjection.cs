@@ -19,8 +19,8 @@ namespace FarmersMarketplace.Persistence
             {
                 options.UseNpgsql(connectionString);
             });
-            services.AddScoped<IApplicationDbContext>(provider => provider.GetService<MainDbContext>());
 
+            services.AddScoped<IApplicationDbContext>(provider => provider.GetService<MainDbContext>());
 
             return services;
         }
