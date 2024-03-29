@@ -20,7 +20,7 @@ namespace FarmersMarketplace.Application.DataTransferObjects.Product
         public uint Count { get; set; }
         public List<ReceivingMethod> ReceivingTypes { get; set; }
         public List<IFormFile>? Images { get; set; }
-        public uint ExpirationDate { get; set; }
+        public uint ExpirationDays { get; set; }
         public DateTime CreationDate { get; set; }
         public List<IFormFile>? Documents { get; set; }
     }

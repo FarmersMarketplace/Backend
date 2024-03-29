@@ -17,7 +17,7 @@ namespace FarmersMarketplace.Application.DataTransferObjects.Product
         public int MinPurchaseQuantity { get; set; }
         public int Count { get; set; }
         public List<IFormFile>? Images { get; set; }
-        public uint ExpirationDate { get; set; }
+        public uint ExpirationDays { get; set; }
         public DateTime CreationDate { get; set; }
         public List<IFormFile>? Documents { get; set; }
         public ProductStatus Status { get; set; }
