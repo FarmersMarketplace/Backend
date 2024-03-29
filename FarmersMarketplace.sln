@@ -17,6 +17,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FarmersMarketplace.Domain",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FarmersMarketplace.Persistence", "ProjectForFarmers.Persistence\FarmersMarketplace.Persistence.csproj", "{FFE0259C-7807-43FC-9B26-8943FB00C645}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FarmersMarketplace.Elasticsearch", "FarmersMarketplace.Elasticsearch\FarmersMarketplace.Elasticsearch.csproj", "{2EAAF2B3-48C7-406D-9527-A3D06C5E28B9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{FFE0259C-7807-43FC-9B26-8943FB00C645}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FFE0259C-7807-43FC-9B26-8943FB00C645}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FFE0259C-7807-43FC-9B26-8943FB00C645}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2EAAF2B3-48C7-406D-9527-A3D06C5E28B9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2EAAF2B3-48C7-406D-9527-A3D06C5E28B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2EAAF2B3-48C7-406D-9527-A3D06C5E28B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2EAAF2B3-48C7-406D-9527-A3D06C5E28B9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -48,6 +54,7 @@ Global
 		{5A521562-AAF6-4422-9170-BBC7CB10E9B7} = {EDFBD9CF-04DA-4A7E-96B6-8173F53C5C62}
 		{53AC18E6-F9F3-4123-B0AF-9CDE273D4B05} = {EDFBD9CF-04DA-4A7E-96B6-8173F53C5C62}
 		{FFE0259C-7807-43FC-9B26-8943FB00C645} = {DDFF9AFF-020C-4CC0-91D1-DCBFF3EABA26}
+		{2EAAF2B3-48C7-406D-9527-A3D06C5E28B9} = {DDFF9AFF-020C-4CC0-91D1-DCBFF3EABA26}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {65B7292C-866F-42D6-96A6-F56AB86016A7}
