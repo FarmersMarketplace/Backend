@@ -297,7 +297,7 @@ namespace FarmersMarketplace.Application.Services.Business
             product.PricePerOne = dto.PricePerOne;
             product.MinPurchaseQuantity = dto.MinPurchaseQuantity;
             product.Count = dto.Count;
-            product.ExpirationDate = dto.ExpirationDate;
+            product.ExpirationDays = dto.ExpirationDays;
             product.CreationDate = dto.CreationDate;
 
             if (dto.Images == null) dto.Images = new List<IFormFile>();
@@ -376,7 +376,7 @@ namespace FarmersMarketplace.Application.Services.Business
                     PricePerOne = product.PricePerOne,
                     MinPurchaseQuantity = product.MinPurchaseQuantity,
                     Count = product.Count,
-                    ExpirationDate = product.ExpirationDate,
+                    ExpirationDays = product.ExpirationDays,
                     CreationDate = product.CreationDate,
                     ImagesNames = new List<string>(),
                     DocumentsNames = new List<string>()
