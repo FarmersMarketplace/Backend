@@ -67,6 +67,16 @@ namespace FarmersMarketplace.Application.Services.Business
 
             var vm = Mapper.Map<FarmerVm>(farmer);
 
+            if(farmer.PaymentTypes != null 
+                && farmer.PaymentTypes.Contains(PaymentType.Online))
+            {
+                vm.PaymentData.HasOnlinePayment = true;
+            }
+            else
+            {
+                vm.PaymentData.HasOnlinePayment = false;
+            }
+
             return vm;
         }
 
@@ -99,6 +109,16 @@ namespace FarmersMarketplace.Application.Services.Business
             }
 
             var vm = Mapper.Map<SellerVm>(seller);
+
+            if (seller.PaymentTypes != null
+                && seller.PaymentTypes.Contains(PaymentType.Online))
+            {
+                vm.PaymentData.HasOnlinePayment = true;
+            }
+            else
+            {
+                vm.PaymentData.HasOnlinePayment = false;
+            }
 
             return vm;
         }
@@ -342,7 +362,6 @@ namespace FarmersMarketplace.Application.Services.Business
                     }
                 }
             }
-
         }
 
         private async Task UpdateSellerSchedule(Seller seller, ScheduleDto dto)
@@ -409,18 +428,26 @@ namespace FarmersMarketplace.Application.Services.Business
                 DbContext.ProducerPaymentData.Add(farmer.PaymentData);
             }
 
+            if (dto.HasOnlinePayment)
+            {
+                farmer.PaymentTypes = new List<PaymentType> { PaymentType.Online, PaymentType.Cash };
+            }
+            else
+            {
+                farmer.PaymentTypes = new List<PaymentType> { PaymentType.Cash };
+            }
+
             farmer.PaymentData.CardNumber = dto.CardNumber;
             farmer.PaymentData.AccountNumber = dto.AccountNumber;
             farmer.PaymentData.BankUSREOU = dto.BankUSREOU;
             farmer.PaymentData.BIC = dto.BIC;
-            farmer.PaymentData.HolderFullName = dto.HolderFullName;
             farmer.PaymentData.CardExpirationYear = dto.CardExpirationYear;
             farmer.PaymentData.CardExpirationMonth = dto.CardExpirationMonth;
 
             await DbContext.SaveChangesAsync();
         }
 
-        public async Task UpdateSellerPaymentData(UpdateProducerPaymentDataDto dto, Guid accountId)
+        public async Task UpdateSellerPaymentData(ProducerPaymentDataDto dto, Guid accountId)
         {
             var seller = await DbContext.Sellers.Include(s => s.PaymentData)
                 .FirstOrDefaultAsync(a => a.Id == accountId);
@@ -439,13 +466,12 @@ namespace FarmersMarketplace.Application.Services.Business
                 DbContext.ProducerPaymentData.Add(seller.PaymentData);
             }
 
-            seller.PaymentData.CardNumber = dto.PaymentData.CardNumber;
-            seller.PaymentData.AccountNumber = dto.PaymentData.AccountNumber;
-            seller.PaymentData.BankUSREOU = dto.PaymentData.BankUSREOU;
-            seller.PaymentData.BIC = dto.PaymentData.BIC;
-            seller.PaymentData.HolderFullName = dto.PaymentData.HolderFullName;
-            seller.PaymentData.CardExpirationYear = dto.PaymentData.CardExpirationYear;
-            seller.PaymentData.CardExpirationMonth = dto.PaymentData.CardExpirationMonth;
+            seller.PaymentData.CardNumber = dto.CardNumber;
+            seller.PaymentData.AccountNumber = dto.AccountNumber;
+            seller.PaymentData.BankUSREOU = dto.BankUSREOU;
+            seller.PaymentData.BIC = dto.BIC;
+            seller.PaymentData.CardExpirationYear = dto.CardExpirationYear;
+            seller.PaymentData.CardExpirationMonth = dto.CardExpirationMonth;
 
             if (dto.HasOnlinePayment) 
             {
@@ -455,7 +481,6 @@ namespace FarmersMarketplace.Application.Services.Business
             {
                 seller.PaymentTypes = new List<PaymentType> { PaymentType.Cash };
             }
-
             
             await DbContext.SaveChangesAsync();
         }

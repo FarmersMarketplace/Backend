@@ -16,7 +16,7 @@ namespace FarmersMarketplace.Application.Services.Business
         Task<FarmerVm> GetFarmer(Guid accountId);
         Task UpdateFarmer(UpdateFarmerDto dto, Guid accountId);
         Task UpdateFarmerPaymentData(ProducerPaymentDataDto dto, Guid accountId);
-        Task UpdateSellerPaymentData(UpdateProducerPaymentDataDto dto, Guid accountId);
+        Task UpdateSellerPaymentData(ProducerPaymentDataDto dto, Guid accountId);
         Task DeleteAccount(Role role, Guid accountId);
     }
 }

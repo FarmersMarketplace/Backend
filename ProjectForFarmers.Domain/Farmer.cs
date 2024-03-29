@@ -13,6 +13,7 @@ namespace FarmersMarketplace.Domain
         public ProducerPaymentData? PaymentData { get; set; }
         public Guid? AddressId { get; set; }
         public Address? Address { get; set; }
+        public List<PaymentType>? PaymentTypes { get; set; }
     }
 
 }

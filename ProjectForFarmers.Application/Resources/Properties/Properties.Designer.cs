@@ -304,6 +304,15 @@ namespace FarmersMarketplace.Application.Resources.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Main payment data.
+        /// </summary>
+        internal static string MainPaymentData {
+            get {
+                return ResourceManager.GetString("MainPaymentData", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Monday.
         /// </summary>
         internal static string Monday {

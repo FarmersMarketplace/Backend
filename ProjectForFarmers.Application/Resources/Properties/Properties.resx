@@ -198,6 +198,9 @@
   <data name="Longitude" xml:space="preserve">
     <value>Longitude</value>
   </data>
+  <data name="MainPaymentData" xml:space="preserve">
+    <value>Main payment data</value>
+  </data>
   <data name="Monday" xml:space="preserve">
     <value>Monday</value>
   </data>

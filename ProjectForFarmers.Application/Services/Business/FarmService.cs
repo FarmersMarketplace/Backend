@@ -5,6 +5,7 @@ using FarmersMarketplace.Application.Exceptions;
 using FarmersMarketplace.Application.Helpers;
 using FarmersMarketplace.Application.Interfaces;
 using FarmersMarketplace.Application.Services.Auth;
+using FarmersMarketplace.Application.ViewModels.Account;
 using FarmersMarketplace.Application.ViewModels.Category;
 using FarmersMarketplace.Application.ViewModels.Farm;
 using FarmersMarketplace.Application.ViewModels.Subcategory;
@@ -397,7 +398,17 @@ namespace FarmersMarketplace.Application.Services.Business
 
             var vm = Mapper.Map<FarmVm>(farm);
 
-            foreach(var log in farm.Logs)
+            if (farm.PaymentTypes != null
+                && farm.PaymentTypes.Contains(PaymentType.Online))
+            {
+                vm.PaymentData.HasOnlinePayment = true;
+            }
+            else
+            {
+                vm.PaymentData.HasOnlinePayment = false;
+            }
+
+            foreach (var log in farm.Logs)
             {
                 var logVm = new FarmLogVm(GetMessage(log), log.CreationDate);
                 vm.Logs.Add(logVm);
@@ -486,12 +497,12 @@ namespace FarmersMarketplace.Application.Services.Business
             await DbContext.SaveChangesAsync();
         }
 
-        public async Task UpdatePaymentData(UpdateProducerPaymentDataDto dto, Guid ownerId)
+        public async Task UpdatePaymentData(FarmPaymentDataDto dto, Guid ownerId)
         {
-            var farm = await DbContext.Farms.FirstOrDefaultAsync(f => f.Id == dto.ProducerId);
+            var farm = await DbContext.Farms.FirstOrDefaultAsync(f => f.Id == dto.FarmId);
             if (farm == null)
             {
-                string message = $"Farm with Id {dto.ProducerId} was not found.";
+                string message = $"Farm with Id {dto.FarmId} was not found.";
                 string userFacingMessage = CultureHelper.Exception("FarmFound");
 
                 throw new NotFoundException(message, userFacingMessage);
@@ -502,18 +513,15 @@ namespace FarmersMarketplace.Application.Services.Business
             if (farm.PaymentData == null)
                 farm.PaymentData = new ProducerPaymentData();
 
-            if(dto.PaymentData != null)
-            {
-                LogAndUpdateIfChanged("CardNumber", farm.PaymentData.CardNumber, dto.PaymentData.CardNumber, () => farm.PaymentData.CardNumber = dto.PaymentData.CardNumber, farm.Id);
-                LogAndUpdateIfChanged("AccountNumber", farm.PaymentData.AccountNumber, dto.PaymentData.AccountNumber, () => farm.PaymentData.AccountNumber = dto.PaymentData.AccountNumber, farm.Id);
-                LogAndUpdateIfChanged("BankUSREOU", farm.PaymentData.BankUSREOU, dto.PaymentData.BankUSREOU, () => farm.PaymentData.BankUSREOU = dto.PaymentData.BankUSREOU, farm.Id);
-                LogAndUpdateIfChanged("BIC", farm.PaymentData.BIC, dto.PaymentData.BIC, () => farm.PaymentData.BIC = dto.PaymentData.BIC, farm.Id);
-                LogAndUpdateIfChanged("HolderFullName", farm.PaymentData.HolderFullName, dto.PaymentData.HolderFullName, () => farm.PaymentData.HolderFullName = dto.PaymentData.HolderFullName, farm.Id);
-                LogAndUpdateIfChanged("CardExpirationYear", farm.PaymentData.CardExpirationYear, dto.PaymentData.CardExpirationYear, () => farm.PaymentData.CardExpirationYear = dto.PaymentData.CardExpirationYear, farm.Id);
-                LogAndUpdateIfChanged("CardExpirationMonth", farm.PaymentData.CardExpirationMonth, dto.PaymentData.CardExpirationMonth, () => farm.PaymentData.CardExpirationMonth = dto.PaymentData.CardExpirationMonth, farm.Id);
-            }
+            LogAndUpdateIfChanged("CardNumber", farm.PaymentData.CardNumber, dto.CardNumber, () => farm.PaymentData.CardNumber = dto.CardNumber, farm.Id);
+            LogAndUpdateIfChanged("AccountNumber", farm.PaymentData.AccountNumber, dto.AccountNumber, () => farm.PaymentData.AccountNumber = dto.AccountNumber, farm.Id);
+            LogAndUpdateIfChanged("BankUSREOU", farm.PaymentData.BankUSREOU, dto.BankUSREOU, () => farm.PaymentData.BankUSREOU = dto.BankUSREOU, farm.Id);
+            LogAndUpdateIfChanged("BIC", farm.PaymentData.BIC, dto.BIC, () => farm.PaymentData.BIC = dto.BIC, farm.Id);
+            LogAndUpdateIfChanged("CardExpirationYear", farm.PaymentData.CardExpirationYear, dto.CardExpirationYear, () => farm.PaymentData.CardExpirationYear = dto.CardExpirationYear, farm.Id);
+            LogAndUpdateIfChanged("CardExpirationMonth", farm.PaymentData.CardExpirationMonth, dto.CardExpirationMonth, () => farm.PaymentData.CardExpirationMonth = dto.CardExpirationMonth, farm.Id);
+            LogAndUpdateIfChanged("MainPaymentData", farm.PaymentData.MainPaymentData.ToString(), dto.MainPaymentData.ToString(), () => farm.PaymentData.MainPaymentData = dto.MainPaymentData, farm.Id);
 
-            if(farm.ReceivingMethods == null) 
+            if (farm.ReceivingMethods == null) 
                 farm.PaymentTypes = new List<PaymentType>() { PaymentType.Cash };  
 
             if (dto.HasOnlinePayment 
