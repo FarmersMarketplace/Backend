@@ -1,4 +1,4 @@
-﻿using FarmersMarketplace.Domain;
+﻿using FarmersMarketplace.Domain.Payment;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;

@@ -1,11 +1,11 @@
-﻿using FarmersMarketplace.Domain;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
+﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using FarmersMarketplace.Domain.Account;
 
 namespace FarmersMarketplace.Persistence.EntityTypeConfigurations
 {

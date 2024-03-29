@@ -8,6 +8,8 @@ using FarmersMarketplace.Application.ViewModels;
 using FarmersMarketplace.Application.ViewModels.Account;
 using FarmersMarketplace.Application.ViewModels.Farm;
 using FarmersMarketplace.Domain;
+using FarmersMarketplace.Domain.Account;
+using FarmersMarketplace.Domain.Payment;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -241,6 +243,7 @@ namespace FarmersMarketplace.Application.Services.Business
             farmer.Phone = dto.Phone;
             farmer.Gender = dto.Gender;
             farmer.DateOfBirth = dto.DateOfBirth.ToUniversalTime();
+            farmer.AdditionalPhone = dto.AdditionalPhone;
 
             if (dto.Avatar != null && farmer.AvatarName != dto.Avatar.Name)
             {
@@ -255,6 +258,8 @@ namespace FarmersMarketplace.Application.Services.Business
             {
                 var addressDto = dto.Address;
                 farmer.Address = farmer.Address ?? new Address();
+                farmer.Address.Note = dto.Address.Note; 
+                farmer.Address.PostalCode = addressDto.PostalCode;
 
                 if (!AddressEqualToDto(farmer.Address, addressDto))
                 {
@@ -263,7 +268,6 @@ namespace FarmersMarketplace.Application.Services.Business
                     farmer.Address.Settlement = addressDto.Settlement;
                     farmer.Address.Street = addressDto.Street;
                     farmer.Address.HouseNumber = addressDto.HouseNumber;
-                    farmer.Address.PostalCode = addressDto.PostalCode;
 
                     var coords = await CoordinateHelper.GetCoordinates(farmer.Address);
                     farmer.Address.Latitude = coords.Latitude;
@@ -311,6 +315,7 @@ namespace FarmersMarketplace.Application.Services.Business
                 }
 
                 seller.Address.PostalCode = addressDto.PostalCode;
+                seller.Address.Note = addressDto.Note;
 
                 if (!AddressEqualToDto(seller.Address, addressDto))
                 {

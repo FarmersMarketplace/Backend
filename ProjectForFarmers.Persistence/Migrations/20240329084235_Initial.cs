@@ -119,9 +119,9 @@ namespace FarmersMarketplace.Persistence.Migrations
                     AccountNumber = table.Column<string>(type: "text", nullable: true),
                     BankUSREOU = table.Column<string>(type: "text", nullable: true),
                     BIC = table.Column<string>(type: "text", nullable: true),
-                    HolderFullName = table.Column<string>(type: "text", nullable: true),
                     CardExpirationYear = table.Column<string>(type: "text", nullable: true),
-                    CardExpirationMonth = table.Column<string>(type: "text", nullable: true)
+                    CardExpirationMonth = table.Column<string>(type: "text", nullable: true),
+                    MainPaymentData = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -134,6 +134,7 @@ namespace FarmersMarketplace.Persistence.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false),
+                    ImageName = table.Column<string>(type: "text", nullable: true),
                     CategoryId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
@@ -159,7 +160,7 @@ namespace FarmersMarketplace.Persistence.Migrations
                     TotalPayment = table.Column<decimal>(type: "numeric", nullable: false),
                     PaymentType = table.Column<int>(type: "integer", nullable: false),
                     PaymentStatus = table.Column<int>(type: "integer", nullable: false),
-                    ReceivingType = table.Column<int>(type: "integer", nullable: false),
+                    ReceivingMethod = table.Column<int>(type: "integer", nullable: false),
                     DeliveryPointId = table.Column<Guid>(type: "uuid", nullable: true),
                     Producer = table.Column<int>(type: "integer", nullable: false),
                     Status = table.Column<int>(type: "integer", nullable: false),
@@ -285,7 +286,8 @@ namespace FarmersMarketplace.Persistence.Migrations
                     DateOfBirth = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     AvatarName = table.Column<string>(type: "text", nullable: true),
                     PaymentDataId = table.Column<Guid>(type: "uuid", nullable: true),
-                    AddressId = table.Column<Guid>(type: "uuid", nullable: true)
+                    AddressId = table.Column<Guid>(type: "uuid", nullable: true),
+                    PaymentTypes = table.Column<int[]>(type: "integer[]", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -305,6 +307,7 @@ namespace FarmersMarketplace.Persistence.Migrations
                     ProductId = table.Column<Guid>(type: "uuid", nullable: false),
                     OrderId = table.Column<Guid>(type: "uuid", nullable: false),
                     Count = table.Column<long>(type: "bigint", nullable: false),
+                    PricePerOne = table.Column<decimal>(type: "numeric", nullable: false),
                     TotalPrice = table.Column<decimal>(type: "numeric", nullable: false)
                 },
                 constraints: table =>
@@ -435,6 +438,7 @@ namespace FarmersMarketplace.Persistence.Migrations
                     NewOrdersStatisticId = table.Column<Guid>(type: "uuid", nullable: false),
                     TotalActivityStatisticId = table.Column<Guid>(type: "uuid", nullable: false),
                     TotalRevenue = table.Column<decimal>(type: "numeric", nullable: false),
+                    PreviousMonthTotalRevenue = table.Column<decimal>(type: "numeric", nullable: false),
                     CustomerWithHighestPaymentId = table.Column<Guid>(type: "uuid", nullable: true),
                     TotalRevenueChangePercentage = table.Column<float>(type: "real", nullable: false),
                     HighestCustomerPayment = table.Column<decimal>(type: "numeric", nullable: false),
@@ -506,9 +510,10 @@ namespace FarmersMarketplace.Persistence.Migrations
                     MinPurchaseQuantity = table.Column<long>(type: "bigint", nullable: false),
                     Count = table.Column<long>(type: "bigint", nullable: false),
                     ImagesNames = table.Column<List<string>>(type: "text[]", nullable: true),
-                    ExpirationDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    ExpirationDate = table.Column<long>(type: "bigint", nullable: false),
                     CreationDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     DocumentsNames = table.Column<List<string>>(type: "text[]", nullable: true),
+                    ReceivingMethods = table.Column<int[]>(type: "integer[]", nullable: true),
                     FarmId = table.Column<Guid>(type: "uuid", nullable: true),
                     SellerId = table.Column<Guid>(type: "uuid", nullable: true)
                 },

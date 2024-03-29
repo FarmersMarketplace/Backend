@@ -4,15 +4,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FarmersMarketplace.Domain
+namespace FarmersMarketplace.Domain.Payment
 {
-    public class CustomerPaymentData
+    public class ProducerPaymentData
     {
         public Guid Id { get; set; }
         public string CardNumber { get; set; }
+        public string AccountNumber { get; set; }
+        public string BankUSREOU { get; set; }
+        public string BIC { get; set; }
         public string CardExpirationYear { get; set; }
         public string CardExpirationMonth { get; set; }
-        public string CVV { get; set; }
+        public MainPaymentData MainPaymentData { get; set; }
     }
 
 }

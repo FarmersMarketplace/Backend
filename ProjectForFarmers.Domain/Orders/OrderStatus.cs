@@ -1,4 +1,4 @@
-﻿namespace FarmersMarketplace.Domain
+﻿namespace FarmersMarketplace.Domain.Orders
 {
     public enum OrderStatus
     {

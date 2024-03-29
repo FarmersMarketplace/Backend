@@ -1,7 +1,7 @@
 ﻿using FarmersMarketplace.Application.DataTransferObjects;
 using FarmersMarketplace.Application.DataTransferObjects.Account;
 using FarmersMarketplace.Application.ViewModels.Account;
-using FarmersMarketplace.Domain;
+using FarmersMarketplace.Domain.Account;
 
 namespace FarmersMarketplace.Application.Services.Business
 {

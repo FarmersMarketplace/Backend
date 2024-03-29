@@ -1,4 +1,5 @@
 ﻿using FarmersMarketplace.Domain;
+using FarmersMarketplace.Domain.Account;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

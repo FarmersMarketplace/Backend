@@ -5,6 +5,7 @@ using FarmersMarketplace.Application.ViewModels;
 using FarmersMarketplace.Application.ViewModels.Account;
 using FarmersMarketplace.Application.ViewModels.Farm;
 using FarmersMarketplace.Domain;
+using FarmersMarketplace.Domain.Payment;
 using DayOfWeek = FarmersMarketplace.Domain.DayOfWeek;
 
 namespace FarmersMarketplace.Application.Mappings

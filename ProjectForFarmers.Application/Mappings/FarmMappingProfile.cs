@@ -6,6 +6,7 @@ using FarmersMarketplace.Application.ViewModels.Category;
 using FarmersMarketplace.Application.ViewModels.Farm;
 using FarmersMarketplace.Application.ViewModels.Subcategory;
 using FarmersMarketplace.Domain;
+using FarmersMarketplace.Domain.Payment;
 using System.Net;
 using Address = FarmersMarketplace.Domain.Address;
 using DayOfWeek = FarmersMarketplace.Domain.DayOfWeek;

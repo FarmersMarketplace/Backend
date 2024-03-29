@@ -4,7 +4,7 @@ using FarmersMarketplace.Application.Services.Business;
 using FarmersMarketplace.Application.ViewModels.Dashboard;
 using FarmersMarketplace.Application.ViewModels.Order;
 using System.Security.Claims;
-using FarmersMarketplace.Domain;
+using FarmersMarketplace.Domain.Orders;
 
 namespace FarmersMarketplace.WebApi.Controllers
 {

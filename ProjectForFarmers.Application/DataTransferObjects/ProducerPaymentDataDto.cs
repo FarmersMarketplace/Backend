@@ -1,4 +1,4 @@
-﻿using FarmersMarketplace.Domain;
+﻿using FarmersMarketplace.Domain.Payment;
 
 namespace FarmersMarketplace.Application.DataTransferObjects
 {
@@ -11,7 +11,12 @@ namespace FarmersMarketplace.Application.DataTransferObjects
         public string BIC { get; set; }
         public string CardExpirationYear { get; set; }
         public string CardExpirationMonth { get; set; }
-        public MainPaymentData MainPaymentData { get; set; }
+        public MainPaymentData? MainPaymentData { get; set; }
+
+        public ProducerPaymentDataDto()
+        {
+            MainPaymentData = MainPaymentData ?? Domain.Payment.MainPaymentData.Card;
+        }
     }
 
 }

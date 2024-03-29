@@ -14,6 +14,8 @@ using InvalidDataException = FarmersMarketplace.Application.Exceptions.InvalidDa
 using Microsoft.IdentityModel.Tokens;
 using Address = FarmersMarketplace.Domain.Address;
 using FarmersMarketplace.Application.DataTransferObjects;
+using FarmersMarketplace.Domain.Orders;
+using FarmersMarketplace.Domain.Payment;
 
 namespace FarmersMarketplace.Application.Services.Business
 {

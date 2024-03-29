@@ -13,7 +13,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FarmersMarketplace.Persistence.Migrations
 {
     [DbContext(typeof(MainDbContext))]
-    [Migration("20240326182423_Initial")]
+    [Migration("20240329084235_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -337,6 +337,9 @@ namespace FarmersMarketplace.Persistence.Migrations
                     b.Property<Guid>("NewOrdersStatisticId")
                         .HasColumnType("uuid");
 
+                    b.Property<decimal>("PreviousMonthTotalRevenue")
+                        .HasColumnType("numeric");
+
                     b.Property<Guid>("ProcessingOrdersStatisticId")
                         .HasColumnType("uuid");
 
@@ -425,7 +428,7 @@ namespace FarmersMarketplace.Persistence.Migrations
                     b.Property<DateTime>("ReceiveDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int>("ReceivingType")
+                    b.Property<int>("ReceivingMethod")
                         .HasColumnType("integer");
 
                     b.Property<int>("Status")
@@ -478,6 +481,9 @@ namespace FarmersMarketplace.Persistence.Migrations
                     b.Property<Guid>("OrderId")
                         .HasColumnType("uuid");
 
+                    b.Property<decimal>("PricePerOne")
+                        .HasColumnType("numeric");
+
                     b.Property<Guid>("ProductId")
                         .HasColumnType("uuid");
 
@@ -516,8 +522,8 @@ namespace FarmersMarketplace.Persistence.Migrations
                     b.Property<string>("CardNumber")
                         .HasColumnType("text");
 
-                    b.Property<string>("HolderFullName")
-                        .HasColumnType("text");
+                    b.Property<int>("MainPaymentData")
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -553,8 +559,8 @@ namespace FarmersMarketplace.Persistence.Migrations
                     b.Property<List<string>>("DocumentsNames")
                         .HasColumnType("text[]");
 
-                    b.Property<DateTime>("ExpirationDate")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<long>("ExpirationDate")
+                        .HasColumnType("bigint");
 
                     b.Property<Guid?>("FarmId")
                         .HasColumnType("uuid");
@@ -580,6 +586,9 @@ namespace FarmersMarketplace.Persistence.Migrations
 
                     b.Property<Guid>("ProducerId")
                         .HasColumnType("uuid");
+
+                    b.Property<int[]>("ReceivingMethods")
+                        .HasColumnType("integer[]");
 
                     b.Property<Guid?>("SellerId")
                         .HasColumnType("uuid");
@@ -679,6 +688,9 @@ namespace FarmersMarketplace.Persistence.Migrations
                     b.Property<Guid>("CategoryId")
                         .HasColumnType("uuid");
 
+                    b.Property<string>("ImageName")
+                        .HasColumnType("text");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
@@ -724,6 +736,9 @@ namespace FarmersMarketplace.Persistence.Migrations
 
                     b.Property<Guid?>("PaymentDataId")
                         .HasColumnType("uuid");
+
+                    b.Property<int[]>("PaymentTypes")
+                        .HasColumnType("integer[]");
 
                     b.HasIndex("AddressId")
                         .IsUnique();

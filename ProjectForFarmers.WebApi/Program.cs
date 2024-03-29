@@ -30,7 +30,7 @@ namespace FarmersMarketplace.WebApi
 
         private static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
         {
-            string connectionString = configuration.GetConnectionString("RemoteConnection");
+            string connectionString = configuration.GetConnectionString("LocalConnection");
 
             services.AddPersistence(connectionString);
             services.AddMemoryCache();

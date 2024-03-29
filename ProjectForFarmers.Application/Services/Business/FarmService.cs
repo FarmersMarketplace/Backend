@@ -9,6 +9,7 @@ using FarmersMarketplace.Application.ViewModels.Category;
 using FarmersMarketplace.Application.ViewModels.Farm;
 using FarmersMarketplace.Application.ViewModels.Subcategory;
 using FarmersMarketplace.Domain;
+using FarmersMarketplace.Domain.Payment;
 using Geocoding;
 using Geocoding.Google;
 using Microsoft.AspNetCore.Http;
@@ -512,13 +513,16 @@ namespace FarmersMarketplace.Application.Services.Business
             if (farm.PaymentData == null)
                 farm.PaymentData = new ProducerPaymentData();
 
+            if(dto.MainPaymentData == null)
+                dto.MainPaymentData = MainPaymentData.Card;
+
             LogAndUpdateIfChanged("CardNumber", farm.PaymentData.CardNumber, dto.CardNumber, () => farm.PaymentData.CardNumber = dto.CardNumber, farm.Id);
             LogAndUpdateIfChanged("AccountNumber", farm.PaymentData.AccountNumber, dto.AccountNumber, () => farm.PaymentData.AccountNumber = dto.AccountNumber, farm.Id);
             LogAndUpdateIfChanged("BankUSREOU", farm.PaymentData.BankUSREOU, dto.BankUSREOU, () => farm.PaymentData.BankUSREOU = dto.BankUSREOU, farm.Id);
             LogAndUpdateIfChanged("BIC", farm.PaymentData.BIC, dto.BIC, () => farm.PaymentData.BIC = dto.BIC, farm.Id);
             LogAndUpdateIfChanged("CardExpirationYear", farm.PaymentData.CardExpirationYear, dto.CardExpirationYear, () => farm.PaymentData.CardExpirationYear = dto.CardExpirationYear, farm.Id);
             LogAndUpdateIfChanged("CardExpirationMonth", farm.PaymentData.CardExpirationMonth, dto.CardExpirationMonth, () => farm.PaymentData.CardExpirationMonth = dto.CardExpirationMonth, farm.Id);
-            LogAndUpdateIfChanged("MainPaymentData", farm.PaymentData.MainPaymentData.ToString(), dto.MainPaymentData.ToString(), () => farm.PaymentData.MainPaymentData = dto.MainPaymentData, farm.Id);
+            LogAndUpdateIfChanged("MainPaymentData", farm.PaymentData.MainPaymentData.ToString(), dto.MainPaymentData.ToString(), () => farm.PaymentData.MainPaymentData = (MainPaymentData)dto.MainPaymentData, farm.Id);
 
             if (farm.ReceivingMethods == null) 
                 farm.PaymentTypes = new List<PaymentType>() { PaymentType.Cash };  

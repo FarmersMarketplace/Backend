@@ -1,4 +1,6 @@
-﻿namespace FarmersMarketplace.Domain
+﻿using FarmersMarketplace.Domain.Payment;
+
+namespace FarmersMarketplace.Domain
 {
     public class Farm
     {

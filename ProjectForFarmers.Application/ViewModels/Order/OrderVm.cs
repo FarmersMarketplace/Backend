@@ -1,5 +1,7 @@
 ﻿using FarmersMarketplace.Application.ViewModels.Account;
 using FarmersMarketplace.Domain;
+using FarmersMarketplace.Domain.Orders;
+using FarmersMarketplace.Domain.Payment;
 
 namespace FarmersMarketplace.Application.ViewModels.Order
 {

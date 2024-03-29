@@ -5,7 +5,7 @@ using FarmersMarketplace.Application.Helpers;
 using FarmersMarketplace.Application.Services.Business;
 using FarmersMarketplace.Application.ViewModels.Account;
 using FarmersMarketplace.Application.ViewModels.Auth;
-using FarmersMarketplace.Domain;
+using FarmersMarketplace.Domain.Account;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -106,7 +106,7 @@ namespace FarmersMarketplace.WebApi.Controllers
         [HttpPut]
         [Authorize(Roles = "Seller")]
         [ProducesResponseType(204)]
-        public async Task<IActionResult> UpdateSellerPaymentData([FromBody] UpdateProducerPaymentDataDto dto)
+        public async Task<IActionResult> UpdateSellerPaymentData([FromBody] ProducerPaymentDataDto dto)
         {
             await AccountService.UpdateSellerPaymentData(dto, AccountId);
             return NoContent();

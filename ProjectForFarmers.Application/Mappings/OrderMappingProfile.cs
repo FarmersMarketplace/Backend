@@ -3,6 +3,7 @@ using FarmersMarketplace.Application.DataTransferObjects.Farm;
 using FarmersMarketplace.Application.ViewModels.Dashboard;
 using FarmersMarketplace.Application.ViewModels.Order;
 using FarmersMarketplace.Domain;
+using FarmersMarketplace.Domain.Orders;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -64,7 +65,7 @@ namespace FarmersMarketplace.Application.Mappings
                 .ForMember(vm => vm.TotalPayment, opt => opt.MapFrom(order => order.TotalPayment))
                 .ForMember(vm => vm.PaymentType, opt => opt.MapFrom(order => order.PaymentType))
                 .ForMember(vm => vm.PaymentStatus, opt => opt.MapFrom(order => order.PaymentStatus))
-                .ForMember(vm => vm.ReceivingType, opt => opt.MapFrom(order => order.ReceivingMethod))
+                .ForMember(vm => vm.ReceivingMethod, opt => opt.MapFrom(order => order.ReceivingMethod))
                 .ForMember(vm => vm.DeliveryPoint, opt => opt.MapFrom(order => order.DeliveryPoint))
                 .ForMember(vm => vm.Status, opt => opt.MapFrom(order => order.Status))
                 .ForMember(vm => vm.CustomerId, opt => opt.MapFrom(order => order.CustomerId))

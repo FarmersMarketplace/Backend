@@ -1,6 +1,6 @@
 ﻿using FarmersMarketplace.Application.DataTransferObjects.Order;
 using FarmersMarketplace.Application.ViewModels.Order;
-using FarmersMarketplace.Domain;
+using FarmersMarketplace.Domain.Orders;
 
 namespace FarmersMarketplace.Application.Services.Business
 {

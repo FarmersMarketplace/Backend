@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using FarmersMarketplace.Application.Interfaces;
-using FarmersMarketplace.Domain;
+using FarmersMarketplace.Domain.Account;
 
 namespace FarmersMarketplace.Application.DataTransferObjects.Auth
 {

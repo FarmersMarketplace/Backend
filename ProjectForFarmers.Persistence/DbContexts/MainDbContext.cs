@@ -1,5 +1,8 @@
 ﻿using FarmersMarketplace.Application.Interfaces;
 using FarmersMarketplace.Domain;
+using FarmersMarketplace.Domain.Account;
+using FarmersMarketplace.Domain.Orders;
+using FarmersMarketplace.Domain.Payment;
 using FarmersMarketplace.Persistence.EntityTypeConfigurations;
 using Microsoft.EntityFrameworkCore;
 using DayOfWeek = FarmersMarketplace.Domain.DayOfWeek;

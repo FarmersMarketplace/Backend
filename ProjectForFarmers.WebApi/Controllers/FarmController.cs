@@ -94,7 +94,7 @@ namespace FarmersMarketplace.WebApi.Controllers
         [HttpPut]
         [Authorize(Roles = "Farmer")]
         [ProducesResponseType(204)]
-        public async Task<IActionResult> UpdateSettings([FromBody] FarmPaymentDataDto dto)
+        public async Task<IActionResult> UpdatePaymentData([FromBody] FarmPaymentDataDto dto)
         {
             await FarmService.UpdatePaymentData(dto, AccountId);
             return NoContent();
