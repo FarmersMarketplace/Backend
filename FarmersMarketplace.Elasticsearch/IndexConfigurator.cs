@@ -1,10 +1,7 @@
-﻿using FarmersMarketplace.Elasticsearch.Factories;
+﻿using AutoMapper;
+using FarmersMarketplace.Application.Interfaces;
+using FarmersMarketplace.Elasticsearch.Factories;
 using Nest;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FarmersMarketplace.Elasticsearch
 {
@@ -27,6 +24,20 @@ namespace FarmersMarketplace.Elasticsearch
                 factory.CreateIndex(client);
             }
         }
+
+        public async Task LoadData(IElasticClient client, IApplicationDbContext dbContext, IMapper mapper)
+        {
+            var tasks = new Task[IndexFactories.Count];
+
+            for (int i = 0; i < IndexFactories.Count; i++)
+            {
+                tasks[i] = IndexFactories[i].LoadData(client, dbContext, mapper);
+            }
+
+            await Task.WhenAll(tasks);
+        }
+
+        
     }
 
 }

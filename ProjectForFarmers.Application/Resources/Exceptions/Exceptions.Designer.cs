@@ -142,6 +142,15 @@ namespace FarmersMarketplace.Application.Resources.Exceptions {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Products documents was not uploaded successfully to Elasticsearch..
+        /// </summary>
+        internal static string ElasticsearchProductsNotLoaded {
+            get {
+                return ResourceManager.GetString("ElasticsearchProductsNotLoaded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Email {0} is already associated with another account..
         /// </summary>
         internal static string EmailIsAssociatedWithAnotherAccount {
@@ -264,15 +273,6 @@ namespace FarmersMarketplace.Application.Resources.Exceptions {
         internal static string StatisticWithIdNotExist {
             get {
                 return ResourceManager.GetString("StatisticWithIdNotExist", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Failed to retrieve or parse role..
-        /// </summary>
-        internal static string String1 {
-            get {
-                return ResourceManager.GetString("String1", resourceCulture);
             }
         }
         

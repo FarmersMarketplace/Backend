@@ -16,7 +16,8 @@ namespace FarmersMarketplace.Application.Mappings
         {
             MapCreateProductDtoToProduct();
             MapProductToProducerProductVm();
-            MapProductToProductLookupVm();
+            MapProductToProducerProductLookupVm();
+            MapProductToCustomerLookupVm();
         }
 
         private void MapProductToProducerProductVm()
@@ -33,9 +34,9 @@ namespace FarmersMarketplace.Application.Mappings
                 .ForMember(product => product.Id, opt => opt.MapFrom(dto => Guid.NewGuid()));
         }
 
-        private void MapProductToProductLookupVm()
+        private void MapProductToProducerProductLookupVm()
         {
-            CreateMap<Product, ProductLookupVm>()
+            CreateMap<Product, ProducerProductLookupVm>()
                 .ForMember(vm => vm.Category, opt => opt.MapFrom(product => product.Category.Name))
                 .ForMember(vm => vm.Subcategory, opt => opt.MapFrom(product => product.Subcategory.Name))
                 .ForMember(vm => vm.Rest, opt => opt.MapFrom(product => product.Count));
