@@ -20,10 +20,12 @@ namespace FarmersMarketplace.Elasticsearch.Documents
         public DateTime ExpirationDate { get; set; }
         public DateTime CreationDate { get; set; }
         public string ImageName { get; set; }
+        public List<ReceivingMethod> ReceivingMethods { get; set; }
         public string ProducerImageName { get; set; }
         public float Rating { get; set; }
         public uint FeedbacksCount { get; set; }
         public string ProducerName { get; set; }
+        public bool HasOnlinePayment { get; set; }
     }
 
 }
