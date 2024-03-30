@@ -4,16 +4,13 @@ using FarmersMarketplace.Application.DataTransferObjects.Account;
 using FarmersMarketplace.Application.Exceptions;
 using FarmersMarketplace.Application.Helpers;
 using FarmersMarketplace.Application.Interfaces;
-using FarmersMarketplace.Application.ViewModels;
 using FarmersMarketplace.Application.ViewModels.Account;
-using FarmersMarketplace.Application.ViewModels.Farm;
 using FarmersMarketplace.Domain;
 using FarmersMarketplace.Domain.Accounts;
 using FarmersMarketplace.Domain.Payment;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using System;
 using DayOfWeek = FarmersMarketplace.Domain.DayOfWeek;
 
 namespace FarmersMarketplace.Application.Services.Business

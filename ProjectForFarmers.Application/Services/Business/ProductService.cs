@@ -234,7 +234,7 @@ namespace FarmersMarketplace.Application.Services.Business
 
             var vm = new ProductListVm
             {
-                Products = new List<ProductLookupVm>(),
+                Products = new List<ProducerProductLookupVm>(),
                 Count = products.Count
             };
 
@@ -242,7 +242,7 @@ namespace FarmersMarketplace.Application.Services.Business
 
             foreach (var product in products)
             {
-                var productVm = Mapper.Map<ProductLookupVm>(product);
+                var productVm = Mapper.Map<ProducerProductLookupVm>(product);
                 vm.Products.Add(productVm);
             }
 
@@ -509,7 +509,7 @@ namespace FarmersMarketplace.Application.Services.Business
                 productsQuery = await dto.Filter.ApplyFilter(productsQuery);
             }
 
-            List<ProductLookupVm> products = await productsQuery.Select(p => Mapper.Map<ProductLookupVm>(p)).ToListAsync();
+            List<ProducerProductLookupVm> products = await productsQuery.Select(p => Mapper.Map<ProducerProductLookupVm>(p)).ToListAsync();
 
             string fileName = await GetFileName(dto.ProducerId, dto.Producer);
             string filePath = Path.Combine(Configuration["File:Temporary"], fileName);

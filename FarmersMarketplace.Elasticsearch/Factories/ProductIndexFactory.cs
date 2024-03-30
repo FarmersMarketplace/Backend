@@ -1,6 +1,12 @@
-﻿using FarmersMarketplace.Domain;
+﻿using AutoMapper;
+using FarmersMarketplace.Application.Exceptions;
+using FarmersMarketplace.Application.Helpers;
+using FarmersMarketplace.Application.Interfaces;
+using FarmersMarketplace.Domain;
 using FarmersMarketplace.Elasticsearch.Documents;
+using Microsoft.EntityFrameworkCore;
 using Nest;
+using ApplicationException = FarmersMarketplace.Application.Exceptions.ApplicationException;
 
 namespace FarmersMarketplace.Elasticsearch.Factories
 {
@@ -52,11 +58,91 @@ namespace FarmersMarketplace.Elasticsearch.Factories
                         .Text(t => t
                             .Name(product => product.ImageName))
                         .Text(t => t
+                            .Name(product => product.ProducerName))
+                        .Text(t => t
                             .Name(product => product.ProducerImageName))
                         .Number(t => t
                             .Name(product => product.Rating))
                         .Number(t => t
                             .Name(product => product.FeedbacksCount))));
+        }
+
+        public async Task LoadData(IElasticClient client, IApplicationDbContext dbContext, IMapper mapper)
+        {
+            var deleteResponse = client.DeleteByQuery<ProductDocument>(d => d
+                .Index(Indecies.Products)
+                .Query(q => q.MatchAll()));
+
+            if (!deleteResponse.IsValid)
+            {
+                string message = $"Products documents was not deleted successfully from Elasticsearch.";
+                string userFacingMessage = CultureHelper.Exception("ElasticsearchProductsNotDeleted");
+
+                throw new ApplicationException(message, userFacingMessage);
+            }
+
+            var products = await dbContext.Products.Include(p => p.Subcategory)
+                .Include(p => p.Category)
+                .Include(p => p.Feedbacks)
+                .ToArrayAsync();
+
+            var documents = new ProductDocument[products.Length];
+
+            for (int i = 0; i < products.Length; i++)
+            {
+                documents[i] = mapper.Map<ProductDocument>(products[i]);
+
+                if (products[i].Producer == Producer.Farm)
+                {
+                    var farm = await dbContext.Farms.FirstOrDefaultAsync(f => f.Id == products[i].ProducerId);
+
+                    if (farm == null)
+                    {
+                        string message = $"Farm with Id {products[i].ProducerId} was not found.";
+                        string userFacingMessage = CultureHelper.Exception("FarmNotFound");
+
+                        throw new NotFoundException(message, userFacingMessage);
+                    }
+
+                    documents[i].ProducerName = farm.Name;
+                    documents[i].ProducerImageName =
+                        (farm.ImagesNames != null && farm.ImagesNames.Count > 0)
+                        ? farm.ImagesNames[0]
+                        : "";
+                }
+                else if (products[i].Producer == Producer.Seller)
+                {
+                    var seller = await dbContext.Sellers.FirstOrDefaultAsync(f => f.Id == products[i].ProducerId);
+
+                    if (seller == null)
+                    {
+                        string message = $"Account with Id {products[i].ProducerId} was not found.";
+                        string userFacingMessage = CultureHelper.Exception("AccountNotFound");
+
+                        throw new NotFoundException(message, userFacingMessage);
+                    }
+
+                    documents[i].ProducerName = seller.Surname + " " + seller.Name;
+                    documents[i].ProducerImageName =
+                        (seller.ImagesNames != null && seller.ImagesNames.Count > 0)
+                        ? seller.ImagesNames[0]
+                        : "";
+                }
+                else
+                {
+                    throw new NotImplementedException();
+                }
+            }
+
+            var bulkIndexResponse = client.IndexMany(documents);
+
+            if (!bulkIndexResponse.IsValid)
+            {
+                string message = $"Products documents was not uploaded successfully to Elasticsearch.";
+                string userFacingMessage = CultureHelper.Exception("ElasticsearchProductsNotUpoaded");
+
+                throw new ApplicationException(message, userFacingMessage);
+            }
         }
     }
 

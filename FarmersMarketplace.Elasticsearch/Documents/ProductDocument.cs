@@ -1,10 +1,4 @@
-﻿using FarmersMarketplace.Domain.Feedbacks;
-using FarmersMarketplace.Domain;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using FarmersMarketplace.Domain;
 
 namespace FarmersMarketplace.Elasticsearch.Documents
 {
@@ -29,6 +23,7 @@ namespace FarmersMarketplace.Elasticsearch.Documents
         public string ProducerImageName { get; set; }
         public float Rating { get; set; }
         public uint FeedbacksCount { get; set; }
+        public string ProducerName { get; set; }
     }
 
 }

@@ -8,7 +8,7 @@ namespace FarmersMarketplace.Application.ViewModels.Product
 {
     public class ProductListVm
     {
-        public List<ProductLookupVm> Products { get; set; }
+        public List<ProducerProductLookupVm> Products { get; set; }
         public int Count { get; set; }
     }
 

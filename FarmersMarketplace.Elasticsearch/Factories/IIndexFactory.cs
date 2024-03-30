@@ -1,4 +1,6 @@
-﻿using Nest;
+﻿using AutoMapper;
+using FarmersMarketplace.Application.Interfaces;
+using Nest;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,5 +13,6 @@ namespace FarmersMarketplace.Elasticsearch.Factories
     {
         void CreateIndex(IElasticClient client);
         CreateIndexDescriptor ConfigureIndex(CreateIndexDescriptor descriptor);
+        Task LoadData(IElasticClient client, IApplicationDbContext dbContext, IMapper mapper);
     }
 }
