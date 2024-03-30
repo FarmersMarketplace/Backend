@@ -12,6 +12,7 @@ using FarmersMarketplace.Persistence;
 using Hangfire;
 using Hangfire.PostgreSql;
 using FarmersMarketplace.Application.Helpers;
+using FarmersMarketplace.Elasticsearch;
 
 namespace FarmersMarketplace.WebApi
 {
@@ -33,13 +34,14 @@ namespace FarmersMarketplace.WebApi
             string connectionString = configuration.GetConnectionString("LocalConnection");
 
             services.AddPersistence(connectionString);
-            services.AddMemoryCache();
+            services.AddApplication(configuration);
+            services.AddElasticsearch(configuration);
 
             Log.Logger = new LoggerConfiguration().WriteTo.PostgreSQL(connectionString, "Logs", needAutoCreateTable: true)
                .MinimumLevel.Information().CreateLogger();
             Log.Information("The program has started.");
 
-            services.AddApplication(configuration);
+            
             services.AddControllers(options =>
             {
                 options.Filters.Add(new ProducesAttribute("application/json"));

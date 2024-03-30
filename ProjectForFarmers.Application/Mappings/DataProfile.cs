@@ -10,9 +10,9 @@ using DayOfWeek = FarmersMarketplace.Domain.DayOfWeek;
 
 namespace FarmersMarketplace.Application.Mappings
 {
-    public class DataMappingProfile : Profile
+    public class DataProfile : Profile
     {
-        public DataMappingProfile()
+        public DataProfile()
         {
             MapProducerPaymentDataDtoToProducerPaymentData();
             MapDayOfWeekDtoToDayOfWeek();

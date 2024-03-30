@@ -1,15 +1,30 @@
 ﻿using AutoMapper;
+using FarmersMarketplace.Application.ViewModels.Product;
 using FarmersMarketplace.Domain;
 using FarmersMarketplace.Elasticsearch.Documents;
-using System.Reflection.Metadata;
 
-namespace FarmersMarketplace.Elasticsearch
+namespace FarmersMarketplace.Elasticsearch.Mappings
 {
-    public class DocumentMappingProfile : Profile
+    public class ProductSearchProfile : Profile
     {
-        public DocumentMappingProfile()
+        public ProductSearchProfile()
         {
             MapProductToProductDocument();
+            MapProductDocumentToCustomerProductLookupVm();
+            MapProductDocumentToProducerProductLookupVm();
+        }
+
+        private void MapProductDocumentToProducerProductLookupVm()
+        {
+            CreateMap<ProductDocument, ProducerProductLookupVm>();
+        }
+
+        private void MapProductDocumentToCustomerProductLookupVm()
+        {
+                CreateMap<ProductDocument, ProducerProductLookupVm>()
+                    .ForMember(vm => vm.Category, opt => opt.MapFrom(document => document.CategoryName))
+                    .ForMember(vm => vm.Subcategory, opt => opt.MapFrom(document => document.SubcategoryName))
+                    .ForMember(vm => vm.Rest, opt => opt.MapFrom(document => document.Count));
         }
 
         private void MapProductToProductDocument()
@@ -20,7 +35,7 @@ namespace FarmersMarketplace.Elasticsearch
                 .ForMember(document => document.ExpirationDate, opt => opt
                     .MapFrom(product => product.CreationDate.AddDays(product.ExpirationDays)))
                 .ForMember(document => document.ImageName, opt => opt.MapFrom(product =>
-                    (product.ImagesNames != null && product.ImagesNames.Count > 0)
+                    product.ImagesNames != null && product.ImagesNames.Count > 0
                     ? product.ImagesNames[0]
                     : ""))
                 .ForMember(document => document.ProducerImageName, opt => opt.MapFrom(product => ""))

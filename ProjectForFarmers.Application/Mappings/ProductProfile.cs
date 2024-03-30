@@ -10,9 +10,9 @@ using System.Threading.Tasks;
 
 namespace FarmersMarketplace.Application.Mappings
 {
-    public class ProductMappingProfile : Profile
+    public class ProductProfile : Profile
     {
-        public ProductMappingProfile()
+        public ProductProfile()
         {
             MapCreateProductDtoToProduct();
             MapProductToProducerProductVm();

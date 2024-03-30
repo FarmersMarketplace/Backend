@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using FarmersMarketplace.Application.Interfaces;
+using FarmersMarketplace.Elasticsearch.Mappings;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Nest;
@@ -10,6 +11,11 @@ namespace FarmersMarketplace.Elasticsearch
     {
         public static IServiceCollection AddElasticsearch(this IServiceCollection services, IConfiguration configuration)
         {
+            services.AddAutoMapper(config =>
+            {
+                config.AddProfile(new ProductSearchProfile());
+            });
+
             var url = configuration["ElasticsearchUrl"];
 
             var settings = new ConnectionSettings(new Uri(url)).PrettyJson();

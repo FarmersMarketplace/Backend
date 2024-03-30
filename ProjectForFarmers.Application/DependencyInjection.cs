@@ -22,12 +22,12 @@ namespace FarmersMarketplace.Application
 
             services.AddAutoMapper(config =>
             {
-                config.AddProfile(new FarmMappingProfile());
-                config.AddProfile(new OrderMappingProfile());
-                config.AddProfile(new CategoryMappingProfile());
-                config.AddProfile(new ProductMappingProfile());
-                config.AddProfile(new DataMappingProfile());
-                config.AddProfile(new AccountMappingProfile());
+                config.AddProfile(new FarmProfile());
+                config.AddProfile(new OrderProfile());
+                config.AddProfile(new CategoryProfile());
+                config.AddProfile(new ProductProfile());
+                config.AddProfile(new DataProfile());
+                config.AddProfile(new AccountProfile());
             });
 
             return services;

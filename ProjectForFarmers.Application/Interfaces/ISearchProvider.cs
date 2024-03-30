@@ -8,6 +8,6 @@ namespace FarmersMarketplace.Application.Interfaces
 {
     public interface ISearchProvider
     {
-        Task<>
+        
     }
 }

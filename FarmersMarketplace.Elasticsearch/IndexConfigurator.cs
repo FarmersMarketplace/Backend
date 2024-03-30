@@ -36,7 +36,6 @@ namespace FarmersMarketplace.Elasticsearch
 
             await Task.WhenAll(tasks);
         }
-
         
     }
 

@@ -4,9 +4,9 @@ using FarmersMarketplace.Domain.Accounts;
 
 namespace FarmersMarketplace.Application.Mappings
 {
-    public class AccountMappingProfile : Profile
+    public class AccountProfile : Profile
     {
-        public AccountMappingProfile()
+        public AccountProfile()
         {
             MapCustomerToCustomerVm();
             MapSellerToSellerVm();

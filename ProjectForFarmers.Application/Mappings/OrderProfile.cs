@@ -12,9 +12,9 @@ using System.Threading.Tasks;
 
 namespace FarmersMarketplace.Application.Mappings
 {
-    public class OrderMappingProfile : Profile
+    public class OrderProfile : Profile
     {
-        public OrderMappingProfile()
+        public OrderProfile()
         {
             MapOrderGroupStatisticToOrderGroupStatisticVm();
             MapMonthStatisticToDashboardVm();

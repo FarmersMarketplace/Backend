@@ -11,9 +11,9 @@ using System.Threading.Tasks;
 
 namespace FarmersMarketplace.Application.Mappings
 {
-    public class CategoryMappingProfile : Profile
+    public class CategoryProfile : Profile
     {
-        public CategoryMappingProfile()
+        public CategoryProfile()
         {
             MapCategoryToCategoryVm();
             MapSubcategoryToSubcategoryVm();

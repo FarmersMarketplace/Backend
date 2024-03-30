@@ -13,9 +13,9 @@ using DayOfWeek = FarmersMarketplace.Domain.DayOfWeek;
 
 namespace FarmersMarketplace.Application.Mappings
 {
-    public class FarmMappingProfile : Profile
+    public class FarmProfile : Profile
     {
-        public FarmMappingProfile()
+        public FarmProfile()
         {
             MapCreateFarmDtoToFarm();
             MapFarmToFarmLookupVm();
