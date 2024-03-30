@@ -1,9 +1,7 @@
-﻿using Hangfire;
-using Microsoft.Extensions.DependencyInjection;
-using FarmersMarketplace.Application.Interfaces;
+﻿using FarmersMarketplace.Application.Interfaces;
 using FarmersMarketplace.Application.Services.Business;
-using Serilog;
-using Hangfire.Storage;
+using Hangfire;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace FarmersMarketplace.Application.Helpers
 {

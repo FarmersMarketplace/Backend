@@ -1,6 +1,4 @@
-﻿using AutoMapper;
-using FarmersMarketplace.Application.Interfaces;
-using FarmersMarketplace.Domain.Accounts;
+﻿using FarmersMarketplace.Domain.Accounts;
 
 namespace FarmersMarketplace.Application.DataTransferObjects.Auth
 {
@@ -12,7 +10,5 @@ namespace FarmersMarketplace.Application.DataTransferObjects.Auth
         public string Password { get; set; }
         public string ConfirmPassword{ get; set; }
         public Role Role { get; set; }
-
-        
     }
 }

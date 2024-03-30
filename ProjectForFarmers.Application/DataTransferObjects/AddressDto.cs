@@ -1,15 +1,4 @@
-﻿using AutoMapper;
-using FarmersMarketplace.Application.DataTransferObjects.Auth;
-using FarmersMarketplace.Application.Interfaces;
-using FarmersMarketplace.Domain;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace FarmersMarketplace.Application.DataTransferObjects
+﻿namespace FarmersMarketplace.Application.DataTransferObjects
 {
     public class AddressDto
     {
