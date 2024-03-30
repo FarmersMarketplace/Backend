@@ -7,7 +7,7 @@ namespace FarmersMarketplace.Application.DataTransferObjects.Product
     {
         public Guid ProducerId { get; set; }
         public Producer Producer { get; set; }
-        public ProductFilter? Filter { get; set; }
+        public ProducerProductFilter? Filter { get; set; }
     }
 
 }
