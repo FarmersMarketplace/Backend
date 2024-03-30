@@ -39,7 +39,7 @@ namespace FarmersMarketplace.Application.Services.Business
 
         public async Task<OptionListVm> Autocomplete(ProductAutocompleteDto dto)
         {
-            var cacheKey = CacheHelper.GenerateCacheKey<ProductFilter>(dto.ProducerId, dto.Producer, "products");
+            var cacheKey = "";
 
             var vm = new OptionListVm();
             var productsInfo = new List<ProductInfo>();
@@ -188,7 +188,7 @@ namespace FarmersMarketplace.Application.Services.Business
             return randomLetters + "-" + randomNumbers;
         }
 
-        public async Task<ProductVm> Get(Guid productId)
+        public async Task<ProducerProductVm> Get(Guid productId)
         {
             var product = await DbContext.Products.Include(p => p.Category)
                 .Include(p => p.Subcategory)
@@ -202,7 +202,7 @@ namespace FarmersMarketplace.Application.Services.Business
                 throw new NotFoundException(message, userFacingMessage);
             }
 
-            var vm = Mapper.Map<ProductVm>(product);
+            var vm = Mapper.Map<ProducerProductVm>(product);
 
             return vm;
         }

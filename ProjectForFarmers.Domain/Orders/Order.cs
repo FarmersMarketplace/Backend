@@ -1,4 +1,5 @@
-﻿using FarmersMarketplace.Domain.Payment;
+﻿using FarmersMarketplace.Domain.Accounts;
+using FarmersMarketplace.Domain.Payment;
 
 namespace FarmersMarketplace.Domain.Orders
 {
