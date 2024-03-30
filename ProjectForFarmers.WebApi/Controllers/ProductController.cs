@@ -22,7 +22,7 @@ namespace FarmersMarketplace.WebApi.Controllers
         }
 
         [HttpGet("{productId}")]
-        [ProducesResponseType(typeof(ProductVm), 200)]
+        [ProducesResponseType(typeof(ProducerProductVm), 200)]
         public async Task<IActionResult> Get([FromRoute] Guid productId)
         {
             var request = await ProductService.Get(productId);
@@ -30,7 +30,7 @@ namespace FarmersMarketplace.WebApi.Controllers
         }
 
         [HttpGet("{product}/{productId}")]
-        [ProducesResponseType(typeof(ProductVm), 200)]
+        [ProducesResponseType(typeof(ProducerProductVm), 200)]
         public async Task<IActionResult> GetFilterData([FromRoute] Guid productId, [FromRoute] Producer producer)
         {
             var request = await ProductService.GetFilterData(producer, productId);
@@ -103,7 +103,7 @@ namespace FarmersMarketplace.WebApi.Controllers
         }
 
         [HttpGet]
-        [ProducesResponseType(typeof(ProductVm), 200)]
+        [ProducesResponseType(typeof(ProducerProductVm), 200)]
         public async Task<IActionResult> Autocomplete([FromQuery] ProductAutocompleteDto dto)
         {
             var request = await ProductService.Autocomplete(dto);
