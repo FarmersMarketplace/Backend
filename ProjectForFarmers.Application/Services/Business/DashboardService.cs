@@ -25,7 +25,7 @@ namespace FarmersMarketplace.Application.Services.Business
 
         public async Task<OptionListVm> CustomerAutocomplete(Guid producerId, Producer producer, string query, int count)
         {
-            var cacheKey = CacheHelper.GenerateCacheKey(producerId, producer, "customers");
+            var cacheKey = "";
             var vm = new OptionListVm();
 
             if (MemoryCache.TryGetValue(cacheKey, out List<string> cachedCustomerNames))

@@ -15,13 +15,13 @@ namespace FarmersMarketplace.Application.Mappings
         public ProductMappingProfile()
         {
             MapCreateProductDtoToProduct();
-            MapProductToProductVm();
+            MapProductToProducerProductVm();
             MapProductToProductLookupVm();
         }
 
-        private void MapProductToProductVm()
+        private void MapProductToProducerProductVm()
         {
-            CreateMap<Product, ProductVm>()
+            CreateMap<Product, ProducerProductVm>()
                 .ForMember(vm => vm.Category, opt => opt.MapFrom(product => product.Category.Name))
                 .ForMember(vm => vm.Subcategory, opt => opt.MapFrom(product => product.Subcategory.Name))
                 .ForMember(vm => vm.ProducerName, opt => opt.MapFrom(product => ""));

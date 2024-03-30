@@ -51,6 +51,8 @@ namespace FarmersMarketplace.Elasticsearch.Factories
                             .Name(product => product.ExpirationDate))
                         .Text(t => t
                             .Name(product => product.ImageName))
+                        .Text(t => t
+                            .Name(product => product.ProducerImageName))
                         .Number(t => t
                             .Name(product => product.Rating))
                         .Number(t => t

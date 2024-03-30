@@ -141,6 +141,9 @@
   <data name="DuplicateEmail" xml:space="preserve">
     <value>Email {0} is already associated with another account.</value>
   </data>
+  <data name="ElasticsearchProductsNotDeleted" xml:space="preserve">
+    <value>Products documents was not deleted successful from Elasticsearch.</value>
+  </data>
   <data name="EmailIsAssociatedWithAnotherAccount" xml:space="preserve">
     <value>Email {0} is already associated with another account.</value>
   </data>

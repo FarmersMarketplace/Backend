@@ -133,6 +133,15 @@ namespace FarmersMarketplace.Application.Resources.Exceptions {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Products documents was not deleted successful from Elasticsearch..
+        /// </summary>
+        internal static string ElasticsearchProductsNotDeleted {
+            get {
+                return ResourceManager.GetString("ElasticsearchProductsNotDeleted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Email {0} is already associated with another account..
         /// </summary>
         internal static string EmailIsAssociatedWithAnotherAccount {
