@@ -207,7 +207,7 @@ namespace FarmersMarketplace.Application.Services.Business
             return vm;
         }
 
-        public async Task<ProductListVm> GetAll(GetProductListDto dto)
+        public async Task<ProducerProductListVm> GetAll(GetProductListDto dto)
         {
             var productsQuery = DbContext.Products.Include(p => p.Category)
                 .Include(p => p.Subcategory)
@@ -232,7 +232,7 @@ namespace FarmersMarketplace.Application.Services.Business
             var products = await productsQuery.OrderByDescending(product => product.CreationDate)
                 .ToListAsync();
 
-            var vm = new ProductListVm
+            var vm = new ProducerProductListVm
             {
                 Products = new List<ProducerProductLookupVm>(),
                 Count = products.Count

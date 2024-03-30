@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace FarmersMarketplace.Application.ViewModels.Product
 {
-    public class ProductListVm
+    public class ProducerProductListVm
     {
         public List<ProducerProductLookupVm> Products { get; set; }
         public int Count { get; set; }

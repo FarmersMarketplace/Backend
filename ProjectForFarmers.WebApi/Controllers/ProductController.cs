@@ -51,7 +51,7 @@ namespace FarmersMarketplace.WebApi.Controllers
 
         [HttpGet]
         [Authorize(Roles = "Farmer, Seller")]
-        [ProducesResponseType(typeof(ProductListVm), 200)]
+        [ProducesResponseType(typeof(ProducerProductListVm), 200)]
         public async Task<IActionResult> GetAll([FromQuery] GetProductListDto dto)
         {
             var request = await ProductService.GetAll(dto);
