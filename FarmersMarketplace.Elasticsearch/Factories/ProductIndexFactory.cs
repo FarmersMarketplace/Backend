@@ -3,6 +3,8 @@ using FarmersMarketplace.Application.Exceptions;
 using FarmersMarketplace.Application.Helpers;
 using FarmersMarketplace.Application.Interfaces;
 using FarmersMarketplace.Domain;
+using FarmersMarketplace.Domain.Accounts;
+using FarmersMarketplace.Domain.Payment;
 using FarmersMarketplace.Elasticsearch.Documents;
 using Microsoft.EntityFrameworkCore;
 using Nest;
@@ -55,11 +57,11 @@ namespace FarmersMarketplace.Elasticsearch.Factories
                             .Name(product => product.Status))
                         .Date(t => t
                             .Name(product => product.ExpirationDate))
-                        .Text(t => t
+                        .Keyword(t => t
                             .Name(product => product.ImageName))
                         .Text(t => t
                             .Name(product => product.ProducerName))
-                        .Text(t => t
+                        .Keyword(t => t
                             .Name(product => product.ProducerImageName))
                         .Number(t => t
                             .Name(product => product.Rating))
@@ -109,6 +111,9 @@ namespace FarmersMarketplace.Elasticsearch.Factories
                         (farm.ImagesNames != null && farm.ImagesNames.Count > 0)
                         ? farm.ImagesNames[0]
                         : "";
+
+                    documents[i].HasOnlinePayment = farm.PaymentTypes != null && farm.PaymentTypes.Contains(PaymentType.Online);
+                    documents[i].ReceivingMethods = farm.ReceivingMethods;
                 }
                 else if (products[i].Producer == Producer.Seller)
                 {
@@ -127,6 +132,9 @@ namespace FarmersMarketplace.Elasticsearch.Factories
                         (seller.ImagesNames != null && seller.ImagesNames.Count > 0)
                         ? seller.ImagesNames[0]
                         : "";
+
+                    documents[i].HasOnlinePayment = seller.PaymentTypes != null && seller.PaymentTypes.Contains(PaymentType.Online);
+                    documents[i].ReceivingMethods = seller.ReceivingMethods;
                 }
                 else
                 {

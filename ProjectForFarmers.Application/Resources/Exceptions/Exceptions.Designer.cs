@@ -259,6 +259,15 @@ namespace FarmersMarketplace.Application.Resources.Exceptions {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Products documents was not got successfully..
+        /// </summary>
+        internal static string ProductsNotGotSuccessfully {
+            get {
+                return ResourceManager.GetString("ProductsNotGotSuccessfully", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Source file with name {0} was not found..
         /// </summary>
         internal static string SourceFileNotFound {

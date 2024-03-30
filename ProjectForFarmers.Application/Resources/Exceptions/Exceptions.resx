@@ -183,6 +183,9 @@
   <data name="ProductNotFound" xml:space="preserve">
     <value>Product was not found.</value>
   </data>
+  <data name="ProductsNotGotSuccessfully" xml:space="preserve">
+    <value>Products documents was not got successfully.</value>
+  </data>
   <data name="SourceFileNotFound" xml:space="preserve">
     <value>Source file with name {0} was not found.</value>
   </data>

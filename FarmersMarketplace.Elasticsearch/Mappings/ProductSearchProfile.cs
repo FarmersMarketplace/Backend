@@ -40,7 +40,7 @@ namespace FarmersMarketplace.Elasticsearch.Mappings
                     : ""))
                 .ForMember(document => document.ProducerImageName, opt => opt.MapFrom(product => ""))
                 .ForMember(document => document.ProducerName, opt => opt.MapFrom(product => ""))
-                .ForMember(document => document.FeedbacksCount, opt => opt.MapFrom(product => product.Feedbacks.Count));
+                .ForMember(document => document.FeedbacksCount, opt => opt.MapFrom(product => product.Feedbacks.Count))
         }
     }
 
