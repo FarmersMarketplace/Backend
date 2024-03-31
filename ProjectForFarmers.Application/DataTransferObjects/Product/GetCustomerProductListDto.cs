@@ -7,7 +7,7 @@ namespace FarmersMarketplace.Application.DataTransferObjects.Product
         public string? Query { get; set; }
         public CustomerProductFilter? Filter { get; set; }
         public int Page {  get; set; }
-        public int CountPerPage { get; set; }
+        public int PageSize { get; set; }
     }
 
 }

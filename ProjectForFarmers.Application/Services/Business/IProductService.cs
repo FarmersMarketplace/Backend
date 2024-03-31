@@ -13,7 +13,7 @@ namespace FarmersMarketplace.Application.Services.Business
         Task ChangeStatus(ProductListDto dto, ProductStatus status, Guid accountId);
         Task Duplicate(ProductListDto dto, Guid accountId);
         Task<ProducerProductVm> Get(Guid productId);
-        Task<ProducerProductListVm> GetAll (GetProductListDto dto);
+        Task<ProducerProductListVm> GetAll (GetProducerProductListDto dto);
         Task<OptionListVm> Autocomplete(ProductAutocompleteDto dto);
         Task<FilterData> GetFilterData(Producer producer, Guid producerId);
         Task<(string fileName, byte[] bytes)> ExportToExcel(ExportProductsDto dto);

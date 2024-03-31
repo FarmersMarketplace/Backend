@@ -85,21 +85,17 @@ namespace FarmersMarketplace.Elasticsearch.SearchProviders
             if(filter.OnlyOnlinePayment == true)
             {
                 SearchDescriptor.Query(q => q
-                    .Bool(b => b
-                        .Must(m => m
-                            .Term(t => t
-                                .Field(p => p.HasOnlinePayment)
-                                .Value(true)))));
+                    .Term(t => t
+                        .Field(p => p.HasOnlinePayment)
+                        .Value(true)));
             }
 
             if (filter.Producer.HasValue)
             {
                 SearchDescriptor.Query(q => q
-                    .Bool(b => b
-                        .Must(m => m
-                            .Term(t => t
-                                .Field(p => p.Producer)
-                                .Value(filter.Producer)))));
+                    .Term(t => t
+                        .Field(p => p.Producer)
+                        .Value(filter.Producer)));
             }
 
             if (filter.Farms.Any())
@@ -133,29 +129,25 @@ namespace FarmersMarketplace.Elasticsearch.SearchProviders
             if (filter.Subcategories.Any())
             {
                 SearchDescriptor.Query(q => q
-                    .Bool(b => b
-                        .Must(m => m
-                                .Terms(t => t
-                                    .Field(p => p.SubcategoryId)
-                                    .Terms(filter.Subcategories)))));
+                    .Terms(t => t
+                        .Field(p => p.SubcategoryId)
+                        .Terms(filter.Subcategories)));
             }
 
             if (!filter.Region.IsNullOrEmpty())
             {
                 SearchDescriptor.Query(q => q
-                    .Bool(b => b
-                        .Must(m => m
-                            .Term(t => t
-                                .Field(p => p.Region)
-                                .Value(filter.Region)))));
+                    .Match(m => m
+                        .Field(p => p.Region)
+                        .Query(filter.Region)));
             }
         }
 
 
         protected override async Task ApplyPagination()
         {
-            SearchDescriptor.Size(Request.CountPerPage)
-                       .From((Request.Page - 1) * Request.CountPerPage);
+            SearchDescriptor.Size(Request.PageSize)
+                       .From((Request.Page - 1) * Request.PageSize);
         }
 
         protected override async Task ApplyQuery()

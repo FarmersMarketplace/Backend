@@ -207,7 +207,7 @@ namespace FarmersMarketplace.Application.Services.Business
             return vm;
         }
 
-        public async Task<ProducerProductListVm> GetAll(GetProductListDto dto)
+        public async Task<ProducerProductListVm> GetAll(GetProducerProductListDto dto)
         {
             var productsQuery = DbContext.Products.Include(p => p.Category)
                 .Include(p => p.Subcategory)
