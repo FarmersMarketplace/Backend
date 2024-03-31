@@ -43,7 +43,7 @@ namespace FarmersMarketplace.Application.Mappings
 
         private void MapOrderToOrderLookupVm()
         {
-            CreateMap<Order, OrderLookupVm>()
+            CreateMap<Order, ProducerOrderLookupVm>()
                 .ForMember(vm => vm.Id, opt => opt.MapFrom(order => order.Id))
                 .ForMember(vm => vm.Number, opt => opt.MapFrom(order => order.Number.ToString("D7")))
                 .ForMember(vm => vm.CreationDate, opt => opt.MapFrom(order => order.CreationDate))

@@ -3,7 +3,7 @@ using FarmersMarketplace.Domain.Payment;
 
 namespace FarmersMarketplace.Application.Filters
 {
-    public class OrderFilter
+    public class ProducerOrderFilter
     {
         public List<OrderStatus>? Statuses { get; set; }
         public DateTime? StartDate { get; set; }
