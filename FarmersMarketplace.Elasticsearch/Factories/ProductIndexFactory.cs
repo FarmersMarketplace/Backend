@@ -47,7 +47,7 @@ namespace FarmersMarketplace.Elasticsearch.Factories
                             .Name(product => product.SubcategoryName))
                         .Number(t => t
                             .Name(product => product.Count))
-                        .Text(t => t
+                        .Keyword(t => t
                             .Name(product => product.UnitOfMeasurement))
                         .Date(t => t
                             .Name(product => product.CreationDate))
@@ -61,6 +61,8 @@ namespace FarmersMarketplace.Elasticsearch.Factories
                             .Name(product => product.ImageName))
                         .Text(t => t
                             .Name(product => product.ProducerName))
+                        .Keyword(t => t
+                            .Name(product => product.Region))
                         .Keyword(t => t
                             .Name(product => product.ProducerImageName))
                         .Number(t => t

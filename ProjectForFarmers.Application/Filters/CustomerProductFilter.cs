@@ -13,10 +13,10 @@ namespace FarmersMarketplace.Application.Filters
         public List<ReceivingMethod>? ReceivingMethods { get; set; }
         public bool? OnlyOnlinePayment { get; set; }
         public Producer? Producer { get; set; }
-        public List<Guid>? Farms { get; set; }
-        public List<Guid>? Sellers { get; set; }
+        public HashSet<Guid>? Farms { get; set; }
+        public HashSet<Guid>? Sellers { get; set; }
         public string? Region { get; set; }
-        public List<Guid>? Subcategories { get; set; }
+        public HashSet<Guid>? Subcategories { get; set; }
     }
 
 }

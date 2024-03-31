@@ -26,6 +26,7 @@ namespace FarmersMarketplace.Elasticsearch.Documents
         public uint FeedbacksCount { get; set; }
         public string ProducerName { get; set; }
         public bool HasOnlinePayment { get; set; }
+        public string Region { get; set; }
     }
 
 }

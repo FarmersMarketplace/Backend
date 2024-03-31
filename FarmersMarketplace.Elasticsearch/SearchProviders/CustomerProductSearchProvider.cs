@@ -2,7 +2,9 @@
 using FarmersMarketplace.Application.DataTransferObjects.Product;
 using FarmersMarketplace.Application.Helpers;
 using FarmersMarketplace.Application.ViewModels.Product;
+using FarmersMarketplace.Domain;
 using FarmersMarketplace.Elasticsearch.Documents;
+using Microsoft.IdentityModel.Tokens;
 using Nest;
 using Newtonsoft.Json;
 using ApplicationException = FarmersMarketplace.Application.Exceptions.ApplicationException;
@@ -27,63 +29,125 @@ namespace FarmersMarketplace.Elasticsearch.SearchProviders
 
             if (filter.MaxPrice.HasValue)
             {
-                SearchDescriptor.Query(q => q.Range(r => r.Field(fd => fd.PricePerOne).LessThanOrEquals(filter.MaxPrice)));
+                SearchDescriptor.Query(q => q
+                    .Range(r => r
+                        .Field(fd => fd.PricePerOne)
+                            .LessThanOrEquals((double)filter.MaxPrice)));
             }
 
             if (filter.MinPrice.HasValue)
             {
-                SearchDescriptor.Query(q => q.Range(r => r.Field(fd => fd.Price).GreaterThanOrEquals(filter.MinPrice)));
+                SearchDescriptor.Query(q => q
+                    .Range(r => r.Field(fd => fd.PricePerOne)
+                        .GreaterThanOrEquals((double)filter.MinPrice)));
             }
 
             if (filter.MaxCount.HasValue)
             {
-                SearchDescriptor.Query(q => q.Range(r => r.Field(fd => fd.Count).LessThanOrEquals(filter.MaxCount)));
+                SearchDescriptor.Query(q => q
+                    .Range(r => r
+                        .Field(fd => fd.Count)
+                            .LessThanOrEquals(filter.MaxCount)));
             }
 
             if (filter.MinCount.HasValue)
             {
-                SearchDescriptor.Query(q => q.Range(r => r.Field(fd => fd.Count).GreaterThanOrEquals(filter.MinCount)));
-            }
-
-            if (filter.MaxCreationDate.HasValue)
-            {
-                SearchDescriptor.Query(q => q.Range(r => r.Field(fd => fd.CreationDate).LessThanOrEquals(filter.MaxCreationDate)));
+                SearchDescriptor.Query(q => q
+                    .Range(r => r
+                        .Field(fd => fd.Count)
+                            .GreaterThanOrEquals(filter.MinCount)));
             }
 
             if (filter.MinCreationDate.HasValue)
             {
-                SearchDescriptor.Query(q => q.Range(r => r.Field(fd => fd.CreationDate).GreaterThanOrEquals(filter.MinCreationDate)));
+                SearchDescriptor.Query(q => q
+                    .DateRange(r => r
+                        .Field(fd => fd.CreationDate)
+                            .GreaterThanOrEquals(filter.MinCreationDate)));
+            }
+
+            if (filter.MaxCreationDate.HasValue)
+            {
+                SearchDescriptor.Query(q => q
+                    .DateRange(r => r
+                        .Field(fd => fd.CreationDate)
+                            .LessThanOrEquals(filter.MaxCreationDate)));
             }
 
             if (filter.ReceivingMethods != null && filter.ReceivingMethods.Any())
             {
-                SearchDescriptor.Query(q => q.Terms(t => t.Field(fd => fd.ReceivingMethod).Terms(filter.ReceivingMethods)));
+                SearchDescriptor.Query(q => q
+                    .Terms(t => t
+                        .Field(fd => fd.ReceivingMethods)
+                            .Terms(filter.ReceivingMethods)));
+            }
+            
+            if(filter.OnlyOnlinePayment == true)
+            {
+                SearchDescriptor.Query(q => q
+                    .Bool(b => b
+                        .Must(m => m
+                            .Term(t => t
+                                .Field(p => p.HasOnlinePayment)
+                                .Value(true)))));
             }
 
-            if (filter.OnlyOnlinePayment.HasValue)
+            if (filter.Producer.HasValue)
             {
-                SearchDescriptor.Query(q => q.Term(t => t.Field(fd => fd.OnlyOnlinePayment).Value(filter.OnlyOnlinePayment)));
+                SearchDescriptor.Query(q => q
+                    .Bool(b => b
+                        .Must(m => m
+                            .Term(t => t
+                                .Field(p => p.Producer)
+                                .Value(filter.Producer)))));
             }
-            if (Request.Filter != null)
+
+            if (filter.Farms.Any())
             {
+                SearchDescriptor.Query(q => q
+                    .Bool(b => b
+                        .Must(m => m
+                            .Term(t => t
+                                .Field(p => p.Producer)
+                                .Value(Producer.Farm)),
+                              m => m
+                                .Terms(t => t
+                                    .Field(p => p.ProducerId)
+                                    .Terms(filter.Farms)))));
+            }
 
-                if (filter.MinCreationDate.HasValue || filter.MaxCreationDate.HasValue)
-                {
-                    var dateRangeDescriptor = new DateRangeQueryDescriptor<ProductDocument>()
-                        .Field(fd => fd.CreationDate);
+            if (filter.Sellers.Any())
+            {
+                SearchDescriptor.Query(q => q
+                    .Bool(b => b
+                        .Must(m => m
+                            .Term(t => t
+                                .Field(p => p.Producer)
+                                .Value(Producer.Seller)),
+                              m => m
+                                .Terms(t => t
+                                    .Field(p => p.ProducerId)
+                                    .Terms(filter.Sellers)))));
+            }
 
-                    if (filter.MinCreationDate.HasValue)
-                    {
-                        dateRangeDescriptor = dateRangeDescriptor.GreaterThanOrEquals(filter.MinCreationDate);
-                    }
+            if (filter.Subcategories.Any())
+            {
+                SearchDescriptor.Query(q => q
+                    .Bool(b => b
+                        .Must(m => m
+                                .Terms(t => t
+                                    .Field(p => p.SubcategoryId)
+                                    .Terms(filter.Subcategories)))));
+            }
 
-                    if (filter.MaxCreationDate.HasValue)
-                    {
-                        dateRangeDescriptor = dateRangeDescriptor.LessThanOrEquals(filter.MaxCreationDate);
-                    }
-
-                    SearchDescriptor.Query(q => q.DateRange(dr => dateRangeDescriptor));
-                }
+            if (!filter.Region.IsNullOrEmpty())
+            {
+                SearchDescriptor.Query(q => q
+                    .Bool(b => b
+                        .Must(m => m
+                            .Term(t => t
+                                .Field(p => p.Region)
+                                .Value(filter.Region)))));
             }
         }
 
