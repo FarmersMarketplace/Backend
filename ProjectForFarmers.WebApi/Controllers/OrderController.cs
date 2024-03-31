@@ -30,7 +30,7 @@ namespace FarmersMarketplace.WebApi.Controllers
 
         [HttpGet]
         [ProducesResponseType(typeof(OrderListVm), 200)]
-        public async Task<IActionResult> GetAll([FromQuery] GetOrderListDto dto)
+        public async Task<IActionResult> GetAll([FromQuery] GetProducerOrderListDto dto)
         {
             var vm = await OrderService.GetAll(dto);
             return Ok(vm);

@@ -5,6 +5,7 @@ using FarmersMarketplace.Application.Helpers;
 using FarmersMarketplace.Application.Services.Business;
 using FarmersMarketplace.Application.ViewModels.Account;
 using FarmersMarketplace.Application.ViewModels.Auth;
+using FarmersMarketplace.Domain;
 using FarmersMarketplace.Domain.Accounts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -128,6 +129,15 @@ namespace FarmersMarketplace.WebApi.Controllers
             }
 
             await AccountService.DeleteAccount(role, AccountId);
+            return NoContent();
+        }
+
+        [HttpGet("{receivingMethod}")]
+        [Authorize(Roles = "Customer")]
+        [ProducesResponseType(typeof(CustomerOrderDetailsVm), 200)]
+        public async Task<IActionResult> DeleteAccount(ReceivingMethod receivingMethod)
+        {
+            var vm = await AccountService.GetCustomerOrderDetails(AccountId, receivingMethod);
             return NoContent();
         }
     }

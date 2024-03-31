@@ -486,6 +486,37 @@ namespace FarmersMarketplace.Application.Services.Business
             
             await DbContext.SaveChangesAsync();
         }
+
+        public async Task<CustomerOrderDetailsVm> GetCustomerOrderDetails(Guid accountId, ReceivingMethod receivingMethod)
+        {
+            var customer = await DbContext.Customers.Include(c => c.Address)
+                .Include(c => c.PaymentData)
+                .FirstOrDefaultAsync(a => a.Id == accountId);
+
+            if (customer == null)
+            {
+                string message = $"Account with Id {accountId} was not found.";
+                string userFacingMessage = CultureHelper.Exception("AccountNotFound");
+
+                throw new NotFoundException(message, userFacingMessage);
+            }
+
+            var vm = new CustomerOrderDetailsVm
+            {
+                Name = customer.Name,
+                Surname = customer.Surname,
+                Phone = customer.Phone,
+                AdditionalPhone = customer.AdditionalPhone,
+                PaymentData = Mapper.Map<CustomerPaymentDataVm>(customer.PaymentData)
+            };
+
+            if(receivingMethod == ReceivingMethod.Delivery)
+            {
+                vm.Address = Mapper.Map<CustomerAddressVm>(customer.Address);
+            }
+
+            return vm;
+        }
     }
 
 }

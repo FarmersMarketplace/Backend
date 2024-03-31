@@ -1,6 +1,7 @@
 ﻿using FarmersMarketplace.Application.DataTransferObjects;
 using FarmersMarketplace.Application.DataTransferObjects.Account;
 using FarmersMarketplace.Application.ViewModels.Account;
+using FarmersMarketplace.Domain;
 using FarmersMarketplace.Domain.Accounts;
 
 namespace FarmersMarketplace.Application.Services.Business
@@ -18,5 +19,6 @@ namespace FarmersMarketplace.Application.Services.Business
         Task UpdateFarmerPaymentData(ProducerPaymentDataDto dto, Guid accountId);
         Task UpdateSellerPaymentData(ProducerPaymentDataDto dto, Guid accountId);
         Task DeleteAccount(Role role, Guid accountId);
+        Task<CustomerOrderDetailsVm> GetCustomerOrderDetails(Guid accountId, ReceivingMethod receivingMethod);
     }
 }

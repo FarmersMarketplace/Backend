@@ -14,12 +14,15 @@ namespace FarmersMarketplace.Domain.Orders
         public PaymentStatus PaymentStatus { get; set; }
         public ReceivingMethod ReceivingMethod { get; set; }
         public Guid? DeliveryPointId { get; set; }
-        public CustomerAddress DeliveryPoint { get; set; }
+        public CustomerAddress? DeliveryPoint { get; set; }
         public Producer Producer { get; set; }
         public OrderStatus Status { get; set; }
         public Guid ProducerId { get; set; }
         public Guid CustomerId { get; set; }
-        public virtual Account Customer { get; set; }
+        public string CustomerName { get; set; }
+        public string CustomerSurname { get; set; }
+        public string CustomerPhone { get; set; }
+        public string CustomerAdditionalPhone { get; set; }
         public List<OrderItem> Items { get; set; }
     }
 

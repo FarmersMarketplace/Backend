@@ -8,7 +8,7 @@ namespace FarmersMarketplace.Application.ViewModels.Order
 {
     public class OrderListVm
     {
-        public List<OrderLookupVm> Orders {  get; set; }
+        public List<ProducerOrderLookupVm> Orders {  get; set; }
         public int Count { get; set; }
     }
 
