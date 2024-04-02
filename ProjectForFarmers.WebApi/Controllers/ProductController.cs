@@ -15,13 +15,17 @@ namespace FarmersMarketplace.WebApi.Controllers
     public class ProductController : ControllerBase
     {
         private readonly IProductService ProductService;
-        private readonly ISearchProvider<GetProducerProductListDto, ProducerProductListVm> SearchProvider;
+        private readonly ISearchProvider<GetProducerProductListDto, ProducerProductListVm> ProducerSearchProvider;
+        private readonly ISearchProvider<GetCustomerProductListDto, CustomerProductListVm> CustomerSearchProvider;
         private Guid AccountId => Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
 
-        public ProductController(IProductService productService, ISearchProvider<GetProducerProductListDto, ProducerProductListVm> searchProvider)
+        public ProductController(IProductService productService, 
+            ISearchProvider<GetProducerProductListDto, ProducerProductListVm> searchProvider,
+            ISearchProvider<GetCustomerProductListDto, CustomerProductListVm> customerSearchProvider)
         {
             ProductService = productService;
-            SearchProvider = searchProvider;
+            ProducerSearchProvider = searchProvider;
+            CustomerSearchProvider = customerSearchProvider;
         }
 
         [HttpGet("{productId}")]
@@ -55,9 +59,17 @@ namespace FarmersMarketplace.WebApi.Controllers
         [HttpGet]
         [Authorize(Roles = "Farmer, Seller")]
         [ProducesResponseType(typeof(ProducerProductListVm), 200)]
-        public async Task<IActionResult> GetAll([FromQuery] GetProducerProductListDto dto)
+        public async Task<IActionResult> GetAllForProducer([FromQuery] GetProducerProductListDto dto)
         {
-            var request = await SearchProvider.Search(dto);
+            var request = await ProducerSearchProvider.Search(dto);
+            return Ok(request);
+        }
+
+        [HttpGet]
+        [ProducesResponseType(typeof(CustomerProductListVm), 200)]
+        public async Task<IActionResult> GetAllForCustomer([FromBody] GetCustomerProductListDto dto)
+        {
+            var request = await CustomerSearchProvider.Search(dto);
             return Ok(request);
         }
 

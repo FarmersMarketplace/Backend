@@ -4,17 +4,14 @@ using FarmersMarketplace.Application.Exceptions;
 using FarmersMarketplace.Application.Filters;
 using FarmersMarketplace.Application.Helpers;
 using FarmersMarketplace.Application.Interfaces;
-using FarmersMarketplace.Application.ViewModels.Category;
-using FarmersMarketplace.Application.ViewModels.Dashboard;
 using FarmersMarketplace.Application.ViewModels.Product;
 using FarmersMarketplace.Application.ViewModels.Subcategory;
 using FarmersMarketplace.Domain;
+using FarmersMarketplace.Domain.Feedbacks;
 using FastExcel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
 using System.Data;
 using InvalidDataException = FarmersMarketplace.Application.Exceptions.InvalidDataException;
 
@@ -79,6 +76,158 @@ namespace FarmersMarketplace.Application.Services.Business
 
         public async Task Create(CreateProductDto dto)
         {
+            //var products = new List<Product>
+            //{
+            //    new Product
+            //    {
+            //        Id = Guid.NewGuid(),
+            //        Name = "Apple",
+            //        Description = "Fresh and juicy apple",
+            //        ArticleNumber = GenerateArticleNumber(),
+            //        CategoryId = Guid.Parse("01c70bc4-9dac-4589-ba61-5179c7f26e31"),
+            //        SubcategoryId = Guid.Parse("e4312767-564f-4de5-9af5-6c951a3a5daa"),
+            //        Status = ProductStatus.ForSale,
+            //        Producer = Producer.Farm,
+            //        ProducerId = Guid.Parse("a8093c4c-8416-4970-87f1-f2f17d8e772b"),
+            //        PackagingType = "Box",
+            //        UnitOfMeasurement = "kg",
+            //        PricePerOne = 2.5m,
+            //        MinPurchaseQuantity = 1,
+            //        Count = 100,
+            //        ExpirationDays = 7,
+            //        CreationDate = DateTime.UtcNow.AddDays(-10),
+            //        ReceivingMethods = new List<ReceivingMethod> { ReceivingMethod.Delivery },
+            //        Rating = 4.5f,
+            //        Feedbacks = new List<ProductFeedback>(),
+            //        ImagesNames = new List<string>(),
+            //        DocumentsNames = new List<string>()
+            //    },
+            //    new Product
+            //    {
+            //        Id = Guid.NewGuid(),
+            //        Name = "Orange",
+            //        Description = "Sweet and tangy orange",
+            //        ArticleNumber = GenerateArticleNumber(),
+            //        CategoryId = Guid.Parse("01c70bc4-9dac-4589-ba61-5179c7f26e31"),
+            //        SubcategoryId = Guid.Parse("e4312767-564f-4de5-9af5-6c951a3a5daa"),
+            //        Status = ProductStatus.ForSale,
+            //        Producer = Producer.Farm,
+            //        ProducerId = Guid.Parse("a8093c4c-8416-4970-87f1-f2f17d8e772b"),
+            //        PackagingType = "Bag",
+            //        UnitOfMeasurement = "kg",
+            //        PricePerOne = 3.0m,
+            //        MinPurchaseQuantity = 1,
+            //        Count = 50,
+            //        ExpirationDays = 5,
+            //        CreationDate = DateTime.UtcNow.AddDays(-7),
+            //        ReceivingMethods = new List<ReceivingMethod> { ReceivingMethod.SelfPickUp },
+            //        Rating = 4.0f,
+            //        Feedbacks = new List<ProductFeedback>(),
+            //        ImagesNames = new List<string>(),
+            //        DocumentsNames = new List<string>()
+            //    },
+            //    new Product
+            //    {
+            //        Id = Guid.NewGuid(),
+            //        Name = "Grapes",
+            //        Description = "Sweet and succulent grapes",
+            //        ArticleNumber = GenerateArticleNumber(),
+            //        CategoryId = Guid.Parse("01c70bc4-9dac-4589-ba61-5179c7f26e31"),
+            //        SubcategoryId = Guid.Parse("e4312767-564f-4de5-9af5-6c951a3a5daa"),
+            //        Status = ProductStatus.ForSale,
+            //        Producer = Producer.Farm,
+            //        ProducerId = Guid.Parse("a8093c4c-8416-4970-87f1-f2f17d8e772b"),
+            //        PackagingType = "Bunch",
+            //        UnitOfMeasurement = "kg",
+            //        PricePerOne = 5.0m,
+            //        MinPurchaseQuantity = 1,
+            //        Count = 80,
+            //        ExpirationDays = 7,
+            //        CreationDate = DateTime.UtcNow.AddDays(-3),
+            //        ReceivingMethods = new List<ReceivingMethod> { ReceivingMethod.SelfPickUp },
+            //        Rating = 4.3f,
+            //        Feedbacks = new List<ProductFeedback>(),
+            //        ImagesNames = new List<string>(),
+            //        DocumentsNames = new List<string>()
+            //    },
+            //    new Product
+            //    {
+            //        Id = Guid.NewGuid(),
+            //        Name = "Banana",
+            //        Description = "Delicious and nutritious banana",
+            //        ArticleNumber = GenerateArticleNumber(),
+            //        CategoryId = Guid.Parse("01c70bc4-9dac-4589-ba61-5179c7f26e31"),
+            //        SubcategoryId = Guid.Parse("e4312767-564f-4de5-9af5-6c951a3a5daa"),
+            //        Status = ProductStatus.ForSale,
+            //        Producer = Producer.Farm,
+            //        ProducerId = Guid.Parse("a8093c4c-8416-4970-87f1-f2f17d8e772b"),
+            //        PackagingType = "Bunch",
+            //        UnitOfMeasurement = "pcs",
+            //        PricePerOne = 1.0m,
+            //        MinPurchaseQuantity = 1,
+            //        Count = 200,
+            //        ExpirationDays = 3,
+            //        CreationDate = DateTime.UtcNow.AddDays(-5),
+            //        ReceivingMethods = new List<ReceivingMethod> { ReceivingMethod.Delivery, ReceivingMethod.SelfPickUp },
+            //        Rating = 4.8f,
+            //        Feedbacks = new List<ProductFeedback>(),
+            //        ImagesNames = new List<string>(),
+            //        DocumentsNames = new List<string>()
+            //    },
+            //    new Product
+            //    {
+            //        Id = Guid.NewGuid(),
+            //        Name = "Carrot",
+            //        Description = "Fresh and crunchy carrots",
+            //        ArticleNumber = GenerateArticleNumber(),
+            //        CategoryId = Guid.Parse("e1aab56f-4dc0-4b75-a059-171a7771bb63"),
+            //        SubcategoryId = Guid.Parse("1b850e70-11c9-4e52-85df-15f3567cbd9f"),
+            //        Status = ProductStatus.ForSale,
+            //        Producer = Producer.Farm,
+            //        ProducerId = Guid.Parse("a8093c4c-8416-4970-87f1-f2f17d8e772b"),
+            //        PackagingType = "Bunch",
+            //        UnitOfMeasurement = "kg",
+            //        PricePerOne = 3.0m,
+            //        MinPurchaseQuantity = 1,
+            //        Count = 150,
+            //        ExpirationDays = 5,
+            //        CreationDate = DateTime.UtcNow.AddDays(-7),
+            //        ReceivingMethods = new List<ReceivingMethod> { ReceivingMethod.Delivery },
+            //        Rating = 4.5f,
+            //        Feedbacks = new List<ProductFeedback>(),
+            //        ImagesNames = new List<string>(),
+            //        DocumentsNames = new List<string>()
+            //    },
+            //    new Product
+            //    {
+            //        Id = Guid.NewGuid(),
+            //        Name = "Tomato",
+            //        Description = "Juicy and ripe tomatoes",
+            //        ArticleNumber = GenerateArticleNumber(),
+            //        CategoryId = Guid.Parse("e1aab56f-4dc0-4b75-a059-171a7771bb63"),
+            //        SubcategoryId = Guid.Parse("1b850e70-11c9-4e52-85df-15f3567cbd9f"),
+            //        Status = ProductStatus.ForSale,
+            //        Producer = Producer.Farm,
+            //        ProducerId = Guid.Parse("a8093c4c-8416-4970-87f1-f2f17d8e772b"),
+            //        PackagingType = "Box",
+            //        UnitOfMeasurement = "kg",
+            //        PricePerOne = 2.0m,
+            //        MinPurchaseQuantity = 1,
+            //        Count = 100,
+            //        ExpirationDays = 4,
+            //        CreationDate = DateTime.UtcNow.AddDays(-4),
+            //        ReceivingMethods = new List<ReceivingMethod> { ReceivingMethod.SelfPickUp },
+            //        Rating = 4.2f,
+            //        Feedbacks = new List<ProductFeedback>(),
+            //        ImagesNames = new List<string>(),
+            //        DocumentsNames = new List<string>()
+            //    }
+            //};
+            //await DbContext.Products.AddRangeAsync(products);
+            //await DbContext.SaveChangesAsync();
+
+
+
             var product = Mapper.Map<Product>(dto);
 
             var category = await DbContext.Categories.FirstOrDefaultAsync(c => c.Id == product.CategoryId);

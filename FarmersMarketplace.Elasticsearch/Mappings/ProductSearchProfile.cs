@@ -16,15 +16,15 @@ namespace FarmersMarketplace.Elasticsearch.Mappings
 
         private void MapProductDocumentToProducerProductLookupVm()
         {
-            CreateMap<ProductDocument, ProducerProductLookupVm>();
+            CreateMap<ProductDocument, ProducerProductLookupVm>()
+                .ForMember(vm => vm.Category, opt => opt.MapFrom(document => document.CategoryName))
+                .ForMember(vm => vm.Subcategory, opt => opt.MapFrom(document => document.SubcategoryName))
+                .ForMember(vm => vm.Rest, opt => opt.MapFrom(document => document.Count));
         }
 
         private void MapProductDocumentToCustomerProductLookupVm()
         {
-                CreateMap<ProductDocument, ProducerProductLookupVm>()
-                    .ForMember(vm => vm.Category, opt => opt.MapFrom(document => document.CategoryName))
-                    .ForMember(vm => vm.Subcategory, opt => opt.MapFrom(document => document.SubcategoryName))
-                    .ForMember(vm => vm.Rest, opt => opt.MapFrom(document => document.Count));
+                CreateMap<ProductDocument, CustomerProductLookupVm>();
         }
 
         private void MapProductToProductDocument()

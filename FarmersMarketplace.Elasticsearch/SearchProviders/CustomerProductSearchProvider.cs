@@ -22,125 +22,90 @@ namespace FarmersMarketplace.Elasticsearch.SearchProviders
 
         protected override async Task ApplyFilter()
         {
-            if (Request.Filter == null) 
+            if (Request.Filter == null)
                 return;
 
             var filter = Request.Filter;
+            var sd = new SearchDescriptor<object>().Index("Products");
+            var mustQueries = new List<Func<QueryContainerDescriptor<ProductDocument>, QueryContainer>>();
 
             if (filter.MaxPrice.HasValue)
             {
-                SearchDescriptor.Query(q => q
-                    .Range(r => r
-                        .Field(fd => fd.PricePerOne)
-                            .LessThanOrEquals((double)filter.MaxPrice)));
+                mustQueries.Add(q => q.Range(r => r.Field(fd => fd.PricePerOne)
+                    .LessThanOrEquals((double)filter.MaxPrice)));
             }
 
             if (filter.MinPrice.HasValue)
             {
-                SearchDescriptor.Query(q => q
-                    .Range(r => r.Field(fd => fd.PricePerOne)
-                        .GreaterThanOrEquals((double)filter.MinPrice)));
+                mustQueries.Add(q => q.Range(r => r.Field(fd => fd.PricePerOne)
+                    .GreaterThanOrEquals((double)filter.MinPrice)));
             }
 
             if (filter.MaxCount.HasValue)
             {
-                SearchDescriptor.Query(q => q
-                    .Range(r => r
-                        .Field(fd => fd.Count)
-                            .LessThanOrEquals(filter.MaxCount)));
+                mustQueries.Add(q => q.Range(r => r.Field(fd => fd.Count)
+                    .LessThanOrEquals(filter.MaxCount)));
             }
 
             if (filter.MinCount.HasValue)
             {
-                SearchDescriptor.Query(q => q
-                    .Range(r => r
-                        .Field(fd => fd.Count)
-                            .GreaterThanOrEquals(filter.MinCount)));
+                mustQueries.Add(q => q.Range(r => r.Field(fd => fd.Count)
+                    .GreaterThanOrEquals(filter.MinCount)));
             }
 
             if (filter.MinCreationDate.HasValue)
             {
-                SearchDescriptor.Query(q => q
-                    .DateRange(r => r
-                        .Field(fd => fd.CreationDate)
-                            .GreaterThanOrEquals(filter.MinCreationDate)));
+                mustQueries.Add(q => q.DateRange(r => r.Field(fd => fd.CreationDate)
+                    .GreaterThanOrEquals((DateTime)filter.MinCreationDate)));
             }
 
             if (filter.MaxCreationDate.HasValue)
             {
-                SearchDescriptor.Query(q => q
-                    .DateRange(r => r
-                        .Field(fd => fd.CreationDate)
-                            .LessThanOrEquals(filter.MaxCreationDate)));
+                mustQueries.Add(q => q.DateRange(r => r.Field(fd => fd.CreationDate)
+                    .LessThanOrEquals((DateTime)filter.MaxCreationDate)));
             }
 
             if (filter.ReceivingMethods != null && filter.ReceivingMethods.Any())
             {
-                SearchDescriptor.Query(q => q
-                    .Terms(t => t
-                        .Field(fd => fd.ReceivingMethods)
-                            .Terms(filter.ReceivingMethods)));
+                mustQueries.Add(q => q.Terms(t => t.Field(fd => fd.ReceivingMethods)
+                    .Terms(filter.ReceivingMethods)));
             }
-            
-            if(filter.OnlyOnlinePayment == true)
+
+            if (filter.OnlyOnlinePayment == true)
             {
-                SearchDescriptor.Query(q => q
-                    .Term(t => t
-                        .Field(p => p.HasOnlinePayment)
-                        .Value(true)));
+                mustQueries.Add(q => q.Term(t => t.Field(p => p.HasOnlinePayment).Value(true)));
             }
 
             if (filter.Producer.HasValue)
             {
-                SearchDescriptor.Query(q => q
-                    .Term(t => t
-                        .Field(p => p.Producer)
-                        .Value(filter.Producer)));
+                mustQueries.Add(q => q.Term(t => t.Field(p => p.Producer).Value(filter.Producer)));
             }
 
-            if (filter.Farms.Any())
+            if (filter.Farms != null && filter.Farms.Any())
             {
-                SearchDescriptor.Query(q => q
+                mustQueries.Add(q => q.Bool(b => b.Must(m => m.Term(t => t.Field(p => p.Producer).Value(Producer.Farm)),
+                    m => m.Terms(t => t.Field(p => p.ProducerId).Terms(filter.Farms)))));
+            }
+
+            if (filter.Sellers != null && filter.Sellers.Any())
+            {
+                mustQueries.Add(q => q.Bool(b => b.Must(m => m.Term(t => t.Field(p => p.Producer).Value(Producer.Seller)),
+                    m => m.Terms(t => t.Field(p => p.ProducerId).Terms(filter.Sellers)))));
+            }
+
+            if (filter.Subcategories != null && filter.Subcategories.Any())
+            {
+                mustQueries.Add(q => q.Terms(t => t.Field(p => p.SubcategoryId).Terms(filter.Subcategories)));
+            }
+
+            if (!string.IsNullOrEmpty(filter.Region))
+            {
+                mustQueries.Add(q => q.Term(t => t.Field(p => p.Region).Value(filter.Region)));
+            }
+
+            SearchDescriptor.Query(q => q
                     .Bool(b => b
-                        .Must(m => m
-                            .Term(t => t
-                                .Field(p => p.Producer)
-                                .Value(Producer.Farm)),
-                              m => m
-                                .Terms(t => t
-                                    .Field(p => p.ProducerId)
-                                    .Terms(filter.Farms)))));
-            }
-
-            if (filter.Sellers.Any())
-            {
-                SearchDescriptor.Query(q => q
-                    .Bool(b => b
-                        .Must(m => m
-                            .Term(t => t
-                                .Field(p => p.Producer)
-                                .Value(Producer.Seller)),
-                              m => m
-                                .Terms(t => t
-                                    .Field(p => p.ProducerId)
-                                    .Terms(filter.Sellers)))));
-            }
-
-            if (filter.Subcategories.Any())
-            {
-                SearchDescriptor.Query(q => q
-                    .Terms(t => t
-                        .Field(p => p.SubcategoryId)
-                        .Terms(filter.Subcategories)));
-            }
-
-            if (!filter.Region.IsNullOrEmpty())
-            {
-                SearchDescriptor.Query(q => q
-                    .Match(m => m
-                        .Field(p => p.Region)
-                        .Query(filter.Region)));
-            }
+                        .Must(mustQueries)));
         }
 
 
@@ -152,23 +117,24 @@ namespace FarmersMarketplace.Elasticsearch.SearchProviders
 
         protected override async Task ApplyQuery()
         {
-            if (!string.IsNullOrEmpty(Request.Query))
-            {
-                SearchDescriptor.Query(q => q
-                    .QueryString(qs => qs
-                        .Query(Request.Query)));
-            }
+            //if (!string.IsNullOrEmpty(Request.Query))
+            //{
+            //    SearchDescriptor.Query(q => q
+            //        .QueryString(qs => qs
+            //            .Query(Request.Query)));
+            //}
         }
 
         protected override async Task ApplySorting()
         {
-            SearchDescriptor.Sort(s => s
-                .Descending(fd => fd.CreationDate));
+            //SearchDescriptor.Index(Indecies.Products)
+            //    .Sort(s => s
+            //        .Descending(fd => fd.CreationDate));
         }
 
         protected override async Task<CustomerProductListVm> Execute()
         {
-            var searchResponse = Client.Search<ProductDocument>(SearchDescriptor);
+            var searchResponse = Client.Search<ProductDocument>(SearchDescriptor.Index(Indecies.Products));
 
             if (!searchResponse.IsValid)
             {
@@ -180,14 +146,15 @@ namespace FarmersMarketplace.Elasticsearch.SearchProviders
 
             var response = new CustomerProductListVm
             {
-                Products = new List<CustomerProductLookupVm>(searchResponse.Documents.Count)
+                Products = new CustomerProductLookupVm[searchResponse.Documents.Count]
             };
 
-            var productList = searchResponse.Documents.ToArray();
+            var productList = searchResponse.Documents.Select(p => p.PricePerOne).ToArray();
 
             for (int i = 0; i < productList.Length; i++)
             {
-                response.Products[i] = Mapper.Map<CustomerProductLookupVm>(productList[i]);
+                //response.Products[i] = Mapper.Map<CustomerProductLookupVm>(productList[i]);
+                Console.WriteLine(productList[i]);
             }
 
             return response;
