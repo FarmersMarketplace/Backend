@@ -8,7 +8,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FarmersMarketplace.Persistence.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -149,35 +149,6 @@ namespace FarmersMarketplace.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Orders",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Number = table.Column<long>(type: "bigint", maxLength: 7, nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn),
-                    CreationDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    ReceiveDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    TotalPayment = table.Column<decimal>(type: "numeric", nullable: false),
-                    PaymentType = table.Column<int>(type: "integer", nullable: false),
-                    PaymentStatus = table.Column<int>(type: "integer", nullable: false),
-                    ReceivingMethod = table.Column<int>(type: "integer", nullable: false),
-                    DeliveryPointId = table.Column<Guid>(type: "uuid", nullable: true),
-                    Producer = table.Column<int>(type: "integer", nullable: false),
-                    Status = table.Column<int>(type: "integer", nullable: false),
-                    ProducerId = table.Column<Guid>(type: "uuid", nullable: false),
-                    CustomerId = table.Column<Guid>(type: "uuid", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Orders", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Orders_CustomerAddresses_DeliveryPointId",
-                        column: x => x.DeliveryPointId,
-                        principalTable: "CustomerAddresses",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Customers",
                 columns: table => new
                 {
@@ -193,7 +164,8 @@ namespace FarmersMarketplace.Persistence.Migrations
                     DateOfBirth = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     AvatarName = table.Column<string>(type: "text", nullable: true),
                     PaymentDataId = table.Column<Guid>(type: "uuid", nullable: true),
-                    AddressId = table.Column<Guid>(type: "uuid", nullable: true)
+                    AddressId = table.Column<Guid>(type: "uuid", nullable: true),
+                    FavouriteProducts = table.Column<List<Guid>>(type: "uuid[]", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -300,62 +272,40 @@ namespace FarmersMarketplace.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "OrdersItems",
+                name: "Orders",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    ProductId = table.Column<Guid>(type: "uuid", nullable: false),
-                    OrderId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Count = table.Column<long>(type: "bigint", nullable: false),
-                    PricePerOne = table.Column<decimal>(type: "numeric", nullable: false),
-                    TotalPrice = table.Column<decimal>(type: "numeric", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_OrdersItems", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_OrdersItems_Orders_OrderId",
-                        column: x => x.OrderId,
-                        principalTable: "Orders",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Farms",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Name = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
-                    Description = table.Column<string>(type: "text", nullable: true),
-                    Phone = table.Column<string>(type: "text", nullable: true),
-                    AdditionalPhone = table.Column<string>(type: "text", nullable: true),
-                    FirstSocialPageUrl = table.Column<string>(type: "text", nullable: true),
-                    SecondSocialPageUrl = table.Column<string>(type: "text", nullable: true),
-                    ImagesNames = table.Column<List<string>>(type: "text[]", nullable: true),
+                    Number = table.Column<long>(type: "bigint", maxLength: 7, nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn),
                     CreationDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    OwnerId = table.Column<Guid>(type: "uuid", nullable: false),
-                    AddressId = table.Column<Guid>(type: "uuid", nullable: false),
-                    ScheduleId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Categories = table.Column<List<Guid>>(type: "uuid[]", nullable: true),
-                    Subcategories = table.Column<List<Guid>>(type: "uuid[]", nullable: true),
-                    ReceivingMethods = table.Column<int[]>(type: "integer[]", nullable: true),
-                    PaymentTypes = table.Column<int[]>(type: "integer[]", nullable: true),
-                    PaymentDataId = table.Column<Guid>(type: "uuid", nullable: true)
+                    ReceiveDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    TotalPayment = table.Column<decimal>(type: "numeric", nullable: false),
+                    PaymentType = table.Column<int>(type: "integer", nullable: false),
+                    PaymentStatus = table.Column<int>(type: "integer", nullable: false),
+                    ReceivingMethod = table.Column<int>(type: "integer", nullable: false),
+                    DeliveryPointId = table.Column<Guid>(type: "uuid", nullable: true),
+                    Producer = table.Column<int>(type: "integer", nullable: false),
+                    Status = table.Column<int>(type: "integer", nullable: false),
+                    ProducerId = table.Column<Guid>(type: "uuid", nullable: false),
+                    CustomerId = table.Column<Guid>(type: "uuid", nullable: false),
+                    CustomerName = table.Column<string>(type: "text", nullable: true),
+                    CustomerSurname = table.Column<string>(type: "text", nullable: true),
+                    CustomerPhone = table.Column<string>(type: "text", nullable: true),
+                    CustomerAdditionalPhone = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Farms", x => x.Id);
+                    table.PrimaryKey("PK_Orders", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Farms_ProducerPaymentData_PaymentDataId",
-                        column: x => x.PaymentDataId,
-                        principalTable: "ProducerPaymentData",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        name: "FK_Orders_CustomerAddresses_DeliveryPointId",
+                        column: x => x.DeliveryPointId,
+                        principalTable: "CustomerAddresses",
+                        principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_Farms_Schedules_ScheduleId",
-                        column: x => x.ScheduleId,
-                        principalTable: "Schedules",
+                        name: "FK_Orders_Customers_CustomerId",
+                        column: x => x.CustomerId,
+                        principalTable: "Customers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -383,7 +333,8 @@ namespace FarmersMarketplace.Persistence.Migrations
                     ReceivingMethods = table.Column<int[]>(type: "integer[]", nullable: true),
                     PaymentTypes = table.Column<int[]>(type: "integer[]", nullable: true),
                     Categories = table.Column<List<Guid>>(type: "uuid[]", nullable: true),
-                    Subcategories = table.Column<List<Guid>>(type: "uuid[]", nullable: true)
+                    Subcategories = table.Column<List<Guid>>(type: "uuid[]", nullable: true),
+                    Rating = table.Column<float>(type: "real", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -397,6 +348,74 @@ namespace FarmersMarketplace.Persistence.Migrations
                         name: "FK_Sellers_Schedules_ScheduleId",
                         column: x => x.ScheduleId,
                         principalTable: "Schedules",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Farms",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Name = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    Description = table.Column<string>(type: "text", nullable: true),
+                    Phone = table.Column<string>(type: "text", nullable: true),
+                    AdditionalPhone = table.Column<string>(type: "text", nullable: true),
+                    FirstSocialPageUrl = table.Column<string>(type: "text", nullable: true),
+                    SecondSocialPageUrl = table.Column<string>(type: "text", nullable: true),
+                    ImagesNames = table.Column<List<string>>(type: "text[]", nullable: true),
+                    CreationDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    OwnerId = table.Column<Guid>(type: "uuid", nullable: false),
+                    AddressId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ScheduleId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Categories = table.Column<List<Guid>>(type: "uuid[]", nullable: true),
+                    Subcategories = table.Column<List<Guid>>(type: "uuid[]", nullable: true),
+                    ReceivingMethods = table.Column<int[]>(type: "integer[]", nullable: true),
+                    PaymentTypes = table.Column<int[]>(type: "integer[]", nullable: true),
+                    PaymentDataId = table.Column<Guid>(type: "uuid", nullable: true),
+                    Rating = table.Column<float>(type: "real", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Farms", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Farms_Farmers_OwnerId",
+                        column: x => x.OwnerId,
+                        principalTable: "Farmers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Farms_ProducerPaymentData_PaymentDataId",
+                        column: x => x.PaymentDataId,
+                        principalTable: "ProducerPaymentData",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Farms_Schedules_ScheduleId",
+                        column: x => x.ScheduleId,
+                        principalTable: "Schedules",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "OrdersItems",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    ProductId = table.Column<Guid>(type: "uuid", nullable: false),
+                    OrderId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Count = table.Column<long>(type: "bigint", nullable: false),
+                    PricePerOne = table.Column<decimal>(type: "numeric", nullable: false),
+                    TotalPrice = table.Column<decimal>(type: "numeric", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_OrdersItems", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_OrdersItems_Orders_OrderId",
+                        column: x => x.OrderId,
+                        principalTable: "Orders",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -510,10 +529,11 @@ namespace FarmersMarketplace.Persistence.Migrations
                     MinPurchaseQuantity = table.Column<long>(type: "bigint", nullable: false),
                     Count = table.Column<long>(type: "bigint", nullable: false),
                     ImagesNames = table.Column<List<string>>(type: "text[]", nullable: true),
-                    ExpirationDate = table.Column<long>(type: "bigint", nullable: false),
+                    ExpirationDays = table.Column<long>(type: "bigint", nullable: false),
                     CreationDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     DocumentsNames = table.Column<List<string>>(type: "text[]", nullable: true),
                     ReceivingMethods = table.Column<int[]>(type: "integer[]", nullable: true),
+                    Rating = table.Column<float>(type: "real", nullable: false),
                     FarmId = table.Column<Guid>(type: "uuid", nullable: true),
                     SellerId = table.Column<Guid>(type: "uuid", nullable: true)
                 },
@@ -542,6 +562,39 @@ namespace FarmersMarketplace.Persistence.Migrations
                         principalTable: "Subcategories",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ProductFeedback",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    ProductId = table.Column<Guid>(type: "uuid", nullable: false),
+                    FarmId = table.Column<Guid>(type: "uuid", nullable: true),
+                    SellerId = table.Column<Guid>(type: "uuid", nullable: true),
+                    CustomerId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Comment = table.Column<string>(type: "text", nullable: true),
+                    Rating = table.Column<float>(type: "real", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ProductFeedback", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ProductFeedback_Farms_FarmId",
+                        column: x => x.FarmId,
+                        principalTable: "Farms",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_ProductFeedback_Products_ProductId",
+                        column: x => x.ProductId,
+                        principalTable: "Products",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ProductFeedback_Sellers_SellerId",
+                        column: x => x.SellerId,
+                        principalTable: "Sellers",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateIndex(
@@ -731,6 +784,21 @@ namespace FarmersMarketplace.Persistence.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_ProductFeedback_FarmId",
+                table: "ProductFeedback",
+                column: "FarmId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProductFeedback_ProductId",
+                table: "ProductFeedback",
+                column: "ProductId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProductFeedback_SellerId",
+                table: "ProductFeedback",
+                column: "SellerId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Products_CategoryId",
                 table: "Products",
                 column: "CategoryId");
@@ -844,12 +912,6 @@ namespace FarmersMarketplace.Persistence.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Customers");
-
-            migrationBuilder.DropTable(
-                name: "Farmers");
-
-            migrationBuilder.DropTable(
                 name: "FarmsLogs");
 
             migrationBuilder.DropTable(
@@ -862,16 +924,19 @@ namespace FarmersMarketplace.Persistence.Migrations
                 name: "ProducerAddresses");
 
             migrationBuilder.DropTable(
-                name: "Products");
-
-            migrationBuilder.DropTable(
-                name: "CustomerPaymentData");
+                name: "ProductFeedback");
 
             migrationBuilder.DropTable(
                 name: "OrderGroupStatistic");
 
             migrationBuilder.DropTable(
                 name: "Orders");
+
+            migrationBuilder.DropTable(
+                name: "Products");
+
+            migrationBuilder.DropTable(
+                name: "Customers");
 
             migrationBuilder.DropTable(
                 name: "Farms");
@@ -886,13 +951,19 @@ namespace FarmersMarketplace.Persistence.Migrations
                 name: "CustomerAddresses");
 
             migrationBuilder.DropTable(
-                name: "ProducerPaymentData");
+                name: "CustomerPaymentData");
+
+            migrationBuilder.DropTable(
+                name: "Farmers");
 
             migrationBuilder.DropTable(
                 name: "Schedules");
 
             migrationBuilder.DropTable(
                 name: "Categories");
+
+            migrationBuilder.DropTable(
+                name: "ProducerPaymentData");
 
             migrationBuilder.DropTable(
                 name: "DaysOfWeek");

@@ -1,10 +1,8 @@
 ﻿using FarmersMarketplace.Application.DataTransferObjects;
 using FarmersMarketplace.Application.DataTransferObjects.Account;
-using FarmersMarketplace.Application.Exceptions;
 using FarmersMarketplace.Application.Helpers;
 using FarmersMarketplace.Application.Services.Business;
 using FarmersMarketplace.Application.ViewModels.Account;
-using FarmersMarketplace.Application.ViewModels.Auth;
 using FarmersMarketplace.Domain;
 using FarmersMarketplace.Domain.Accounts;
 using Microsoft.AspNetCore.Authorization;

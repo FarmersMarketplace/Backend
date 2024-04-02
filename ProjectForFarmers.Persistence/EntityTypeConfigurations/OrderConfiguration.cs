@@ -25,11 +25,6 @@ namespace FarmersMarketplace.Persistence.EntityTypeConfigurations
             builder.Property(order => order.PaymentStatus).IsRequired();
             builder.Property(order => order.ReceivingMethod).IsRequired();
 
-            builder.HasOne(order => order.Customer)
-                .WithMany() 
-                .HasForeignKey(order => order.CustomerId)
-                .IsRequired();
-
             builder.HasOne(order => order.DeliveryPoint)
                 .WithMany()
                 .HasForeignKey(order => order.DeliveryPointId);

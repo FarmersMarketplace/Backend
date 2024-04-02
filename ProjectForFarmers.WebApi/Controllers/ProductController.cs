@@ -6,6 +6,7 @@ using FarmersMarketplace.Application.ViewModels.Dashboard;
 using FarmersMarketplace.Application.ViewModels.Product;
 using FarmersMarketplace.Domain;
 using System.Security.Claims;
+using FarmersMarketplace.Application.Interfaces;
 
 namespace FarmersMarketplace.WebApi.Controllers
 {
@@ -14,18 +15,20 @@ namespace FarmersMarketplace.WebApi.Controllers
     public class ProductController : ControllerBase
     {
         private readonly IProductService ProductService;
+        private readonly ISearchProvider<GetProducerProductListDto, ProducerProductListVm> SearchProvider;
         private Guid AccountId => Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
 
-        public ProductController(IProductService productService)
+        public ProductController(IProductService productService, ISearchProvider<GetProducerProductListDto, ProducerProductListVm> searchProvider)
         {
             ProductService = productService;
+            SearchProvider = searchProvider;
         }
 
         [HttpGet("{productId}")]
         [ProducesResponseType(typeof(ProducerProductVm), 200)]
         public async Task<IActionResult> Get([FromRoute] Guid productId)
         {
-            var request = await ProductService.Get(productId);
+            var request = await ProductService.GetForProducer(productId);
             return Ok(request);
         }
 
@@ -33,7 +36,7 @@ namespace FarmersMarketplace.WebApi.Controllers
         [ProducesResponseType(typeof(ProducerProductVm), 200)]
         public async Task<IActionResult> GetFilterData([FromRoute] Guid productId, [FromRoute] Producer producer)
         {
-            var request = await ProductService.GetFilterData(producer, productId);
+            var request = await ProductService.GetProducerProductFilterData(producer, productId);
             return Ok(request);
         }
 
@@ -54,7 +57,7 @@ namespace FarmersMarketplace.WebApi.Controllers
         [ProducesResponseType(typeof(ProducerProductListVm), 200)]
         public async Task<IActionResult> GetAll([FromQuery] GetProducerProductListDto dto)
         {
-            var request = await ProductService.GetAll(dto);
+            var request = await SearchProvider.Search(dto);
             return Ok(request);
         }
 
@@ -102,12 +105,12 @@ namespace FarmersMarketplace.WebApi.Controllers
             return NoContent();
         }
 
-        [HttpGet]
-        [ProducesResponseType(typeof(ProducerProductVm), 200)]
-        public async Task<IActionResult> Autocomplete([FromQuery] ProductAutocompleteDto dto)
-        {
-            var request = await ProductService.Autocomplete(dto);
-            return Ok(request);
-        }
+        //[HttpGet]
+        //[ProducesResponseType(typeof(ProducerProductVm), 200)]
+        //public async Task<IActionResult> Autocomplete([FromQuery] ProductAutocompleteDto dto)
+        //{
+        //    var request = await ProductService.Autocomplete(dto);
+        //    return Ok(request);
+        //}
     }
 }

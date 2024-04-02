@@ -120,6 +120,9 @@
   <data name="AccountNumber" xml:space="preserve">
     <value>Account number</value>
   </data>
+  <data name="AdditionalPhone" xml:space="preserve">
+    <value>Additional phone</value>
+  </data>
   <data name="Amount" xml:space="preserve">
     <value>Amount</value>
   </data>

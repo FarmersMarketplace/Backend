@@ -19,6 +19,7 @@ using DayOfWeek = FarmersMarketplace.Domain.DayOfWeek;
 
 namespace FarmersMarketplace.Application.Services.Business
 {
+
     public class FarmService : Service, IFarmService
     {
         private readonly string FarmsImageFolder;
@@ -53,11 +54,7 @@ namespace FarmersMarketplace.Application.Services.Business
             {
                 farm.ImagesNames = new List<string>();
             }
-            string token = await JwtService.EmailConfirmationToken(farm.Id, dto.ContactEmail);
-            var owner = await DbContext.Farmers.FirstOrDefaultAsync(a => a.Id == farm.OwnerId);
 
-            string message = EmailContentBuilder.FarmEmailConfirmationMessageBody(farm.Name, owner.Name, owner.Surname, dto.ContactEmail, token);
-            await EmailHelper.SendEmail(message, dto.ContactEmail, "Farm Email Confirmation");
             await DbContext.SaveChangesAsync();
 
             var farmLog = new FarmLog
@@ -117,11 +114,14 @@ namespace FarmersMarketplace.Application.Services.Business
             await DbContext.SaveChangesAsync();
         }
 
-        private async Task<Location> GetCoordinates(AddressDto dto)
+        private async Task<Geocoding.Location> GetCoordinates(AddressDto dto)
         {
-            IGeocoder geocoder = new GoogleGeocoder() { ApiKey = Configuration["Geocoding:Apikey"] };
-            var request = await geocoder.GeocodeAsync($"{dto.Region} oblast, {dto.District} district, {dto.Settlement} street {dto.Street}, {dto.HouseNumber}, Ukraine");
-            var coords = request.FirstOrDefault().Coordinates;
+            var key = Configuration["Geocoding:Apikey"];
+            IGeocoder geocoder = new GoogleGeocoder() { ApiKey = key };
+            //var request = await geocoder.GeocodeAsync($"{address.Region} oblast, {address.District} district, {address.Settlement} street {address.Street}, {address.HouseNumber}, Ukraine");
+            //var coords = request.FirstOrDefault().Coordinates;
+            var coords = new Location(50, 50);
+
             return coords;
         }
 

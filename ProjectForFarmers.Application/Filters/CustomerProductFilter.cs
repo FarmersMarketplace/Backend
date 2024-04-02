@@ -10,7 +10,7 @@ namespace FarmersMarketplace.Application.Filters
         public uint? MinCount { get; set; }
         public DateTime? MaxCreationDate { get; set; }
         public DateTime? MinCreationDate { get; set; }
-        public List<ReceivingMethod>? ReceivingMethods { get; set; }
+        public HashSet<ReceivingMethod>? ReceivingMethods { get; set; }
         public bool? OnlyOnlinePayment { get; set; }
         public Producer? Producer { get; set; }
         public HashSet<Guid>? Farms { get; set; }

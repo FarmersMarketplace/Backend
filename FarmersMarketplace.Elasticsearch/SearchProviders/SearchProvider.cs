@@ -21,6 +21,7 @@ namespace FarmersMarketplace.Elasticsearch.SearchProviders
 
             await ApplyQuery();
             await ApplyFilter();
+            await ApplySorting();
             await ApplyPagination();
 
             return await Execute();
@@ -28,6 +29,7 @@ namespace FarmersMarketplace.Elasticsearch.SearchProviders
 
         protected abstract Task ApplyQuery();
         protected abstract Task ApplyFilter();
+        protected abstract Task ApplySorting();
         protected abstract Task ApplyPagination();
         protected abstract Task<TResponse> Execute();
     }

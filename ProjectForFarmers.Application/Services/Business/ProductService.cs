@@ -1,83 +1,81 @@
 ﻿using AutoMapper;
+using FarmersMarketplace.Application.DataTransferObjects.Product;
+using FarmersMarketplace.Application.Exceptions;
+using FarmersMarketplace.Application.Filters;
+using FarmersMarketplace.Application.Helpers;
+using FarmersMarketplace.Application.Interfaces;
+using FarmersMarketplace.Application.ViewModels.Category;
+using FarmersMarketplace.Application.ViewModels.Dashboard;
+using FarmersMarketplace.Application.ViewModels.Product;
+using FarmersMarketplace.Application.ViewModels.Subcategory;
+using FarmersMarketplace.Domain;
 using FastExcel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using FarmersMarketplace.Application.DataTransferObjects.Product;
-using FarmersMarketplace.Application.Exceptions;
-using FarmersMarketplace.Application.Filters;
-using FarmersMarketplace.Application.Helpers;
-using FarmersMarketplace.Application.Interfaces;
-using FarmersMarketplace.Application.ViewModels.Dashboard;
-using FarmersMarketplace.Application.ViewModels.Product;
-using FarmersMarketplace.Domain;
 using System.Data;
 using InvalidDataException = FarmersMarketplace.Application.Exceptions.InvalidDataException;
-using FarmersMarketplace.Application.ViewModels.Category;
-using FarmersMarketplace.Application.ViewModels.Subcategory;
 
 namespace FarmersMarketplace.Application.Services.Business
 {
     public class ProductService : Service, IProductService
     {
         private readonly FileHelper FileHelper;
-        private readonly IMemoryCache MemoryCache;
         private readonly string ProductsImagesFolder;
         private readonly string DocumentsFolder;
         private readonly ValidateService Validator;
 
-        public ProductService(IMapper mapper, IApplicationDbContext dbContext, IConfiguration configuration, IMemoryCache memoryCache) : base(mapper, dbContext, configuration)
+        public ProductService(IMapper mapper, IApplicationDbContext dbContext, IConfiguration configuration) : base(mapper, dbContext, configuration)
         {
             FileHelper = new FileHelper();
-            MemoryCache = memoryCache;
             ProductsImagesFolder = Configuration["File:Images:Product"];
             DocumentsFolder = Configuration["File:Documents"];
             Validator = new ValidateService(DbContext);
         }
 
-        public async Task<OptionListVm> Autocomplete(ProductAutocompleteDto dto)
-        {
-            var cacheKey = "";
+        //public async Task<OptionListVm> Autocomplete(ProductAutocompleteDto dto)
+        //{
+        //    var cacheKey = "";
 
-            var vm = new OptionListVm();
-            var productsInfo = new List<ProductInfo>();
+        //    var vm = new OptionListVm();
+        //    var productsInfo = new List<ProductInfo>();
 
-            if (!MemoryCache.TryGetValue(cacheKey, out productsInfo))
-            {
-                productsInfo = await DbContext.Products
-                    .Where(p => p.ProducerId == dto.ProducerId && p.Producer == dto.Producer)
-                    .Select(p => new ProductInfo { Name = p.Name, ArticleNumber = p.ArticleNumber })
-                    .Distinct()
-                    .ToListAsync();
+        //    if (!MemoryCache.TryGetValue(cacheKey, out productsInfo))
+        //    {
+        //        productsInfo = await DbContext.Products
+        //            .Where(p => p.ProducerId == dto.ProducerId && p.Producer == dto.Producer)
+        //            .Select(p => new ProductInfo { Name = p.Name, ArticleNumber = p.ArticleNumber })
+        //            .Distinct()
+        //            .ToListAsync();
 
-                MemoryCache.Set(cacheKey, productsInfo, TimeSpan.FromMinutes(10));
-            }
+        //        MemoryCache.Set(cacheKey, productsInfo, TimeSpan.FromMinutes(10));
+        //    }
 
-            int added = 0;
+        //    int added = 0;
 
-            if(!dto.Query.IsNullOrEmpty()) dto.Query = dto.Query.Trim();
+        //    if(!dto.Query.IsNullOrEmpty()) dto.Query = dto.Query.Trim();
 
-            for (int i = 0; i < productsInfo.Count && added < dto.Count; i++)
-            {
-                if (productsInfo[i].Name.Contains(dto.Query, StringComparison.OrdinalIgnoreCase)
-                     && !vm.Options.Contains(productsInfo[i].Name))
-                {
-                    vm.Options.Add(productsInfo[i].Name);
-                    added++;
-                }
+        //    for (int i = 0; i < productsInfo.Count && added < dto.Count; i++)
+        //    {
+        //        if (productsInfo[i].Name.Contains(dto.Query, StringComparison.OrdinalIgnoreCase)
+        //             && !vm.Options.Contains(productsInfo[i].Name))
+        //        {
+        //            vm.Options.Add(productsInfo[i].Name);
+        //            added++;
+        //        }
 
-                if (productsInfo[i].ArticleNumber.Contains(dto.Query, StringComparison.OrdinalIgnoreCase)
-                    && !vm.Options.Contains(productsInfo[i].ArticleNumber))
-                {
-                    vm.Options.Add(productsInfo[i].ArticleNumber);
-                    added++;
-                }
-            }
+        //        if (productsInfo[i].ArticleNumber.Contains(dto.Query, StringComparison.OrdinalIgnoreCase)
+        //            && !vm.Options.Contains(productsInfo[i].ArticleNumber))
+        //        {
+        //            vm.Options.Add(productsInfo[i].ArticleNumber);
+        //            added++;
+        //        }
+        //    }
 
-            return vm;
-        }
+        //    return vm;
+        //}
 
         public async Task Create(CreateProductDto dto)
         {
@@ -188,7 +186,7 @@ namespace FarmersMarketplace.Application.Services.Business
             return randomLetters + "-" + randomNumbers;
         }
 
-        public async Task<ProducerProductVm> Get(Guid productId)
+        public async Task<ProducerProductVm> GetForProducer(Guid productId)
         {
             var product = await DbContext.Products.Include(p => p.Category)
                 .Include(p => p.Subcategory)
@@ -207,47 +205,7 @@ namespace FarmersMarketplace.Application.Services.Business
             return vm;
         }
 
-        public async Task<ProducerProductListVm> GetAll(GetProducerProductListDto dto)
-        {
-            var productsQuery = DbContext.Products.Include(p => p.Category)
-                .Include(p => p.Subcategory)
-                .Where(p => p.CreationDate < dto.Cursor 
-                && p.ProducerId == dto.ProducerId
-                && p.Producer == dto.Producer);
-
-            if (!dto.Query.IsNullOrEmpty())
-            {
-                dto.Query = dto.Query.Trim().ToLower();
-                productsQuery = productsQuery.Where(p =>
-                    p.Name.ToLower().Contains(dto.Query) ||
-                    p.ArticleNumber.ToLower().Contains(dto.Query));
-
-            }
-
-            if (dto.Filter != null)
-            {
-                productsQuery = await dto.Filter.ApplyFilter(productsQuery);
-            }
-
-            var products = await productsQuery.OrderByDescending(product => product.CreationDate)
-                .ToListAsync();
-
-            var vm = new ProducerProductListVm
-            {
-                Products = new List<ProducerProductLookupVm>(),
-                Count = products.Count
-            };
-
-            products = products.Take(dto.PageSize).ToList();
-
-            foreach (var product in products)
-            {
-                var productVm = Mapper.Map<ProducerProductLookupVm>(product);
-                vm.Products.Add(productVm);
-            }
-
-            return vm;
-        }
+        
 
         public async Task Update(UpdateProductDto dto, Guid accountId)
         {
@@ -400,14 +358,14 @@ namespace FarmersMarketplace.Application.Services.Business
             await DbContext.SaveChangesAsync();
         }
 
-        public async Task<FilterData> GetFilterData(Producer producer, Guid producerId)
+        public async Task<ProducerProductFilterData> GetProducerProductFilterData(Producer producer, Guid producerId)
         {
             var unitsOfMeasurement = await DbContext.Products.Where(p => p.Producer == producer
                 && p.ProducerId == producerId)
                 .Select(p => p.UnitOfMeasurement)
                 .ToListAsync();
 
-            var vm = new FilterData();
+            var vm = new ProducerProductFilterData();
 
             if (producer == Producer.Seller)
             {
@@ -419,20 +377,6 @@ namespace FarmersMarketplace.Application.Services.Business
                     string userFacingMessage = CultureHelper.Exception("AccountNotFound");
 
                     throw new NotFoundException(message, userFacingMessage);
-                }
-
-                foreach (var categoryId in seller.Categories)
-                {
-                    var category = DbContext.Categories.FirstOrDefault(c => c.Id == categoryId);
-                    if (category == null)
-                    {
-                        string message = $"Category with Id {categoryId} was not found.";
-                        string userFacingMessage = CultureHelper.Exception("CategoryNotFound");
-
-                        throw new NotFoundException(message, userFacingMessage);
-                    }
-
-                    vm.Categories.Add(new CategoryLookupVm(category.Id, category.Name));
                 }
 
                 foreach (var subcategoryId in seller.Subcategories)
@@ -458,20 +402,6 @@ namespace FarmersMarketplace.Application.Services.Business
                     string userFacingMessage = CultureHelper.Exception("FarmNotFound");
 
                     throw new NotFoundException(message, userFacingMessage);
-                }
-
-                foreach (var categoryId in farm.Categories)
-                {
-                    var category = DbContext.Categories.FirstOrDefault(c => c.Id == categoryId);
-                    if (category == null)
-                    {
-                        string message = $"Category with Id {categoryId} was not found.";
-                        string userFacingMessage = CultureHelper.Exception("CategoryNotFound");
-
-                        throw new NotFoundException(message, userFacingMessage);
-                    }
-
-                    vm.Categories.Add(new CategoryLookupVm(category.Id, category.Name));
                 }
 
                 foreach (var subcategoryId in farm.Subcategories)
@@ -506,7 +436,7 @@ namespace FarmersMarketplace.Application.Services.Business
 
             if(dto.Filter != null)
             {
-                productsQuery = await dto.Filter.ApplyFilter(productsQuery);
+                productsQuery = await ApplyFilter(productsQuery, dto.Filter);
             }
 
             List<ProducerProductLookupVm> products = await productsQuery.Select(p => Mapper.Map<ProducerProductLookupVm>(p)).ToListAsync();
@@ -560,6 +490,17 @@ namespace FarmersMarketplace.Application.Services.Business
             return (fileName, fileBytes);
         }
 
+        public async Task<IQueryable<Product>> ApplyFilter(IQueryable<Product> query, ProducerProductFilter filter)
+        {
+            return query
+                    .Where(p =>
+                        (!filter.Subcategories.Any() || filter.Subcategories.Contains(p.SubcategoryId)) &&
+                        (!filter.MinCreationDate.HasValue || p.CreationDate >= filter.MinCreationDate) &&
+                        (!filter.MaxCreationDate.HasValue || p.CreationDate <= filter.MaxCreationDate) &&
+                        (!filter.UnitsOfMeasurement.Any() || filter.UnitsOfMeasurement.Contains(p.UnitOfMeasurement)) &&
+                        (!filter.MinRest.HasValue || p.Count >= filter.MinRest) &&
+                        (!filter.MaxRest.HasValue || p.Count <= filter.MaxRest));
+        }
         private async Task<string> GetFileName(Guid producerId, Producer producer)
         {
             string producerName = "";

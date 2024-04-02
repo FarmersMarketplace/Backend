@@ -1,9 +1,11 @@
-﻿using FarmersMarketplace.Domain.Accounts;
+﻿using FarmersMarketplace.Domain;
+using FarmersMarketplace.Domain.Accounts;
+using FarmersMarketplace.Domain.Orders;
 using FarmersMarketplace.Domain.Payment;
 
-namespace FarmersMarketplace.Domain.Orders
+namespace FarmersMarketplace.Elasticsearch.Documents
 {
-    public class Order
+    public class OrderDocument
     {
         public Guid Id { get; set; }
         public uint Number { get; set; }
@@ -14,16 +16,12 @@ namespace FarmersMarketplace.Domain.Orders
         public PaymentStatus PaymentStatus { get; set; }
         public ReceivingMethod ReceivingMethod { get; set; }
         public Guid? DeliveryPointId { get; set; }
-        public CustomerAddress? DeliveryPoint { get; set; }
+        public CustomerAddress DeliveryPoint { get; set; }
         public Producer Producer { get; set; }
         public OrderStatus Status { get; set; }
         public Guid ProducerId { get; set; }
         public Guid CustomerId { get; set; }
-        public virtual Customer Customer { get; set; }
-        public string CustomerName { get; set; }
-        public string CustomerSurname { get; set; }
-        public string CustomerPhone { get; set; }
-        public string CustomerAdditionalPhone { get; set; }
+        public virtual Account Customer { get; set; }
         public List<OrderItem> Items { get; set; }
     }
 

@@ -8,18 +8,17 @@ using System.Threading.Tasks;
 
 namespace FarmersMarketplace.Application.ViewModels.Product
 {
-    public class FilterData
+    public class ProducerProductFilterData
     {
         public List<string> UnitsOfMeasurement { get; set; }
-        public List<CategoryLookupVm> Categories { get; set; }
         public List<SubcategoryVm> Subcategories { get; set; }
 
-        public FilterData(List<string> unitsOfMeasurement)
+        public ProducerProductFilterData(List<string> unitsOfMeasurement)
         {
             UnitsOfMeasurement = unitsOfMeasurement;
         }
 
-        public FilterData()
+        public ProducerProductFilterData()
         {
             UnitsOfMeasurement = new List<string>();
         }

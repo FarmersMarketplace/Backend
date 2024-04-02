@@ -17,7 +17,6 @@ namespace FarmersMarketplace.Application.Mappings
             MapCreateProductDtoToProduct();
             MapProductToProducerProductVm();
             MapProductToProducerProductLookupVm();
-            MapProductToCustomerLookupVm();
         }
 
         private void MapProductToProducerProductVm()

@@ -5,6 +5,7 @@ using FarmersMarketplace.Application.ViewModels.Dashboard;
 using FarmersMarketplace.Application.ViewModels.Order;
 using System.Security.Claims;
 using FarmersMarketplace.Domain.Orders;
+using FarmersMarketplace.Application.Interfaces;
 
 namespace FarmersMarketplace.WebApi.Controllers
 {
@@ -13,11 +14,13 @@ namespace FarmersMarketplace.WebApi.Controllers
     public class OrderController : ControllerBase
     {
         private readonly IOrderService OrderService;
+        private readonly ISearchProvider<GetProducerOrderListDto, ProducerOrderListVm> SearchProdvider;
         private Guid AccountId => Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
 
-        public OrderController(IOrderService orderService, IConfiguration configuration)
+        public OrderController(IOrderService orderService, ISearchProvider<GetProducerOrderListDto, ProducerOrderListVm> searchProdvider, IConfiguration configuration)
         {
             OrderService = orderService;
+            SearchProdvider = searchProdvider;
         }
 
         [HttpGet("{orderId}")]
@@ -29,10 +32,10 @@ namespace FarmersMarketplace.WebApi.Controllers
         }
 
         [HttpGet]
-        [ProducesResponseType(typeof(OrderListVm), 200)]
+        [ProducesResponseType(typeof(ProducerOrderListVm), 200)]
         public async Task<IActionResult> GetAll([FromQuery] GetProducerOrderListDto dto)
         {
-            var vm = await OrderService.GetAll(dto);
+            var vm = await SearchProdvider.Search(dto);
             return Ok(vm);
         }
 

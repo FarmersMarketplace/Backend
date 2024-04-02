@@ -1,6 +1,9 @@
 ﻿using AutoMapper;
+using FarmersMarketplace.Application.DataTransferObjects.Product;
 using FarmersMarketplace.Application.Interfaces;
+using FarmersMarketplace.Application.ViewModels.Product;
 using FarmersMarketplace.Elasticsearch.Mappings;
+using FarmersMarketplace.Elasticsearch.SearchProviders;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Nest;
@@ -16,9 +19,16 @@ namespace FarmersMarketplace.Elasticsearch
                 config.AddProfile(new ProductSearchProfile());
             });
 
-            var url = configuration["ElasticsearchUrl"];
+            services.AddTransient
+               <ISearchProvider<GetCustomerProductListDto, CustomerProductListVm>,
+               CustomerProductSearchProvider>();
+            services.AddTransient
+                <ISearchProvider<GetProducerProductListDto, ProducerProductListVm>,
+                ProducerProductSearchProvider>();
 
-            var settings = new ConnectionSettings(new Uri(url)).PrettyJson();
+            var settings = new ConnectionSettings(new Uri(configuration["ElasticsearchUrl"]))
+                .EnableApiVersioningHeader()
+                .PrettyJson();
             var client = new ElasticClient(settings);
 
             var configurator = new IndexConfigurator();

@@ -109,6 +109,12 @@ namespace FarmersMarketplace.Elasticsearch.SearchProviders
             }
         }
 
+        protected override async Task ApplySorting()
+        {
+            SearchDescriptor.Sort(s => s
+                .Descending(fd => fd.CreationDate));
+        }
+
         protected override async Task<ProducerProductListVm> Execute()
         {
             var searchResponse = Client.Search<ProductDocument>(SearchDescriptor);

@@ -16,6 +16,7 @@ using Address = FarmersMarketplace.Domain.Address;
 using FarmersMarketplace.Application.DataTransferObjects;
 using FarmersMarketplace.Domain.Orders;
 using FarmersMarketplace.Domain.Payment;
+using FarmersMarketplace.Application.Filters;
 
 namespace FarmersMarketplace.Application.Services.Business
 {
@@ -28,51 +29,15 @@ namespace FarmersMarketplace.Application.Services.Business
             Validator = new ValidateService(DbContext);
         }
 
-        public async Task<OrderListVm> GetAll(GetOrderListDto dto)
-        {
-            var ordersQuery = DbContext.Orders.Include(o => o.Customer)
-                .Where(o => o.CreationDate < dto.Cursor
-                && o.Producer == dto.Producer
-                && o.ProducerId == dto.ProducerId);
-
-            if (!dto.Query.IsNullOrEmpty())
-            {
-                ordersQuery = ordersQuery.Where(o => o.Number.ToString().Contains(dto.Query, StringComparison.OrdinalIgnoreCase)
-                && (o.Customer.Name + " " + o.Customer.Surname).Contains(dto.Query, StringComparison.OrdinalIgnoreCase));
-            }
-
-            if (dto.Filter != null)
-            {
-                ordersQuery = await dto.Filter.ApplyFilter(ordersQuery);
-            }
-            
-            var orders = await ordersQuery.OrderByDescending(order => order.CreationDate)
-                .Take(dto.PageSize)
-                .ToListAsync();
-
-            var vm = new OrderListVm
-            {
-                Orders = new List<OrderLookupVm>(),
-                Count = await ordersQuery.CountAsync()
-            };
-
-            foreach(var order in orders)
-            {
-                vm.Orders.Add(Mapper.Map<OrderLookupVm>(order));
-            }
-
-            return vm;
-        }
-
         public async Task<(string fileName, byte[] bytes)> ExportToExcel(ExportOrdersDto dto)
         {
-            var ordersQuery = DbContext.Orders.Include(o => o.Customer)
+            var ordersQuery = DbContext.Orders
                 .Where(o => o.Producer == dto.Producer
                 && o.ProducerId == dto.ProducerId);
 
             if(dto.Filter != null)
             {
-                ordersQuery = await dto.Filter.ApplyFilter(ordersQuery);
+                ordersQuery = await ApplyFilter(ordersQuery, dto.Filter);
             }
 
             var orders = ordersQuery.ToList();
@@ -91,12 +56,13 @@ namespace FarmersMarketplace.Application.Services.Business
                 cells.Add(new Cell(1, CultureHelper.Property("Id"))); 
                 cells.Add(new Cell(2, CultureHelper.Property("Number"))); 
                 cells.Add(new Cell(3, CultureHelper.Property("OrderDate"))); 
-                cells.Add(new Cell(4, CultureHelper.Property("CustomerName"))); 
-                cells.Add(new Cell(5, CultureHelper.Property("CustomerEmail"))); 
+                cells.Add(new Cell(4, CultureHelper.Property("CustomerName")));
+                cells.Add(new Cell(5, CultureHelper.Property("Email")));
                 cells.Add(new Cell(6, CultureHelper.Property("Phone"))); 
-                cells.Add(new Cell(7, CultureHelper.Property("Amount"))); 
-                cells.Add(new Cell(8, CultureHelper.Property("PaymentType"))); 
-                cells.Add(new Cell(9, CultureHelper.Property("Status"))); 
+                cells.Add(new Cell(7, CultureHelper.Property("AdditionalPhone")));
+                cells.Add(new Cell(8, CultureHelper.Property("Amount"))); 
+                cells.Add(new Cell(9, CultureHelper.Property("PaymentType"))); 
+                cells.Add(new Cell(10, CultureHelper.Property("Status"))); 
 
                 rows.Add(new Row(1, cells));
 
@@ -107,19 +73,20 @@ namespace FarmersMarketplace.Application.Services.Business
                     cells.Add(new Cell(1, orders[i].Id.ToString()));
                     cells.Add(new Cell(2, orders[i].Number));
                     cells.Add(new Cell(3, orders[i].CreationDate));
-                    cells.Add(new Cell(4, orders[i].Customer.Name + " " + orders[i].Customer.Surname));
+                    cells.Add(new Cell(4, orders[i].CustomerName + " " + orders[i].CustomerSurname));
                     cells.Add(new Cell(5, orders[i].Customer.Email));
-                    cells.Add(new Cell(6, orders[i].Customer.Phone == null ? "" : orders[i].Customer.Phone));
-                    cells.Add(new Cell(7, orders[i].TotalPayment));
+                    cells.Add(new Cell(6, orders[i].CustomerPhone == null ? "" : orders[i].CustomerPhone));
+                    cells.Add(new Cell(7, orders[i].CustomerAdditionalPhone == null ? "" : orders[i].CustomerAdditionalPhone));
+                    cells.Add(new Cell(8, orders[i].TotalPayment));
 
-                    if (orders[i].PaymentType == PaymentType.Online) cells.Add(new Cell(8, CultureHelper.Property("Online"))); //Онлайн
-                    else if (orders[i].PaymentType == PaymentType.Cash) cells.Add(new Cell(8, CultureHelper.Property("Cash"))); //Готівка
+                    if (orders[i].PaymentType == PaymentType.Online) cells.Add(new Cell(9, CultureHelper.Property("Online")));
+                    else if (orders[i].PaymentType == PaymentType.Cash) cells.Add(new Cell(9, CultureHelper.Property("Cash")));
 
-                    if (orders[i].Status == OrderStatus.New) cells.Add(new Cell(9, "New")); //Нове
-                    else if (orders[i].Status == OrderStatus.InProcessing) cells.Add(new Cell(9, CultureHelper.Property("InProcessing"))); //В обробці
-                    else if (orders[i].Status == OrderStatus.Collected) cells.Add(new Cell(9, CultureHelper.Property("Collected"))); //Зібрано
-                    else if (orders[i].Status == OrderStatus.InDelivery) cells.Add(new Cell(9, CultureHelper.Property("InDelivery"))); //В доставці
-                    else if (orders[i].Status == OrderStatus.Completed) cells.Add(new Cell(9, CultureHelper.Property("Completed"))); //Виконано
+                    if (orders[i].Status == OrderStatus.New) cells.Add(new Cell(10, "New"));
+                    else if (orders[i].Status == OrderStatus.InProcessing) cells.Add(new Cell(10, CultureHelper.Property("InProcessing")));
+                    else if (orders[i].Status == OrderStatus.Collected) cells.Add(new Cell(10, CultureHelper.Property("Collected")));
+                    else if (orders[i].Status == OrderStatus.InDelivery) cells.Add(new Cell(10, CultureHelper.Property("InDelivery")));
+                    else if (orders[i].Status == OrderStatus.Completed) cells.Add(new Cell(10, CultureHelper.Property("Completed")));
 
                     rows.Add(new Row(i + 2, cells));
                 }
@@ -132,6 +99,15 @@ namespace FarmersMarketplace.Application.Services.Business
             System.IO.File.Delete(filePath);
 
             return (fileName, fileBytes);
+        }
+
+        public async Task<IQueryable<Order>> ApplyFilter(IQueryable<Order> query, ProducerOrderFilter filter)
+        {
+            return query.Where(o =>
+                (filter.Statuses == null || !filter.Statuses.Any() || filter.Statuses.Contains(o.Status)) &&
+                (!filter.StartDate.HasValue || o.CreationDate >= filter.StartDate) &&
+                (!filter.EndDate.HasValue || o.CreationDate <= filter.EndDate) &&
+                (filter.PaymentTypes == null || !filter.PaymentTypes.Any() || filter.PaymentTypes.Contains(o.PaymentType)));
         }
 
         private async Task<string> GetFileName(Guid producerId, Producer producer)
@@ -236,7 +212,10 @@ namespace FarmersMarketplace.Application.Services.Business
                     Status = OrderStatus.New,
                     ProducerId = order.ProducerId,
                     CustomerId = order.CustomerId,
-                    Customer = order.Customer,
+                    CustomerName = order.CustomerName,
+                    CustomerSurname = order.CustomerSurname,
+                    CustomerPhone = order.CustomerPhone,
+                    CustomerAdditionalPhone = order.CustomerAdditionalPhone,
                     Items = items
                 };
 
@@ -375,7 +354,7 @@ namespace FarmersMarketplace.Application.Services.Business
             address.Note = dto.Note;
         }
 
-        private async Task<Location> GetCoordinates(AddressDto dto)
+        private async Task<Geocoding.Location> GetCoordinates(AddressDto dto)
         {
             IGeocoder geocoder = new GoogleGeocoder() { ApiKey = Configuration["Geocoding:Apikey"] };
             var request = await geocoder.GeocodeAsync($"{dto.Region} oblast, {dto.District} district, {dto.Settlement} street {dto.Street}, {dto.HouseNumber}, Ukraine");

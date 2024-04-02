@@ -33,9 +33,11 @@ namespace FarmersMarketplace.WebApi
         {
             string connectionString = configuration.GetConnectionString("LocalConnection");
 
-            services.AddPersistence(connectionString);
             services.AddApplication(configuration);
+            services.AddPersistence(connectionString);
             services.AddElasticsearch(configuration);
+
+            services.AddMemoryCache();
 
             Log.Logger = new LoggerConfiguration().WriteTo.PostgreSQL(connectionString, "Logs", needAutoCreateTable: true)
                .MinimumLevel.Information().CreateLogger();

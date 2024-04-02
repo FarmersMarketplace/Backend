@@ -70,6 +70,15 @@ namespace FarmersMarketplace.Application.Resources.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Additional phone.
+        /// </summary>
+        internal static string AdditionalPhone {
+            get {
+                return ResourceManager.GetString("AdditionalPhone", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Amount.
         /// </summary>
         internal static string Amount {

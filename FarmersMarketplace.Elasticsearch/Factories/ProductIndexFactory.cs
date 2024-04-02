@@ -61,14 +61,25 @@ namespace FarmersMarketplace.Elasticsearch.Factories
                             .Name(product => product.ImageName))
                         .Text(t => t
                             .Name(product => product.ProducerName))
-                        .Keyword(t => t
+                        .Text(t => t
                             .Name(product => product.Region))
                         .Keyword(t => t
                             .Name(product => product.ProducerImageName))
                         .Number(t => t
                             .Name(product => product.Rating))
                         .Number(t => t
-                            .Name(product => product.FeedbacksCount))));
+                            .Name(product => product.FeedbacksCount))
+                        .Keyword(t => t
+                            .Name(product => product.Producer))
+                        .Boolean(t => t
+                            .Name(product => product.HasOnlinePayment))
+                        .Number(n => n
+                            .Name(p => p.ReceivingMethods)
+                            .Type(NumberType.Integer))));
+
+            //return descriptor.Mappings(ms => ms
+            //        .Map<ProductDocument>(m => m
+            //            .AutoMap()));
         }
 
         public async Task LoadData(IElasticClient client, IApplicationDbContext dbContext, IMapper mapper)
@@ -98,7 +109,8 @@ namespace FarmersMarketplace.Elasticsearch.Factories
 
                 if (products[i].Producer == Producer.Farm)
                 {
-                    var farm = await dbContext.Farms.FirstOrDefaultAsync(f => f.Id == products[i].ProducerId);
+                    var farm = await dbContext.Farms.Include(f => f.Address)
+                        .FirstOrDefaultAsync(f => f.Id == products[i].ProducerId);
 
                     if (farm == null)
                     {
@@ -115,11 +127,12 @@ namespace FarmersMarketplace.Elasticsearch.Factories
                         : "";
 
                     documents[i].HasOnlinePayment = farm.PaymentTypes != null && farm.PaymentTypes.Contains(PaymentType.Online);
-                    documents[i].ReceivingMethods = farm.ReceivingMethods;
+                    documents[i].Region = farm.Address.Region;
                 }
                 else if (products[i].Producer == Producer.Seller)
                 {
-                    var seller = await dbContext.Sellers.FirstOrDefaultAsync(f => f.Id == products[i].ProducerId);
+                    var seller = await dbContext.Sellers.Include(s => s.Address)
+                        .FirstOrDefaultAsync(f => f.Id == products[i].ProducerId);
 
                     if (seller == null)
                     {
@@ -136,7 +149,7 @@ namespace FarmersMarketplace.Elasticsearch.Factories
                         : "";
 
                     documents[i].HasOnlinePayment = seller.PaymentTypes != null && seller.PaymentTypes.Contains(PaymentType.Online);
-                    documents[i].ReceivingMethods = seller.ReceivingMethods;
+                    documents[i].Region = seller.Address.Region;
                 }
                 else
                 {
@@ -144,7 +157,10 @@ namespace FarmersMarketplace.Elasticsearch.Factories
                 }
             }
 
-            var bulkIndexResponse = client.IndexMany(documents);
+           var bulkIndexResponse = client.Bulk(b => b
+                .Index(Indecies.Products)
+                .IndexMany(documents)
+                .Pretty(true));
 
             if (!bulkIndexResponse.IsValid)
             {
