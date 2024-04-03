@@ -16,15 +16,20 @@ namespace FarmersMarketplace.Elasticsearch.SearchProviders
         public ProducerProductSearchProvider(IElasticClient client, IMapper mapper) : base(client)
         {
             Mapper = mapper;
+            SearchDescriptor.Index(Indecies.Products);
         }
 
         protected override async Task ApplyFilter()
         {
-            var mustQueries = new List<Func<QueryContainerDescriptor<ProductDocument>, QueryContainer>>();
-
-            mustQueries.Add(q => q.Bool(b => b.Must(m => m
-                        .Term(t => t.Field(p => p.Producer).Value(Request.Producer)),
-                              m => m.Term(t => t.Field(p => p.ProducerId).Value(Request.ProducerId)))));
+            MustQueries.Add(q => q
+                .Bool(b => b
+                    .Must(m => m
+                        .Term(t => t
+                            .Field(p => p.Producer)
+                            .Value(Request.Producer)),
+                    m => m.Term(t => t
+                        .Field(p => p.ProducerId)
+                        .Value(Request.ProducerId)))));
 
             if (Request.Filter != null)
             {
@@ -32,43 +37,60 @@ namespace FarmersMarketplace.Elasticsearch.SearchProviders
 
                 if (filter.Subcategories.Any())
                 {
-                    mustQueries.Add(q => q.Terms(t => t.Field(p => p.SubcategoryId).Terms(filter.Subcategories)));
+                    MustQueries.Add(q => q
+                        .Terms(t => t
+                            .Field(p => p.SubcategoryId)
+                            .Terms(filter.Subcategories)));
                 }
 
                 if (filter.Statuses.Any())
                 {
-                    mustQueries.Add(q => q.Terms(t => t.Field(p => p.Status).Terms(filter.Statuses)));
+                    MustQueries.Add(q => q
+                        .Terms(t => t
+                            .Field(p => p.Status)
+                            .Terms(filter.Statuses)));
                 }
 
                 if (filter.MinCreationDate.HasValue)
                 {
-                    mustQueries.Add(q => q.DateRange(r => r.Field(fd => fd.CreationDate).GreaterThanOrEquals(filter.MinCreationDate)));
+                    MustQueries.Add(q => q
+                        .DateRange(r => r
+                            .Field(fd => fd.CreationDate)
+                            .GreaterThanOrEquals(filter.MinCreationDate)));
                 }
 
                 if (filter.MaxCreationDate.HasValue)
                 {
-                    mustQueries.Add(q => q.DateRange(r => r.Field(fd => fd.CreationDate).LessThanOrEquals(filter.MaxCreationDate)));
+                    MustQueries.Add(q => q
+                        .DateRange(r => r
+                            .Field(fd => fd.CreationDate)
+                            .LessThanOrEquals(filter.MaxCreationDate)));
                 }
 
                 if (filter.UnitsOfMeasurement.Any())
                 {
-                    mustQueries.Add(q => q.Terms(t => t.Field(p => p.UnitOfMeasurement).Terms(filter.UnitsOfMeasurement)));
+                    MustQueries.Add(q => q
+                        .Terms(t => t
+                            .Field(p => p.UnitOfMeasurement)
+                            .Terms(filter.UnitsOfMeasurement)));
                 }
 
                 if (filter.MinRest.HasValue)
                 {
-                    mustQueries.Add(q => q.Range(r => r.Field(fd => fd.PricePerOne).LessThanOrEquals(filter.MinRest)));
+                    MustQueries.Add(q => q
+                        .Range(r => r
+                            .Field(fd => fd.PricePerOne)
+                            .LessThanOrEquals(filter.MinRest)));
                 }
 
                 if (filter.MaxRest.HasValue)
                 {
-                    mustQueries.Add(q => q.Range(r => r.Field(fd => fd.PricePerOne).GreaterThanOrEquals(filter.MaxRest)));
+                    MustQueries.Add(q => q
+                        .Range(r => r
+                            .Field(fd => fd.PricePerOne)
+                            .GreaterThanOrEquals(filter.MaxRest)));
                 }
             }
-
-            SearchDescriptor.Query(q => q
-                .Bool(b => b
-                    .Must(mustQueries)));
         }
 
         protected override async Task ApplyPagination()
@@ -81,9 +103,13 @@ namespace FarmersMarketplace.Elasticsearch.SearchProviders
         {
             if (!string.IsNullOrEmpty(Request.Query))
             {
-                SearchDescriptor.Query(q => q
-                    .QueryString(qs => qs
-                        .Query(Request.Query)));
+                MustQueries.Add(q => q
+                .Match(m => m
+                    .Field(f => f.Name)
+                    .Query(Request.Query)
+                    .Analyzer("keyword")
+                )
+            );
             }
         }
 
@@ -99,7 +125,7 @@ namespace FarmersMarketplace.Elasticsearch.SearchProviders
 
             if (!searchResponse.IsValid)
             {
-                string message = $"Products documents was not got successfully from Elasticsearch. Request:\n {JsonConvert.SerializeObject(Request)}";
+                string message = $"Products documents was not got successfully from Elasticsearch. Request:\n {JsonConvert.SerializeObject(Request)}\n Debug information: {searchResponse.DebugInformation}";
                 string userFacingMessage = CultureHelper.Exception("ProductsNotGotSuccessfully");
 
                 throw new ApplicationException(message, userFacingMessage);
