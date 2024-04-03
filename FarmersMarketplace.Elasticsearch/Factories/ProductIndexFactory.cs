@@ -34,47 +34,66 @@ namespace FarmersMarketplace.Elasticsearch.Factories
                         .Keyword(k => k
                             .Name(product => product.Id))
                         .Keyword(k => k
-                            .Name(product => product.ProducerId))
+                            .Name(product => product.ProducerId)
+                            .Index(false))
                         .Keyword(k => k
-                            .Name(product => product.SubcategoryId))
+                            .Name(product => product.SubcategoryId)
+                            .Index(false))
                         .Text(t => t
                             .Name(product => product.Name))
                         .Text(t => t
                             .Name(product => product.ArticleNumber))
                         .Text(t => t
-                            .Name(product => product.CategoryName))
+                            .Name(product => product.CategoryName)
+                            .Index(false))
                         .Text(t => t
-                            .Name(product => product.SubcategoryName))
+                            .Name(product => product.SubcategoryName)
+                            .Index(false))
                         .Number(t => t
-                            .Name(product => product.Count))
+                            .Name(product => product.Count)
+                            .Index(false))
                         .Keyword(t => t
-                            .Name(product => product.UnitOfMeasurement))
+                            .Name(product => product.UnitOfMeasurement)
+                            .Index(false))
                         .Date(t => t
-                            .Name(product => product.CreationDate))
+                            .Name(product => product.CreationDate)
+                            .Index(false))
                         .Number(t => t
-                            .Name(product => product.PricePerOne))
+                            .Name(product => product.PricePerOne)
+                            .Index(false))
                         .Number(t => t
-                            .Name(product => product.Status))
+                            .Name(product => product.Status)
+                            .Index(false))
                         .Date(t => t
-                            .Name(product => product.ExpirationDate))
+                            .Name(product => product.ExpirationDate)
+                            .Index(false))
                         .Keyword(t => t
-                            .Name(product => product.ImageName))
+                            .Name(product => product.ImageName)
+                            .Index(false))
                         .Text(t => t
-                            .Name(product => product.ProducerName))
-                        .Text(t => t
-                            .Name(product => product.Region))
+                            .Name(product => product.ProducerName)
+                            .Index(false))
                         .Keyword(t => t
-                            .Name(product => product.ProducerImageName))
-                        .Number(t => t
-                            .Name(product => product.Rating))
-                        .Number(t => t
-                            .Name(product => product.FeedbacksCount))
+                            .Name(product => product.Region)
+                            .Index(false))
                         .Keyword(t => t
-                            .Name(product => product.Producer))
+                            .Name(product => product.ProducerImageName)
+                            .Index(false))
+                        .Number(t => t
+                            .Name(product => product.Rating)
+                            .Index(false))
+                        .Number(t => t
+                            .Name(product => product.FeedbacksCount)
+                            .Index(false))
+                        .Keyword(t => t
+                            .Name(product => product.Producer)
+                            .Index(false))
                         .Boolean(t => t
-                            .Name(product => product.HasOnlinePayment))
+                            .Name(product => product.HasOnlinePayment)
+                            .Index(false))
                         .Number(n => n
                             .Name(p => p.ReceivingMethods)
+                            .Index(false)
                             .Type(NumberType.Integer))));
 
             //return descriptor.Mappings(ms => ms

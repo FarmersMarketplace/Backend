@@ -6,13 +6,15 @@ namespace FarmersMarketplace.Elasticsearch.SearchProviders
     public abstract class SearchProvider<TRequest, TDocument, TResponse> : ISearchProvider<TRequest, TResponse> where TDocument : class
     {
         protected readonly IElasticClient Client;
-        protected SearchDescriptor<TDocument> SearchDescriptor { get; set; }
+        protected List<Func<QueryContainerDescriptor<TDocument>, QueryContainer>> MustQueries { get; set; }
+        protected readonly SearchDescriptor<TDocument> SearchDescriptor;
         protected TRequest Request { get; set; }
 
         public SearchProvider(IElasticClient client)
         {
-            Client = client;
             SearchDescriptor = new SearchDescriptor<TDocument>();
+            Client = client;
+            MustQueries = new List<Func<QueryContainerDescriptor<TDocument>, QueryContainer>>();
         }
 
         public async Task<TResponse> Search(TRequest request)
@@ -23,6 +25,10 @@ namespace FarmersMarketplace.Elasticsearch.SearchProviders
             await ApplyFilter();
             await ApplySorting();
             await ApplyPagination();
+
+            SearchDescriptor.Query(q => q
+                    .Bool(b => b
+                        .Must(MustQueries)));
 
             return await Execute();
         }

@@ -20,77 +20,55 @@ namespace FarmersMarketplace.Elasticsearch.SearchProviders
 
         protected override async Task ApplyFilter()
         {
+            var mustQueries = new List<Func<QueryContainerDescriptor<ProductDocument>, QueryContainer>>();
+
+            mustQueries.Add(q => q.Bool(b => b.Must(m => m
+                        .Term(t => t.Field(p => p.Producer).Value(Request.Producer)),
+                              m => m.Term(t => t.Field(p => p.ProducerId).Value(Request.ProducerId)))));
+
+            if (Request.Filter != null)
+            {
+                var filter = Request.Filter;
+
+                if (filter.Subcategories.Any())
+                {
+                    mustQueries.Add(q => q.Terms(t => t.Field(p => p.SubcategoryId).Terms(filter.Subcategories)));
+                }
+
+                if (filter.Statuses.Any())
+                {
+                    mustQueries.Add(q => q.Terms(t => t.Field(p => p.Status).Terms(filter.Statuses)));
+                }
+
+                if (filter.MinCreationDate.HasValue)
+                {
+                    mustQueries.Add(q => q.DateRange(r => r.Field(fd => fd.CreationDate).GreaterThanOrEquals(filter.MinCreationDate)));
+                }
+
+                if (filter.MaxCreationDate.HasValue)
+                {
+                    mustQueries.Add(q => q.DateRange(r => r.Field(fd => fd.CreationDate).LessThanOrEquals(filter.MaxCreationDate)));
+                }
+
+                if (filter.UnitsOfMeasurement.Any())
+                {
+                    mustQueries.Add(q => q.Terms(t => t.Field(p => p.UnitOfMeasurement).Terms(filter.UnitsOfMeasurement)));
+                }
+
+                if (filter.MinRest.HasValue)
+                {
+                    mustQueries.Add(q => q.Range(r => r.Field(fd => fd.PricePerOne).LessThanOrEquals(filter.MinRest)));
+                }
+
+                if (filter.MaxRest.HasValue)
+                {
+                    mustQueries.Add(q => q.Range(r => r.Field(fd => fd.PricePerOne).GreaterThanOrEquals(filter.MaxRest)));
+                }
+            }
+
             SearchDescriptor.Query(q => q
-                    .Bool(b => b
-                        .Must(m => m
-                            .Term(t => t
-                                .Field(p => p.Producer)
-                                .Value(Request.Producer)),
-                              m => m
-                                  .Term(t => t
-                                .Field(p => p.ProducerId)
-                                .Value(Request.ProducerId)))));
-
-            if (Request.Filter == null)
-                return;
-
-            var filter = Request.Filter;
-
-            if (filter.Subcategories.Any())
-            {
-                SearchDescriptor.Query(q => q
-                    .Terms(t => t
-                        .Field(p => p.SubcategoryId)
-                        .Terms(filter.Subcategories)));
-            }
-
-            if (filter.Statuses.Any())
-            {
-                SearchDescriptor.Query(q => q
-                    .Terms(t => t
-                        .Field(p => p.Status)
-                        .Terms(filter.Statuses)));
-            }
-
-            if (filter.MinCreationDate.HasValue)
-            {
-                SearchDescriptor.Query(q => q
-                    .DateRange(r => r
-                        .Field(fd => fd.CreationDate)
-                            .GreaterThanOrEquals(filter.MinCreationDate)));
-            }
-
-            if (filter.MaxCreationDate.HasValue)
-            {
-                SearchDescriptor.Query(q => q
-                    .DateRange(r => r
-                        .Field(fd => fd.CreationDate)
-                            .LessThanOrEquals(filter.MaxCreationDate)));
-            }
-
-            if (filter.UnitsOfMeasurement.Any())
-            {
-                SearchDescriptor.Query(q => q
-                    .Terms(t => t
-                        .Field(p => p.UnitOfMeasurement)
-                        .Terms(filter.UnitsOfMeasurement)));
-            }
-
-            if (filter.MinRest.HasValue)
-            {
-                SearchDescriptor.Query(q => q
-                    .Range(r => r
-                        .Field(fd => fd.PricePerOne)
-                            .LessThanOrEquals(filter.MinRest)));
-            }
-
-            if (filter.MaxRest.HasValue)
-            {
-                SearchDescriptor.Query(q => q
-                    .Range(r => r
-                        .Field(fd => fd.PricePerOne)
-                            .GreaterThanOrEquals(filter.MaxRest)));
-            }
+                .Bool(b => b
+                    .Must(mustQueries)));
         }
 
         protected override async Task ApplyPagination()

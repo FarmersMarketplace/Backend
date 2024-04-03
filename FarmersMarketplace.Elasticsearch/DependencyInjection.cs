@@ -44,7 +44,7 @@ namespace FarmersMarketplace.Elasticsearch
                     var dbContext = scope.ServiceProvider.GetRequiredService<IApplicationDbContext>();
                     var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
 
-                    await configurator.LoadData(client, dbContext, mapper);
+                    //await configurator.LoadData(client, dbContext, mapper);
                 }
             }).Wait();
 

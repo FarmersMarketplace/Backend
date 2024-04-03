@@ -4,7 +4,6 @@ using FarmersMarketplace.Application.Helpers;
 using FarmersMarketplace.Application.ViewModels.Product;
 using FarmersMarketplace.Domain;
 using FarmersMarketplace.Elasticsearch.Documents;
-using Microsoft.IdentityModel.Tokens;
 using Nest;
 using Newtonsoft.Json;
 using ApplicationException = FarmersMarketplace.Application.Exceptions.ApplicationException;
@@ -26,86 +25,80 @@ namespace FarmersMarketplace.Elasticsearch.SearchProviders
                 return;
 
             var filter = Request.Filter;
-            var sd = new SearchDescriptor<object>().Index("Products");
-            var mustQueries = new List<Func<QueryContainerDescriptor<ProductDocument>, QueryContainer>>();
-
+            
             if (filter.MaxPrice.HasValue)
             {
-                mustQueries.Add(q => q.Range(r => r.Field(fd => fd.PricePerOne)
+                MustQueries.Add(q => q.Range(r => r.Field(fd => fd.PricePerOne)
                     .LessThanOrEquals((double)filter.MaxPrice)));
             }
 
             if (filter.MinPrice.HasValue)
             {
-                mustQueries.Add(q => q.Range(r => r.Field(fd => fd.PricePerOne)
+                MustQueries.Add(q => q.Range(r => r.Field(fd => fd.PricePerOne)
                     .GreaterThanOrEquals((double)filter.MinPrice)));
             }
 
             if (filter.MaxCount.HasValue)
             {
-                mustQueries.Add(q => q.Range(r => r.Field(fd => fd.Count)
+                MustQueries.Add(q => q.Range(r => r.Field(fd => fd.Count)
                     .LessThanOrEquals(filter.MaxCount)));
             }
 
             if (filter.MinCount.HasValue)
             {
-                mustQueries.Add(q => q.Range(r => r.Field(fd => fd.Count)
+                MustQueries.Add(q => q.Range(r => r.Field(fd => fd.Count)
                     .GreaterThanOrEquals(filter.MinCount)));
             }
 
             if (filter.MinCreationDate.HasValue)
             {
-                mustQueries.Add(q => q.DateRange(r => r.Field(fd => fd.CreationDate)
+                MustQueries.Add(q => q.DateRange(r => r.Field(fd => fd.CreationDate)
                     .GreaterThanOrEquals((DateTime)filter.MinCreationDate)));
             }
 
             if (filter.MaxCreationDate.HasValue)
             {
-                mustQueries.Add(q => q.DateRange(r => r.Field(fd => fd.CreationDate)
+                MustQueries.Add(q => q.DateRange(r => r.Field(fd => fd.CreationDate)
                     .LessThanOrEquals((DateTime)filter.MaxCreationDate)));
             }
 
             if (filter.ReceivingMethods != null && filter.ReceivingMethods.Any())
             {
-                mustQueries.Add(q => q.Terms(t => t.Field(fd => fd.ReceivingMethods)
+                MustQueries.Add(q => q.Terms(t => t.Field(fd => fd.ReceivingMethods)
                     .Terms(filter.ReceivingMethods)));
             }
 
             if (filter.OnlyOnlinePayment == true)
             {
-                mustQueries.Add(q => q.Term(t => t.Field(p => p.HasOnlinePayment).Value(true)));
+                MustQueries.Add(q => q.Term(t => t.Field(p => p.HasOnlinePayment).Value(true)));
             }
 
             if (filter.Producer.HasValue)
             {
-                mustQueries.Add(q => q.Term(t => t.Field(p => p.Producer).Value(filter.Producer)));
+                MustQueries.Add(q => q.Term(t => t.Field(p => p.Producer).Value(filter.Producer)));
             }
 
             if (filter.Farms != null && filter.Farms.Any())
             {
-                mustQueries.Add(q => q.Bool(b => b.Must(m => m.Term(t => t.Field(p => p.Producer).Value(Producer.Farm)),
+                MustQueries.Add(q => q.Bool(b => b.Must(m => m.Term(t => t.Field(p => p.Producer).Value(Producer.Farm)),
                     m => m.Terms(t => t.Field(p => p.ProducerId).Terms(filter.Farms)))));
             }
 
             if (filter.Sellers != null && filter.Sellers.Any())
             {
-                mustQueries.Add(q => q.Bool(b => b.Must(m => m.Term(t => t.Field(p => p.Producer).Value(Producer.Seller)),
+                MustQueries.Add(q => q.Bool(b => b.Must(m => m.Term(t => t.Field(p => p.Producer).Value(Producer.Seller)),
                     m => m.Terms(t => t.Field(p => p.ProducerId).Terms(filter.Sellers)))));
             }
 
             if (filter.Subcategories != null && filter.Subcategories.Any())
             {
-                mustQueries.Add(q => q.Terms(t => t.Field(p => p.SubcategoryId).Terms(filter.Subcategories)));
+                MustQueries.Add(q => q.Terms(t => t.Field(p => p.SubcategoryId).Terms(filter.Subcategories)));
             }
 
             if (!string.IsNullOrEmpty(filter.Region))
             {
-                mustQueries.Add(q => q.Term(t => t.Field(p => p.Region).Value(filter.Region)));
+                MustQueries.Add(q => q.Term(t => t.Field(p => p.Region).Value(filter.Region)));
             }
-
-            SearchDescriptor.Query(q => q
-                    .Bool(b => b
-                        .Must(mustQueries)));
         }
 
 
@@ -117,19 +110,29 @@ namespace FarmersMarketplace.Elasticsearch.SearchProviders
 
         protected override async Task ApplyQuery()
         {
-            //if (!string.IsNullOrEmpty(Request.Query))
-            //{
-            //    SearchDescriptor.Query(q => q
-            //        .QueryString(qs => qs
-            //            .Query(Request.Query)));
-            //}
+            if (!string.IsNullOrEmpty(Request.Query))
+            {
+                MustQueries.Add(q => q
+                    .Bool(b => b
+                        .Should(sh => sh
+                            .Wildcard(w => w
+                                .Field(f => f.Name)
+                                .Boost(1.0)
+                                .Value($"*{Request.Query}*")),
+                            sh => sh
+                            .QueryString(qs => qs
+                                .Fields(f => f.Field(p => p.Name))
+                                .Query($"{Request.Query}~")
+                                .DefaultOperator(Operator.And)
+                                .Boost(2.0)))));
+            }
         }
 
         protected override async Task ApplySorting()
         {
-            //SearchDescriptor.Index(Indecies.Products)
-            //    .Sort(s => s
-            //        .Descending(fd => fd.CreationDate));
+            SearchDescriptor.Index(Indecies.Products)
+                .Sort(s => s
+                    .Descending(fd => fd.CreationDate));
         }
 
         protected override async Task<CustomerProductListVm> Execute()
@@ -149,12 +152,11 @@ namespace FarmersMarketplace.Elasticsearch.SearchProviders
                 Products = new CustomerProductLookupVm[searchResponse.Documents.Count]
             };
 
-            var productList = searchResponse.Documents.Select(p => p.PricePerOne).ToArray();
+            var productList = searchResponse.Documents.ToArray();
 
             for (int i = 0; i < productList.Length; i++)
             {
-                //response.Products[i] = Mapper.Map<CustomerProductLookupVm>(productList[i]);
-                Console.WriteLine(productList[i]);
+                response.Products[i] = Mapper.Map<CustomerProductLookupVm>(productList[i]);
             }
 
             return response;
