@@ -20,10 +20,10 @@ namespace FarmersMarketplace.Elasticsearch
             });
 
             services.AddTransient
-               <ISearchProvider<GetCustomerProductListDto, CustomerProductListVm>,
+               <ISearchProvider<GetCustomerProductListDto, CustomerProductListVm, CustomerProductAutocompleteDto>,
                CustomerProductSearchProvider>();
             services.AddTransient
-                <ISearchProvider<GetProducerProductListDto, ProducerProductListVm>,
+                <ISearchProvider<GetProducerProductListDto, ProducerProductListVm, ProducerProductAutocompleteDto>,
                 ProducerProductSearchProvider>();
 
             var settings = new ConnectionSettings(new Uri(configuration["ElasticsearchUrl"]))

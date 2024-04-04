@@ -15,13 +15,13 @@ namespace FarmersMarketplace.WebApi.Controllers
     public class ProductController : ControllerBase
     {
         private readonly IProductService ProductService;
-        private readonly ISearchProvider<GetProducerProductListDto, ProducerProductListVm> ProducerSearchProvider;
-        private readonly ISearchProvider<GetCustomerProductListDto, CustomerProductListVm> CustomerSearchProvider;
+        private readonly ISearchProvider<GetProducerProductListDto, ProducerProductListVm, ProducerProductAutocompleteDto> ProducerSearchProvider;
+        private readonly ISearchProvider<GetCustomerProductListDto, CustomerProductListVm, CustomerProductAutocompleteDto> CustomerSearchProvider;
         private Guid AccountId => Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
 
         public ProductController(IProductService productService, 
-            ISearchProvider<GetProducerProductListDto, ProducerProductListVm> searchProvider,
-            ISearchProvider<GetCustomerProductListDto, CustomerProductListVm> customerSearchProvider)
+            ISearchProvider<GetProducerProductListDto, ProducerProductListVm, ProducerProductAutocompleteDto> searchProvider,
+            ISearchProvider<GetCustomerProductListDto, CustomerProductListVm, CustomerProductAutocompleteDto> customerSearchProvider)
         {
             ProductService = productService;
             ProducerSearchProvider = searchProvider;
@@ -117,12 +117,12 @@ namespace FarmersMarketplace.WebApi.Controllers
             return NoContent();
         }
 
-        //[HttpGet]
-        //[ProducesResponseType(typeof(ProducerProductVm), 200)]
-        //public async Task<IActionResult> Autocomplete([FromQuery] ProductAutocompleteDto dto)
-        //{
-        //    var request = await ProductService.Autocomplete(dto);
-        //    return Ok(request);
-        //}
+        [HttpGet]
+        [ProducesResponseType(typeof(ProducerProductVm), 200)]
+        public async Task<IActionResult> CustomerAutocomplete([FromQuery] CustomerProductAutocompleteDto dto)
+        {
+            var request = await CustomerSearchProvider.Autocomplete(dto);
+            return Ok(request);
+        }
     }
 }

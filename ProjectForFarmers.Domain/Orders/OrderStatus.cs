@@ -6,7 +6,8 @@
         InProcessing,
         Collected,
         InDelivery,
-        Completed
+        Completed,
+        Cancelled
     }
 
 }

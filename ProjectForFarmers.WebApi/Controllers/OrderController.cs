@@ -6,6 +6,7 @@ using FarmersMarketplace.Application.ViewModels.Order;
 using System.Security.Claims;
 using FarmersMarketplace.Domain.Orders;
 using FarmersMarketplace.Application.Interfaces;
+using FarmersMarketplace.Application.DataTransferObjects.Product;
 
 namespace FarmersMarketplace.WebApi.Controllers
 {
@@ -14,13 +15,13 @@ namespace FarmersMarketplace.WebApi.Controllers
     public class OrderController : ControllerBase
     {
         private readonly IOrderService OrderService;
-        private readonly ISearchProvider<GetProducerOrderListDto, ProducerOrderListVm> SearchProdvider;
+        //private readonly ISearchProvider<GetProducerOrderListDto, ProducerOrderListVm, ProducerProductAutocompleteDto> SearchProdvider;
         private Guid AccountId => Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
 
-        public OrderController(IOrderService orderService, ISearchProvider<GetProducerOrderListDto, ProducerOrderListVm> searchProdvider, IConfiguration configuration)
+        public OrderController(IOrderService orderService, ISearchProvider<GetProducerOrderListDto, ProducerOrderListVm, ProducerProductAutocompleteDto> searchProdvider, IConfiguration configuration)
         {
             OrderService = orderService;
-            SearchProdvider = searchProdvider;
+            //SearchProdvider = searchProdvider;
         }
 
         [HttpGet("{orderId}")]
@@ -31,13 +32,13 @@ namespace FarmersMarketplace.WebApi.Controllers
             return Ok(vm);
         }
 
-        [HttpGet]
-        [ProducesResponseType(typeof(ProducerOrderListVm), 200)]
-        public async Task<IActionResult> GetAll([FromQuery] GetProducerOrderListDto dto)
-        {
-            var vm = await SearchProdvider.Search(dto);
-            return Ok(vm);
-        }
+        //[HttpGet]
+        //[ProducesResponseType(typeof(ProducerOrderListVm), 200)]
+        //public async Task<IActionResult> GetAll([FromQuery] GetProducerOrderListDto dto)
+        //{
+        //    var vm = await SearchProdvider.Search(dto);
+        //    return Ok(vm);
+        //}
 
         [HttpGet]
         [ProducesResponseType(typeof(DashboardVm), 200)]

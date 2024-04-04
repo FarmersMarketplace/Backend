@@ -9,7 +9,7 @@ using ApplicationException = FarmersMarketplace.Application.Exceptions.Applicati
 
 namespace FarmersMarketplace.Elasticsearch.SearchProviders
 {
-    public class ProducerProductSearchProvider : SearchProvider<GetProducerProductListDto, ProductDocument, ProducerProductListVm>
+    public class ProducerProductSearchProvider : SearchProvider<GetProducerProductListDto, ProductDocument, ProducerProductListVm, ProducerProductAutocompleteDto>
     {
         private readonly IMapper Mapper;
 
@@ -19,6 +19,51 @@ namespace FarmersMarketplace.Elasticsearch.SearchProviders
             SearchDescriptor.Index(Indecies.Products);
         }
 
+        public override async Task<List<string>> Autocomplete(ProducerProductAutocompleteDto request)
+        {
+            var autocompleteResponse = await Client.SearchAsync<ProductDocument>(s => s
+               .Index(Indecies.Products)
+               .Size(request.Count)
+               .Query(q => q
+                   .Bool(b => b
+                       .Should(sh => sh
+                           .QueryString(qs => qs
+                               .Fields(f => f.Field(p => p.Name))
+                               .Query($"{request.Query}~")
+                               .DefaultOperator(Operator.And)
+                               .Boost(1.0)),
+                           sh => sh
+                               .Wildcard(w => w
+                                   .Field(f => f.Name)
+                                   .Boost(2.0)
+                                   .Value($"*{request.Query}*")),
+                           sh => sh
+                               .Prefix(p => p
+                                   .Field(f => f.Name)
+                                   .Value(request.Query)
+                                   .Boost(4.0)))
+                       .Must(m => m
+                        .Term(t => t
+                            .Field(p => p.Producer)
+                            .Value(request.Producer)),
+                        m => m.Term(t => t
+                            .Field(p => p.ProducerId)
+                            .Value(request.ProducerId)))))
+               .Source(so => so
+                   .Includes(i => i
+                       .Field(f => f.Name))));
+
+            if (!autocompleteResponse.IsValid)
+            {
+                string message = $"Products documents was not got successfully for autocomplete from Elasticsearch. Request:\n {JsonConvert.SerializeObject(request)}\n Debug information: {autocompleteResponse.DebugInformation}";
+                string userFacingMessage = CultureHelper.Exception("ProductsNotGotSuccessfully");
+
+                throw new ApplicationException(message, userFacingMessage);
+            }
+
+            return autocompleteResponse.Documents.Select(d => d.Name).ToList();
+        }
+
         protected override async Task ApplyFilter()
         {
             MustQueries.Add(q => q
@@ -26,14 +71,14 @@ namespace FarmersMarketplace.Elasticsearch.SearchProviders
                     .Must(m => m
                         .Term(t => t
                             .Field(p => p.Producer)
-                            .Value(Request.Producer)),
+                            .Value(SearchRequest.Producer)),
                     m => m.Term(t => t
                         .Field(p => p.ProducerId)
-                        .Value(Request.ProducerId)))));
+                        .Value(SearchRequest.ProducerId)))));
 
-            if (Request.Filter != null)
+            if (SearchRequest.Filter != null)
             {
-                var filter = Request.Filter;
+                var filter = SearchRequest.Filter;
 
                 if (filter.Subcategories.Any())
                 {
@@ -95,28 +140,42 @@ namespace FarmersMarketplace.Elasticsearch.SearchProviders
 
         protected override async Task ApplyPagination()
         {
-            SearchDescriptor.Size(Request.PageSize)
-                       .From((Request.Page - 1) * Request.PageSize);
+            SearchDescriptor.Size(SearchRequest.PageSize)
+                       .From((SearchRequest.Page - 1) * SearchRequest.PageSize);
         }
 
         protected override async Task ApplyQuery()
         {
-            if (!string.IsNullOrEmpty(Request.Query))
+            if (!string.IsNullOrEmpty(SearchRequest.Query))
             {
+                SearchRequest.Query = SearchRequest.Query.ToLower();
+
                 MustQueries.Add(q => q
-                .Match(m => m
-                    .Field(f => f.Name)
-                    .Query(Request.Query)
-                    .Analyzer("keyword")
-                )
-            );
+                    .Bool(b => b
+                        .Should(sh => sh
+                            .Wildcard(w => w
+                                .Field(f => f.Name)
+                                .Boost(2.0)
+                                .Value($"*{SearchRequest.Query}*")),
+                            sh => sh
+                            .QueryString(qs => qs
+                                .Fields(f => f.Field(p => p.Name))
+                                .Query($"{SearchRequest.Query}~")
+                                .DefaultOperator(Operator.And)
+                                .Boost(2.0)),
+                            sh => sh
+                            .QueryString(m => m
+                                .Fields(f => f.Field(p => p.ArticleNumber))
+                                .Query(SearchRequest.Query)
+                                .DefaultOperator(Operator.And)
+                                .Fuzziness(Fuzziness.Auto)))));
             }
         }
 
         protected override async Task ApplySorting()
         {
-            SearchDescriptor.Sort(s => s
-                .Descending(fd => fd.CreationDate));
+            SearchDescriptor.Sort(sort => sort
+                .Descending("_score"));
         }
 
         protected override async Task<ProducerProductListVm> Execute()
@@ -125,7 +184,7 @@ namespace FarmersMarketplace.Elasticsearch.SearchProviders
 
             if (!searchResponse.IsValid)
             {
-                string message = $"Products documents was not got successfully from Elasticsearch. Request:\n {JsonConvert.SerializeObject(Request)}\n Debug information: {searchResponse.DebugInformation}";
+                string message = $"Products documents was not got successfully from Elasticsearch. Request:\n {JsonConvert.SerializeObject(SearchRequest)}\n Debug information: {searchResponse.DebugInformation}";
                 string userFacingMessage = CultureHelper.Exception("ProductsNotGotSuccessfully");
 
                 throw new ApplicationException(message, userFacingMessage);

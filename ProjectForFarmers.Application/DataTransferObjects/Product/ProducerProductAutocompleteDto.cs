@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 
 namespace FarmersMarketplace.Application.DataTransferObjects.Product
 {
-    public class ProductAutocompleteDto
+    public class ProducerProductAutocompleteDto
     {
-        public Guid ProducerId { get; set; }
         public Producer Producer { get; set; }
-        public int Count { get; set; }
+        public Guid ProducerId { get; set; }
         public string Query { get; set; }
+        public int Count { get; set; }
     }
 
 }

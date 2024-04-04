@@ -10,7 +10,7 @@ using ApplicationException = FarmersMarketplace.Application.Exceptions.Applicati
 
 namespace FarmersMarketplace.Elasticsearch.SearchProviders
 {
-    public class CustomerProductSearchProvider : SearchProvider<GetCustomerProductListDto, ProductDocument, CustomerProductListVm>
+    public class CustomerProductSearchProvider : SearchProvider<GetCustomerProductListDto, ProductDocument, CustomerProductListVm, CustomerProductAutocompleteDto>
     {
         private readonly IMapper Mapper;
 
@@ -20,12 +20,57 @@ namespace FarmersMarketplace.Elasticsearch.SearchProviders
             Mapper = mapper;
         }
 
+        public override async Task<List<string>> Autocomplete(CustomerProductAutocompleteDto request)
+        {
+            var autocompleteResponse = await Client.SearchAsync<ProductDocument>(s => s
+                .Index(Indecies.Products)
+                .Size(request.Count)
+                .Query(q => q
+                    .Bool(b => b
+                        .Should(sh => sh
+                            .QueryString(qs => qs
+                                .Fields(f => f.Field(p => p.Name))
+                                .Query($"{request.Query}~")
+                                .DefaultOperator(Operator.And)
+                                .Boost(1.0)), 
+                            sh => sh
+                                .Wildcard(w => w
+                                    .Field(f => f.Name)
+                                    .Boost(2.0)
+                                    .Value($"*{request.Query}*")),
+                            sh => sh
+                                .Prefix(p => p
+                                    .Field(f => f.Name)
+                                    .Value(request.Query)
+                                    .Boost(4.0)))))
+                .Source(so => so
+                    .Includes(i => i
+                        .Field(f => f.Name))));
+
+            if (!autocompleteResponse.IsValid)
+            {
+                string message = $"Products documents was not got successfully for autocomplete from Elasticsearch. Request:\n {JsonConvert.SerializeObject(request)}\n Debug information: {autocompleteResponse.DebugInformation}";
+                string userFacingMessage = CultureHelper.Exception("ProductsNotGotSuccessfully");
+
+                throw new ApplicationException(message, userFacingMessage);
+            }
+
+            return autocompleteResponse.Documents.Select(d => d.Name).ToList();
+        }
+
         protected override async Task ApplyFilter()
         {
-            if (Request.Filter == null)
+            MustQueries.Add(q => q
+                .Bool(b => b
+                    .MustNot(mn => mn
+                        .Term(t => t
+                            .Field(p => p.Status)
+                            .Value(ProductStatus.Private)))));
+
+            if (SearchRequest.Filter == null)
                 return;
 
-            var filter = Request.Filter;
+            var filter = SearchRequest.Filter;
             
             if (filter.MaxPrice.HasValue)
             {
@@ -142,38 +187,49 @@ namespace FarmersMarketplace.Elasticsearch.SearchProviders
             }
         }
 
-
         protected override async Task ApplyPagination()
         {
-            SearchDescriptor.Size(Request.PageSize)
-                       .From((Request.Page - 1) * Request.PageSize);
+            SearchDescriptor.Size(SearchRequest.PageSize)
+                       .From((SearchRequest.Page - 1) * SearchRequest.PageSize);
         }
 
         protected override async Task ApplyQuery()
         {
-            if (!string.IsNullOrEmpty(Request.Query))
+            if (!string.IsNullOrEmpty(SearchRequest.Query))
             {
+                SearchRequest.Query = SearchRequest.Query.ToLower();
+
                 MustQueries.Add(q => q
                     .Bool(b => b
                         .Should(sh => sh
                             .Wildcard(w => w
                                 .Field(f => f.Name)
-                                .Boost(1.0)
-                                .Value($"*{Request.Query}*")),
+                                .Boost(2.0)
+                                .Value($"*{SearchRequest.Query}*")),
                             sh => sh
                             .QueryString(qs => qs
                                 .Fields(f => f.Field(p => p.Name))
-                                .Query($"{Request.Query}~")
+                                .Query($"{SearchRequest.Query}~")
                                 .DefaultOperator(Operator.And)
-                                .Boost(2.0)))));
+                                .Boost(1.0)),
+                            sh => sh
+                            .QueryString(m => m
+                                .Fields(f => f.Field(p => p.ArticleNumber))
+                                .Query(SearchRequest.Query)
+                                .DefaultOperator(Operator.And)
+                                .Fuzziness(Fuzziness.Auto)), 
+                            sh => sh
+                                .Prefix(p => p
+                                    .Field(f => f.Name)
+                                    .Value(SearchRequest.Query)
+                                    .Boost(4.0)))));
             }
         }
 
         protected override async Task ApplySorting()
         {
-            SearchDescriptor.Index(Indecies.Products)
-                .Sort(s => s
-                    .Descending(fd => fd.CreationDate));
+            SearchDescriptor.Sort(sort => sort
+                .Descending("_score"));
         }
 
         protected override async Task<CustomerProductListVm> Execute()
@@ -182,7 +238,7 @@ namespace FarmersMarketplace.Elasticsearch.SearchProviders
 
             if (!searchResponse.IsValid)
             {
-                string message = $"Products documents was not got successfully from Elasticsearch. Request:\n {JsonConvert.SerializeObject(Request)}\n Debug information: {searchResponse.DebugInformation}";
+                string message = $"Products documents was not got successfully from Elasticsearch. Request:\n {JsonConvert.SerializeObject(SearchRequest)}\n Debug information: {searchResponse.DebugInformation}";
                 string userFacingMessage = CultureHelper.Exception("ProductsNotGotSuccessfully");
 
                 throw new ApplicationException(message, userFacingMessage);
