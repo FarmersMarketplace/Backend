@@ -13,8 +13,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FarmersMarketplace.Persistence.Migrations
 {
     [DbContext(typeof(MainDbContext))]
-    [Migration("20240401154815_initial")]
-    partial class initial
+    [Migration("20240405074737_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

@@ -19,13 +19,20 @@ namespace FarmersMarketplace.Elasticsearch.SearchProviders.Mocks
 
         public async Task<List<string>> Autocomplete(ProducerProductAutocompleteDto request)
         {
-            return await DbContext.Products.Where(p => p
-                    .Name.Contains(request.Query)
+            if (!request.Query.IsNullOrEmpty())
+            {
+                request.Query = request.Query.Trim().ToLower();
+
+                return await DbContext.Products.Where(p => p
+                    .Name.ToLower().Contains(request.Query)
                     && p.Producer == request.Producer
                     && p.ProducerId == request.ProducerId)
                 .Take(request.Count)
                 .Select(p => p.Name)
                 .ToListAsync();
+            }
+
+            return new List<string>();
         }
 
         public async Task<ProducerProductListVm> Search(GetProducerProductListDto request)
@@ -43,7 +50,8 @@ namespace FarmersMarketplace.Elasticsearch.SearchProviders.Mocks
 
             if (!request.Query.IsNullOrEmpty())
             {
-                products = products.Where(p => p.Name.Contains(request.Query)).ToList();
+                request.Query = request.Query.Trim().ToLower();
+                products = products.Where(p => p.Name.ToLower().Contains(request.Query)).ToList();
             }
 
             products = products.Skip((request.Page - 1) * request.PageSize)
