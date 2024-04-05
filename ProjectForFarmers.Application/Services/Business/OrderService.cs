@@ -247,7 +247,7 @@ namespace FarmersMarketplace.Application.Services.Business
             await DbContext.SaveChangesAsync();
         }
 
-        public async Task<OrderVm> Get(Guid orderId)
+        public async Task<ProducerOrderVm> GetForProducer(Guid orderId)
         {
             var order = await DbContext.Orders.Include(o => o.Items).FirstOrDefaultAsync();
 
@@ -259,7 +259,7 @@ namespace FarmersMarketplace.Application.Services.Business
                 throw new NotFoundException(message, userFacingMessage);
             }
 
-            var vm = Mapper.Map<OrderVm>(order);
+            var vm = Mapper.Map<ProducerOrderVm>(order);
             var items = new List<OrderItemVm>();
 
             foreach (var item in order.Items)

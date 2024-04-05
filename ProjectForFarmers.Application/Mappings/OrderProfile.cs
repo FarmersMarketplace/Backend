@@ -57,7 +57,7 @@ namespace FarmersMarketplace.Application.Mappings
 
         private void MapOrderToOrderVm()
         {
-            CreateMap<Order, OrderVm>()
+            CreateMap<Order, ProducerOrderVm>()
                 .ForMember(vm => vm.Id, opt => opt.MapFrom(order => order.Id))
                 .ForMember(vm => vm.Number, opt => opt.MapFrom(order => order.Number.ToString("D7")))
                 .ForMember(vm => vm.CreationDate, opt => opt.MapFrom(order => order.CreationDate))
@@ -69,8 +69,8 @@ namespace FarmersMarketplace.Application.Mappings
                 .ForMember(vm => vm.DeliveryPoint, opt => opt.MapFrom(order => order.DeliveryPoint))
                 .ForMember(vm => vm.Status, opt => opt.MapFrom(order => order.Status))
                 .ForMember(vm => vm.CustomerId, opt => opt.MapFrom(order => order.CustomerId))
-                .ForMember(vm => vm.CustomerName, opt => opt.MapFrom(order => order.Customer.Name + " " + order.Customer.Surname))
-                .ForMember(vm => vm.CustomerPhone, opt => opt.MapFrom(order => order.Customer.Phone))
+                .ForMember(vm => vm.CustomerName, opt => opt.MapFrom(order => order.CustomerName + " " + order.CustomerSurname))
+                .ForMember(vm => vm.CustomerEmail, opt => opt.MapFrom(order => order.Customer.Email))
                 .ForMember(vm => vm.Items, opt => opt.MapFrom(order => new List<OrderItemVm>()));
         }
     }

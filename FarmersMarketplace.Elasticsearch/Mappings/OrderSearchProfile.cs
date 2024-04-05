@@ -1,7 +1,4 @@
 ﻿using AutoMapper;
-using FarmersMarketplace.Application.ViewModels.Order;
-using FarmersMarketplace.Application.ViewModels.Product;
-using FarmersMarketplace.Elasticsearch.Documents;
 
 namespace FarmersMarketplace.Elasticsearch.Mappings
 {
@@ -14,7 +11,6 @@ namespace FarmersMarketplace.Elasticsearch.Mappings
 
         private void MapOrderToOrderDocument()
         {
-            CreateMap<OrderDocument, ProducerOrderLookupVm>();
         }
     }
 

@@ -3,7 +3,7 @@ using FarmersMarketplace.Application.DataTransferObjects.Product;
 using FarmersMarketplace.Application.Interfaces;
 using FarmersMarketplace.Application.ViewModels.Product;
 using FarmersMarketplace.Elasticsearch.Mappings;
-using FarmersMarketplace.Elasticsearch.SearchProviders;
+using FarmersMarketplace.Elasticsearch.SearchProviders.Mocks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Nest;
@@ -21,10 +21,10 @@ namespace FarmersMarketplace.Elasticsearch
 
             services.AddTransient
                <ISearchProvider<GetCustomerProductListDto, CustomerProductListVm, CustomerProductAutocompleteDto>,
-               CustomerProductSearchProvider>();
+               MockCustomerProductSearchProvider>();
             services.AddTransient
                 <ISearchProvider<GetProducerProductListDto, ProducerProductListVm, ProducerProductAutocompleteDto>,
-                ProducerProductSearchProvider>();
+                MockProducerProductSearchProvider>();
 
             var settings = new ConnectionSettings(new Uri(configuration["ElasticsearchUrl"]))
                 .EnableApiVersioningHeader()

@@ -9,8 +9,8 @@ namespace FarmersMarketplace.Application.Filters
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
         public HashSet<PaymentType>? PaymentTypes { get; set; }
-        public decimal MinimumAmount { get; set; }
-        public decimal MaximumAmount { get; set; }
+        public decimal? MinimumAmount { get; set; }
+        public decimal? MaximumAmount { get; set; }
     }
 
 }

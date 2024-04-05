@@ -1,12 +1,12 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using FarmersMarketplace.Application.DataTransferObjects.Product;
+﻿using FarmersMarketplace.Application.DataTransferObjects.Product;
+using FarmersMarketplace.Application.Interfaces;
 using FarmersMarketplace.Application.Services.Business;
 using FarmersMarketplace.Application.ViewModels.Dashboard;
 using FarmersMarketplace.Application.ViewModels.Product;
 using FarmersMarketplace.Domain;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
-using FarmersMarketplace.Application.Interfaces;
 
 namespace FarmersMarketplace.WebApi.Controllers
 {
@@ -20,17 +20,17 @@ namespace FarmersMarketplace.WebApi.Controllers
         private Guid AccountId => Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
 
         public ProductController(IProductService productService, 
-            ISearchProvider<GetProducerProductListDto, ProducerProductListVm, ProducerProductAutocompleteDto> searchProvider,
+            ISearchProvider<GetProducerProductListDto, ProducerProductListVm, ProducerProductAutocompleteDto> producerSearchProvider,
             ISearchProvider<GetCustomerProductListDto, CustomerProductListVm, CustomerProductAutocompleteDto> customerSearchProvider)
         {
             ProductService = productService;
-            ProducerSearchProvider = searchProvider;
+            ProducerSearchProvider = producerSearchProvider;
             CustomerSearchProvider = customerSearchProvider;
         }
 
         [HttpGet("{productId}")]
         [ProducesResponseType(typeof(ProducerProductVm), 200)]
-        public async Task<IActionResult> Get([FromRoute] Guid productId)
+        public async Task<IActionResult> GetForProducer([FromRoute] Guid productId)
         {
             var request = await ProductService.GetForProducer(productId);
             return Ok(request);
@@ -38,7 +38,7 @@ namespace FarmersMarketplace.WebApi.Controllers
 
         [HttpGet("{product}/{productId}")]
         [ProducesResponseType(typeof(ProducerProductVm), 200)]
-        public async Task<IActionResult> GetFilterData([FromRoute] Guid productId, [FromRoute] Producer producer)
+        public async Task<IActionResult> GetProducerProductFilterData([FromRoute] Guid productId, [FromRoute] Producer producer)
         {
             var request = await ProductService.GetProducerProductFilterData(producer, productId);
             return Ok(request);

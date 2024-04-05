@@ -144,30 +144,45 @@ namespace FarmersMarketplace.Elasticsearch.SearchProviders
                         .Value(filter.Producer)));
             }
 
-            if (filter.Farms != null && filter.Farms.Any())
+            if ((filter.Farms != null && filter.Farms.Any()) 
+                && (filter.Sellers != null && filter.Sellers.Any()))
             {
-                MustQueries.Add(q => q
-                    .Bool(b => b
-                        .Must(m => m
-                            .Term(t => t
+                MustQueries.Add(q => q.Bool(b => b
+                    .Should(
+                        s => s.Bool(b2 => b2
+                            .Must(m => m.Term(t => t
                                 .Field(p => p.Producer)
                                 .Value(Producer.Farm)),
-                    m => m.Terms(t => t
-                        .Field(p => p.ProducerId)
-                        .Terms(filter.Farms)))));
-            }
-
-            if (filter.Sellers != null && filter.Sellers.Any())
-            {
-                MustQueries.Add(q => q
-                    .Bool(b => b
-                        .Must(m => m
-                            .Term(t => t
+                                m => m.Terms(t => t
+                                    .Field(p => p.ProducerId)
+                                    .Terms(filter.Farms)),
+                        s => s.Bool(b2 => b2
+                            .Must(m => m.Term(t => t
                                 .Field(p => p.Producer)
                                 .Value(Producer.Seller)),
-                    m => m.Terms(t => t
-                        .Field(p => p.ProducerId)
-                        .Terms(filter.Sellers)))));
+                                m => m.Terms(t => t
+                                    .Field(p => p.ProducerId)
+                                    .Terms(filter.Sellers)))))))));
+            }
+            else if (filter.Farms != null && filter.Farms.Any())
+            {
+                MustQueries.Add(q => q.Bool(b => b
+                    .Must(m => m.Term(t => t
+                        .Field(p => p.Producer)
+                        .Value(Producer.Farm)),
+                        m => m.Terms(t => t
+                            .Field(p => p.ProducerId)
+                            .Terms(filter.Farms)))));
+            }
+            else if(filter.Sellers != null && filter.Sellers.Any())
+            {
+                MustQueries.Add(q => q.Bool(b => b
+                    .Must(m => m.Term(t => t
+                        .Field(p => p.Producer)
+                        .Value(Producer.Seller)),
+                        m => m.Terms(t => t
+                            .Field(p => p.ProducerId)
+                            .Terms(filter.Sellers)))));
             }
 
             if (filter.Subcategories != null && filter.Subcategories.Any())
@@ -246,14 +261,14 @@ namespace FarmersMarketplace.Elasticsearch.SearchProviders
 
             var response = new CustomerProductListVm
             {
-                Products = new CustomerProductLookupVm[searchResponse.Documents.Count]
+                Products = new List<CustomerProductLookupVm>(searchResponse.Documents.Count)
             };
 
             var productList = searchResponse.Documents.ToArray();
 
             for (int i = 0; i < productList.Length; i++)
             {
-                response.Products[i] = Mapper.Map<CustomerProductLookupVm>(productList[i]);
+                response.Products.Add(Mapper.Map<CustomerProductLookupVm>(productList[i]));
             }
 
             return response;

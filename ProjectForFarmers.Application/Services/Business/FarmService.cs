@@ -366,7 +366,7 @@ namespace FarmersMarketplace.Application.Services.Business
             await DbContext.SaveChangesAsync();
         }
 
-        public async Task<FarmVm> Get(Guid farmId)
+        public async Task<FarmVm> GetForProducer(Guid farmId)
         {
             var farm = await DbContext.Farms
                 .Include(f => f.Owner)
@@ -466,7 +466,7 @@ namespace FarmersMarketplace.Application.Services.Business
             return message;
         }
 
-        public async Task<FarmListVm> GetAll(Guid userId)
+        public async Task<FarmListVm> GetAllForProducer(Guid userId)
         {
             var farms = DbContext.Farms.Where(f => f.OwnerId == userId).ToArray();
             var response = new FarmListVm();

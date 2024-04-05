@@ -22,9 +22,9 @@ namespace FarmersMarketplace.WebApi.Controllers
 
         [HttpGet("{farmId}")]
         [ProducesResponseType(typeof(FarmVm), 200)]
-        public async Task<IActionResult> Get([FromRoute] Guid farmId)
+        public async Task<IActionResult> GetForProducer([FromRoute] Guid farmId)
         {
-            var request = await FarmService.Get(farmId);
+            var request = await FarmService.GetForProducer(farmId);
             return Ok(request);
         }
 
@@ -49,9 +49,9 @@ namespace FarmersMarketplace.WebApi.Controllers
         [HttpGet]
         [Authorize(Roles = "Farmer")]
         [ProducesResponseType(typeof(FarmListVm), 200)]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAllForProducer()
         {
-            var vm = await FarmService.GetAll(AccountId);
+            var vm = await FarmService.GetAllForProducer(AccountId);
             return Ok(vm);
         }
 

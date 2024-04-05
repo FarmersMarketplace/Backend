@@ -200,7 +200,7 @@ namespace FarmersMarketplace.Elasticsearch.SearchProviders
 
             for (int i = 0; i < productList.Length; i++)
             {
-                response.Products[i] = Mapper.Map<ProducerProductLookupVm>(productList[i]);
+                response.Products.Add(Mapper.Map<ProducerProductLookupVm>(productList[i]));
             }
 
             return response;

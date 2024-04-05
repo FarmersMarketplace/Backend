@@ -2,7 +2,7 @@
 {
     public class CustomerProductListVm
     {
-        public CustomerProductLookupVm[] Products { get; set; }
+        public List<CustomerProductLookupVm> Products { get; set; }
     }
 
 }

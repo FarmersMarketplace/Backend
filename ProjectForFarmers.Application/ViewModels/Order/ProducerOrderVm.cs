@@ -5,7 +5,7 @@ using FarmersMarketplace.Domain.Payment;
 
 namespace FarmersMarketplace.Application.ViewModels.Order
 {
-    public class OrderVm
+    public class ProducerOrderVm
     {
         public Guid Id { get; set; }
         public string Number { get; set; }
@@ -20,6 +20,8 @@ namespace FarmersMarketplace.Application.ViewModels.Order
         public Guid CustomerId { get; set; }
         public string CustomerName { get; set; }
         public string CustomerPhone { get; set; }
+        public string CustomerEmail { get; set; }
+        public string CustomerAdditionalPhone { get; set; }
         public List<OrderItemVm> Items { get; set; }
     }
 

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace FarmersMarketplace.Domain.Orders
+﻿namespace FarmersMarketplace.Domain.Orders
 {
     public class OrderItem
     {
@@ -15,5 +9,4 @@ namespace FarmersMarketplace.Domain.Orders
         public decimal PricePerOne { get; set; }
         public decimal TotalPrice { get; set; }
     }
-
 }

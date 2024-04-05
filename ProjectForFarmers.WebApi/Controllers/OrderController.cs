@@ -15,30 +15,30 @@ namespace FarmersMarketplace.WebApi.Controllers
     public class OrderController : ControllerBase
     {
         private readonly IOrderService OrderService;
-        //private readonly ISearchProvider<GetProducerOrderListDto, ProducerOrderListVm, ProducerProductAutocompleteDto> SearchProdvider;
+        private readonly ISearchProvider<GetProducerOrderListDto, ProducerOrderListVm, ProducerProductAutocompleteDto> SearchProdvider;
         private Guid AccountId => Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
 
         public OrderController(IOrderService orderService, ISearchProvider<GetProducerOrderListDto, ProducerOrderListVm, ProducerProductAutocompleteDto> searchProdvider, IConfiguration configuration)
         {
             OrderService = orderService;
-            //SearchProdvider = searchProdvider;
+            SearchProdvider = searchProdvider;
         }
 
         [HttpGet("{orderId}")]
-        [ProducesResponseType(typeof(OrderVm), 200)]
-        public async Task<IActionResult> Get([FromRoute] Guid orderId)
+        [ProducesResponseType(typeof(ProducerOrderVm), 200)]
+        public async Task<IActionResult> GetForProducer([FromRoute] Guid orderId)
         {
-            var vm = await OrderService.Get(orderId);
+            var vm = await OrderService.GetForProducer(orderId);
             return Ok(vm);
         }
 
-        //[HttpGet]
-        //[ProducesResponseType(typeof(ProducerOrderListVm), 200)]
-        //public async Task<IActionResult> GetAll([FromQuery] GetProducerOrderListDto dto)
-        //{
-        //    var vm = await SearchProdvider.Search(dto);
-        //    return Ok(vm);
-        //}
+        [HttpGet]
+        [ProducesResponseType(typeof(ProducerOrderListVm), 200)]
+        public async Task<IActionResult> GetAllForProducer([FromQuery] GetProducerOrderListDto dto)
+        {
+            var vm = await SearchProdvider.Search(dto);
+            return Ok(vm);
+        }
 
         [HttpGet]
         [ProducesResponseType(typeof(DashboardVm), 200)]
