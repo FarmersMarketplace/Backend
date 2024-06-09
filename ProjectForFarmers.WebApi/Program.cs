@@ -110,7 +110,6 @@ namespace FarmersMarketplace.WebApi
             HangfireHelper.RegisterTasks(app.Services);
 
             app.UseCors("AllowAll");
-            app.UseMiddleware<CultureMiddleware>();
             app.UseMiddleware<ExceptionHandlerMiddleware>();
             app.UseRouting();
             app.UseHttpsRedirection();
