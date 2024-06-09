@@ -6,18 +6,13 @@ using System.Threading.Tasks;
 
 namespace FarmersMarketplace.Application.Exceptions
 {
-    public class AuthorizationException : ApplicationException
+    public class AuthorizationException : Exception
     {
-        public AuthorizationException(string message, string userFacingMessage) : base(message, userFacingMessage)
+        public AuthorizationException(string message) : base(message)
         {
         }
 
-        public AuthorizationException() : base()
-        {
-
-        }
-
-        public AuthorizationException(string message, string userFacingMessage, string? environment, string? action) : base(message, userFacingMessage, environment, action)
+        public AuthorizationException()
         {
         }
     }

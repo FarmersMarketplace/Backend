@@ -6,19 +6,15 @@ using System.Threading.Tasks;
 
 namespace FarmersMarketplace.Application.Exceptions
 {
-    public class DuplicateException : ApplicationException
+    public class DuplicateException : Exception
     {
-        public DuplicateException(string message, string userFacingMessage) : base(message, userFacingMessage)
+        public DuplicateException(string message) : base(message)
         {
         }
 
         public DuplicateException() : base()
         {
             
-        }
-
-        public DuplicateException(string message, string userFacingMessage, string? environment, string? action) : base(message, userFacingMessage, environment, action)
-        {
         }
     }
 
