@@ -11,18 +11,24 @@ namespace FarmersMarketplace.Elasticsearch.Mappings
         {
             MapOrderToOrderDocument();
             MapOrderDocumentToProducerOrderLookupVm();
+            MapOrderDocumentToCustomerOrderLookupVm();
+        }
+
+        private void MapOrderDocumentToCustomerOrderLookupVm()
+        {
+            CreateMap<OrderDocument, CustomerOrderLookupVm>();
         }
 
         private void MapOrderDocumentToProducerOrderLookupVm()
         {
             CreateMap<OrderDocument, ProducerOrderLookupVm>()
-                .ForMember(vm => vm.Number, opt => opt.MapFrom(document => document.Number.ToString()))
                 .ForMember(vm => vm.CustomerName, opt => opt.MapFrom(document => document.CustomerName + " " + document.CustomerSurname));
         }
 
         private void MapOrderToOrderDocument()
         {
             CreateMap<Order, OrderDocument>()
+                .ForMember(document => document.Number, opt => opt.MapFrom(order => order.Number.ToString("D7")))
                 .ForMember(document => document.CustomerEmail, opt => opt.MapFrom(order => order.Customer.Email));
         }
     }

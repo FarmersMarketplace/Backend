@@ -35,7 +35,13 @@ namespace FarmersMarketplace.Elasticsearch.SearchProviders
 
         protected abstract Task ApplyQuery();
         protected abstract Task ApplyFilter();
-        protected abstract Task ApplySorting();
+
+        protected virtual async Task ApplySorting()
+        {
+            SearchDescriptor.Sort(sort => sort
+                .Descending("_score"));
+        }
+
         protected abstract Task ApplyPagination();
         protected abstract Task<TResponse> Execute();
 

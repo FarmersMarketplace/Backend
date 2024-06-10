@@ -140,12 +140,6 @@ namespace FarmersMarketplace.Elasticsearch.SearchProviders
             }
         }
 
-        protected override async Task ApplySorting()
-        {
-            SearchDescriptor.Sort(sort => sort
-                .Descending("_score"));
-        }
-
         protected override async Task<ProducerOrderListVm> Execute()
         {
             var searchResponse = Client.Search<OrderDocument>(SearchDescriptor);
