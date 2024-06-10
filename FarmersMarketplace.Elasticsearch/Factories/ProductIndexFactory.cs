@@ -1,9 +1,7 @@
 ﻿using AutoMapper;
 using FarmersMarketplace.Application.Exceptions;
-using FarmersMarketplace.Application.Helpers;
 using FarmersMarketplace.Application.Interfaces;
 using FarmersMarketplace.Domain;
-using FarmersMarketplace.Domain.Accounts;
 using FarmersMarketplace.Domain.Payment;
 using FarmersMarketplace.Elasticsearch.Documents;
 using Microsoft.EntityFrameworkCore;
