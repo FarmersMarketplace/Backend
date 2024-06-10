@@ -2,13 +2,15 @@
 {
     public class ApplicationException : Exception
     {
-        public string UserFacingMessage { get; set; }
+        public string UserFacingMessageKey { get; set; }
+        public string[] Details { get; set; }
         public string? Environment {  get; set; }
         public string? Action { get; set; }
 
-        public ApplicationException(string message, string userFacingMessage) : base(message) 
+        public ApplicationException(string message, string userFacingMessageKey, params string[] details) : base(message) 
         {  
-            UserFacingMessage = userFacingMessage;
+            UserFacingMessageKey = userFacingMessageKey;
+            details = Details;
         }
 
         public ApplicationException() : base()
@@ -16,9 +18,9 @@
             
         }
 
-        public ApplicationException(string message, string userFacingMessage, string? environment, string? action) : base(message) 
+        public ApplicationException(string message, string userFacingMessageKey, string? environment, string? action) : base(message) 
         {
-            UserFacingMessage = userFacingMessage;
+            UserFacingMessageKey = userFacingMessageKey;
             Environment = environment;
             Action = action;
         }

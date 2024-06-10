@@ -7,7 +7,6 @@ using FarmersMarketplace.Application.Interfaces;
 using FarmersMarketplace.Application.ViewModels.Product;
 using FarmersMarketplace.Application.ViewModels.Subcategory;
 using FarmersMarketplace.Domain;
-using FarmersMarketplace.Domain.Feedbacks;
 using FastExcel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -32,202 +31,8 @@ namespace FarmersMarketplace.Application.Services.Business
             Validator = new ValidateService(DbContext);
         }
 
-        //public async Task<OptionListVm> Autocomplete(ProductAutocompleteDto dto)
-        //{
-        //    var cacheKey = "";
-
-        //    var vm = new OptionListVm();
-        //    var productsInfo = new List<ProductInfo>();
-
-        //    if (!MemoryCache.TryGetValue(cacheKey, out productsInfo))
-        //    {
-        //        productsInfo = await DbContext.Products
-        //            .Where(p => p.ProducerId == dto.ProducerId && p.Producer == dto.Producer)
-        //            .Select(p => new ProductInfo { Name = p.Name, ArticleNumber = p.ArticleNumber })
-        //            .Distinct()
-        //            .ToListAsync();
-
-        //        MemoryCache.Set(cacheKey, productsInfo, TimeSpan.FromMinutes(10));
-        //    }
-
-        //    int added = 0;
-
-        //    if(!dto.Query.IsNullOrEmpty()) dto.Query = dto.Query.Trim();
-
-        //    for (int i = 0; i < productsInfo.Count && added < dto.Count; i++)
-        //    {
-        //        if (productsInfo[i].Name.Contains(dto.Query, StringComparison.OrdinalIgnoreCase)
-        //             && !vm.Options.Contains(productsInfo[i].Name))
-        //        {
-        //            vm.Options.Add(productsInfo[i].Name);
-        //            added++;
-        //        }
-
-        //        if (productsInfo[i].ArticleNumber.Contains(dto.Query, StringComparison.OrdinalIgnoreCase)
-        //            && !vm.Options.Contains(productsInfo[i].ArticleNumber))
-        //        {
-        //            vm.Options.Add(productsInfo[i].ArticleNumber);
-        //            added++;
-        //        }
-        //    }
-
-        //    return vm;
-        //}
-
         public async Task Create(CreateProductDto dto)
         {
-            //var products = new List<Product>
-            //{
-            //    new Product
-            //    {
-            //        Id = Guid.NewGuid(),
-            //        Name = "Apple",
-            //        Description = "Fresh and juicy apple",
-            //        ArticleNumber = GenerateArticleNumber(),
-            //        CategoryId = Guid.Parse("01c70bc4-9dac-4589-ba61-5179c7f26e31"),
-            //        SubcategoryId = Guid.Parse("e4312767-564f-4de5-9af5-6c951a3a5daa"),
-            //        Status = ProductStatus.ForSale,
-            //        Producer = Producer.Farm,
-            //        ProducerId = Guid.Parse("a8093c4c-8416-4970-87f1-f2f17d8e772b"),
-            //        PackagingType = "Box",
-            //        UnitOfMeasurement = "kg",
-            //        PricePerOne = 2.5m,
-            //        MinPurchaseQuantity = 1,
-            //        Count = 100,
-            //        ExpirationDays = 7,
-            //        CreationDate = DateTime.UtcNow.AddDays(-10),
-            //        ReceivingMethods = new List<ReceivingMethod> { ReceivingMethod.Delivery },
-            //        Rating = 4.5f,
-            //        Feedbacks = new List<ProductFeedback>(),
-            //        ImagesNames = new List<string>(),
-            //        DocumentsNames = new List<string>()
-            //    },
-            //    new Product
-            //    {
-            //        Id = Guid.NewGuid(),
-            //        Name = "Orange",
-            //        Description = "Sweet and tangy orange",
-            //        ArticleNumber = GenerateArticleNumber(),
-            //        CategoryId = Guid.Parse("01c70bc4-9dac-4589-ba61-5179c7f26e31"),
-            //        SubcategoryId = Guid.Parse("e4312767-564f-4de5-9af5-6c951a3a5daa"),
-            //        Status = ProductStatus.ForSale,
-            //        Producer = Producer.Farm,
-            //        ProducerId = Guid.Parse("a8093c4c-8416-4970-87f1-f2f17d8e772b"),
-            //        PackagingType = "Bag",
-            //        UnitOfMeasurement = "kg",
-            //        PricePerOne = 3.0m,
-            //        MinPurchaseQuantity = 1,
-            //        Count = 50,
-            //        ExpirationDays = 5,
-            //        CreationDate = DateTime.UtcNow.AddDays(-7),
-            //        ReceivingMethods = new List<ReceivingMethod> { ReceivingMethod.SelfPickUp },
-            //        Rating = 4.0f,
-            //        Feedbacks = new List<ProductFeedback>(),
-            //        ImagesNames = new List<string>(),
-            //        DocumentsNames = new List<string>()
-            //    },
-            //    new Product
-            //    {
-            //        Id = Guid.NewGuid(),
-            //        Name = "Grapes",
-            //        Description = "Sweet and succulent grapes",
-            //        ArticleNumber = GenerateArticleNumber(),
-            //        CategoryId = Guid.Parse("01c70bc4-9dac-4589-ba61-5179c7f26e31"),
-            //        SubcategoryId = Guid.Parse("e4312767-564f-4de5-9af5-6c951a3a5daa"),
-            //        Status = ProductStatus.ForSale,
-            //        Producer = Producer.Farm,
-            //        ProducerId = Guid.Parse("a8093c4c-8416-4970-87f1-f2f17d8e772b"),
-            //        PackagingType = "Bunch",
-            //        UnitOfMeasurement = "kg",
-            //        PricePerOne = 5.0m,
-            //        MinPurchaseQuantity = 1,
-            //        Count = 80,
-            //        ExpirationDays = 7,
-            //        CreationDate = DateTime.UtcNow.AddDays(-3),
-            //        ReceivingMethods = new List<ReceivingMethod> { ReceivingMethod.SelfPickUp },
-            //        Rating = 4.3f,
-            //        Feedbacks = new List<ProductFeedback>(),
-            //        ImagesNames = new List<string>(),
-            //        DocumentsNames = new List<string>()
-            //    },
-            //    new Product
-            //    {
-            //        Id = Guid.NewGuid(),
-            //        Name = "Banana",
-            //        Description = "Delicious and nutritious banana",
-            //        ArticleNumber = GenerateArticleNumber(),
-            //        CategoryId = Guid.Parse("01c70bc4-9dac-4589-ba61-5179c7f26e31"),
-            //        SubcategoryId = Guid.Parse("e4312767-564f-4de5-9af5-6c951a3a5daa"),
-            //        Status = ProductStatus.ForSale,
-            //        Producer = Producer.Farm,
-            //        ProducerId = Guid.Parse("a8093c4c-8416-4970-87f1-f2f17d8e772b"),
-            //        PackagingType = "Bunch",
-            //        UnitOfMeasurement = "pcs",
-            //        PricePerOne = 1.0m,
-            //        MinPurchaseQuantity = 1,
-            //        Count = 200,
-            //        ExpirationDays = 3,
-            //        CreationDate = DateTime.UtcNow.AddDays(-5),
-            //        ReceivingMethods = new List<ReceivingMethod> { ReceivingMethod.Delivery, ReceivingMethod.SelfPickUp },
-            //        Rating = 4.8f,
-            //        Feedbacks = new List<ProductFeedback>(),
-            //        ImagesNames = new List<string>(),
-            //        DocumentsNames = new List<string>()
-            //    },
-            //    new Product
-            //    {
-            //        Id = Guid.NewGuid(),
-            //        Name = "Carrot",
-            //        Description = "Fresh and crunchy carrots",
-            //        ArticleNumber = GenerateArticleNumber(),
-            //        CategoryId = Guid.Parse("e1aab56f-4dc0-4b75-a059-171a7771bb63"),
-            //        SubcategoryId = Guid.Parse("1b850e70-11c9-4e52-85df-15f3567cbd9f"),
-            //        Status = ProductStatus.ForSale,
-            //        Producer = Producer.Farm,
-            //        ProducerId = Guid.Parse("a8093c4c-8416-4970-87f1-f2f17d8e772b"),
-            //        PackagingType = "Bunch",
-            //        UnitOfMeasurement = "kg",
-            //        PricePerOne = 3.0m,
-            //        MinPurchaseQuantity = 1,
-            //        Count = 150,
-            //        ExpirationDays = 5,
-            //        CreationDate = DateTime.UtcNow.AddDays(-7),
-            //        ReceivingMethods = new List<ReceivingMethod> { ReceivingMethod.Delivery },
-            //        Rating = 4.5f,
-            //        Feedbacks = new List<ProductFeedback>(),
-            //        ImagesNames = new List<string>(),
-            //        DocumentsNames = new List<string>()
-            //    },
-            //    new Product
-            //    {
-            //        Id = Guid.NewGuid(),
-            //        Name = "Tomato",
-            //        Description = "Juicy and ripe tomatoes",
-            //        ArticleNumber = GenerateArticleNumber(),
-            //        CategoryId = Guid.Parse("e1aab56f-4dc0-4b75-a059-171a7771bb63"),
-            //        SubcategoryId = Guid.Parse("1b850e70-11c9-4e52-85df-15f3567cbd9f"),
-            //        Status = ProductStatus.ForSale,
-            //        Producer = Producer.Farm,
-            //        ProducerId = Guid.Parse("a8093c4c-8416-4970-87f1-f2f17d8e772b"),
-            //        PackagingType = "Box",
-            //        UnitOfMeasurement = "kg",
-            //        PricePerOne = 2.0m,
-            //        MinPurchaseQuantity = 1,
-            //        Count = 100,
-            //        ExpirationDays = 4,
-            //        CreationDate = DateTime.UtcNow.AddDays(-4),
-            //        ReceivingMethods = new List<ReceivingMethod> { ReceivingMethod.SelfPickUp },
-            //        Rating = 4.2f,
-            //        Feedbacks = new List<ProductFeedback>(),
-            //        ImagesNames = new List<string>(),
-            //        DocumentsNames = new List<string>()
-            //    }
-            //};
-            //await DbContext.Products.AddRangeAsync(products);
-            //await DbContext.SaveChangesAsync();
-
-
-
             var product = Mapper.Map<Product>(dto);
 
             var category = await DbContext.Categories.FirstOrDefaultAsync(c => c.Id == product.CategoryId);
@@ -235,9 +40,7 @@ namespace FarmersMarketplace.Application.Services.Business
             if (category == null)
             {
                 string message = $"Category with Id {product.CategoryId} was not found.";
-                string userFacingMessage = CultureHelper.Exception("CategoryNotFound", product.CategoryId.ToString());
-
-                throw new NotFoundException(message, userFacingMessage);
+                throw new NotFoundException(message, "CategoryNotFound", product.CategoryId.ToString());
             }
 
             var subcategory = await DbContext.Subcategories.FirstOrDefaultAsync(c => c.Id == product.SubcategoryId);
@@ -245,16 +48,12 @@ namespace FarmersMarketplace.Application.Services.Business
             if (subcategory == null)
             {
                 string message = $"Subcategory with Id {product.SubcategoryId} was not found.";
-                string userFacingMessage = CultureHelper.Exception("SubcategoryNotFound", product.SubcategoryId.ToString());
-
-                throw new NotFoundException(message, userFacingMessage);
+                throw new NotFoundException(message, "SubcategoryNotFound", product.SubcategoryId.ToString());
             }
             else if(subcategory.CategoryId != category.Id)
             {
                 string message = $"Subcategory does not belong to the category.";
-                string userFacingMessage = CultureHelper.Exception("SubcategoryNotBelongsToCategory", product.SubcategoryId.ToString(), product.CategoryId.ToString());
-
-                throw new InvalidDataException(message, userFacingMessage);
+                throw new InvalidDataException(message, "SubcategoryNotBelongsToCategory", product.SubcategoryId.ToString(), product.CategoryId.ToString());
             }
 
             product.ArticleNumber = GenerateArticleNumber();
@@ -294,9 +93,7 @@ namespace FarmersMarketplace.Application.Services.Business
                 if (product == null)
                 {
                     string message = $"Product with Id {productId} was not found.";
-                    string userFacingMessage = CultureHelper.Exception("ProductNotFound");
-
-                    throw new NotFoundException(message, userFacingMessage);
+                    throw new NotFoundException(message, "ProductNotFound");
                 }
                 Validator.ValidateProducer(accountId, product.ProducerId, product.Producer);
 
@@ -305,9 +102,7 @@ namespace FarmersMarketplace.Application.Services.Business
                 if (hasOrdersWithProduct)
                 {
                     string message = $"Product with Id {productId} is used in existing orders.";
-                    string userFacingMessage = CultureHelper.Exception("ProductIsUsed");
-
-                    throw new NotFoundException(message, userFacingMessage);
+                    throw new NotFoundException(message, "ProductIsUsed");
                 }
                 else
                 {
@@ -344,9 +139,7 @@ namespace FarmersMarketplace.Application.Services.Business
             if (product == null)
             {
                 string message = $"Product with Id {productId} was not found.";
-                string userFacingMessage = CultureHelper.Exception("ProductNotFound");
-
-                throw new NotFoundException(message, userFacingMessage);
+                throw new NotFoundException(message, "ProductNotFound");
             }
 
             var vm = Mapper.Map<ProducerProductVm>(product);
@@ -362,25 +155,19 @@ namespace FarmersMarketplace.Application.Services.Business
             if (category == null)
             {
                 string message = $"Category with Id {dto.CategoryId} was not found.";
-                string userFacingMessage = CultureHelper.Exception("CategoryNotFound");
-
-                throw new NotFoundException(message, userFacingMessage);
+                throw new NotFoundException(message, "CategoryNotFound");
             }
 
             var subcategory = await DbContext.Subcategories.FirstOrDefaultAsync(c => c.Id == dto.SubcategoryId);
             if (subcategory == null)
             {
                 string message = $"Subcategory with Id {dto.SubcategoryId} was not found.";
-                string userFacingMessage = CultureHelper.Exception("SubcategoryNotFound");
-
-                throw new NotFoundException(message, userFacingMessage);
+                throw new NotFoundException(message, "SubcategoryNotFound");
             }
             else if (subcategory.CategoryId != category.Id)
             {
                 string message = $"Subcategory with Id {dto.SubcategoryId} does not belong to the category with Id {dto.CategoryId}.";
-                string userFacingMessage = CultureHelper.Exception("SubcategoryNotBelongsToCategory");
-
-                throw new InvalidDataException(message, userFacingMessage);
+                throw new InvalidDataException(message, "SubcategoryNotBelongsToCategory");
             }
 
             var product = await DbContext.Products.FirstAsync(p => p.Id == dto.Id);
@@ -388,9 +175,7 @@ namespace FarmersMarketplace.Application.Services.Business
             if (product == null)
             {
                 string message = $"Product with Id {dto.Id} was not found.";
-                string userFacingMessage = CultureHelper.Exception("ProductNotFound");
-
-                throw new NotFoundException(message, userFacingMessage);
+                throw new NotFoundException(message, "ProductNotFound");
             }
             Validator.ValidateProducer(accountId, product.ProducerId, product.Producer);
 
@@ -461,9 +246,7 @@ namespace FarmersMarketplace.Application.Services.Business
                 if (product == null)
                 {
                     string message = $"Product with Id {productId} was not found.";
-                    string userFacingMessage = CultureHelper.Exception("ProductNotFound");
-
-                    throw new NotFoundException(message, userFacingMessage);
+                    throw new NotFoundException(message, "ProductNotFound");
                 }
                 Validator.ValidateProducer(accountId, product.ProducerId, product.Producer);
 
@@ -523,9 +306,7 @@ namespace FarmersMarketplace.Application.Services.Business
                 if (seller == null)
                 {
                     string message = $"Account with Id {producerId} was not found.";
-                    string userFacingMessage = CultureHelper.Exception("AccountNotFound");
-
-                    throw new NotFoundException(message, userFacingMessage);
+                    throw new NotFoundException(message, "AccountNotFound");
                 }
 
                 foreach (var subcategoryId in seller.Subcategories)
@@ -534,8 +315,7 @@ namespace FarmersMarketplace.Application.Services.Business
                     if (subcategory == null)
                     {
                         string message = $"Subcategory with Id {subcategoryId} was not found.";
-                        string userFacingMessage = CultureHelper.Exception("SubcategoryNotFound");
-                        throw new NotFoundException(message, userFacingMessage);
+                        throw new NotFoundException(message, "SubcategoryNotFound");
                     }
 
                     vm.Subcategories.Add(new SubcategoryVm(subcategory.Id, subcategory.Name, subcategory.CategoryId));
@@ -548,9 +328,7 @@ namespace FarmersMarketplace.Application.Services.Business
                 if (farm == null)
                 {
                     string message = $"Farm with Id {producerId} was not found.";
-                    string userFacingMessage = CultureHelper.Exception("FarmNotFound");
-
-                    throw new NotFoundException(message, userFacingMessage);
+                    throw new NotFoundException(message, "FarmNotFound");
                 }
 
                 foreach (var subcategoryId in farm.Subcategories)
@@ -559,8 +337,7 @@ namespace FarmersMarketplace.Application.Services.Business
                     if (subcategory == null)
                     {
                         string message = $"Subcategory with Id {subcategoryId} was not found.";
-                        string userFacingMessage = CultureHelper.Exception("SubcategoryNotFound");
-                        throw new NotFoundException(message, userFacingMessage);
+                        throw new NotFoundException(message, "SubcategoryNotFound");
                     }
 
                     vm.Subcategories.Add(new SubcategoryVm(subcategory.Id, subcategory.Name, subcategory.CategoryId));
@@ -661,9 +438,7 @@ namespace FarmersMarketplace.Application.Services.Business
                 if (account == null)
                 {
                     string message = $"Account with Id {producerId} was not found.";
-                    string userFacingMessage = CultureHelper.Exception("AccountNotFound");
-
-                    throw new NotFoundException(message, userFacingMessage);
+                    throw new NotFoundException(message, "AccountNotFound");
                 }
 
                 producerName = account.Name + " " + account.Surname;
@@ -675,9 +450,7 @@ namespace FarmersMarketplace.Application.Services.Business
                 if (farm == null)
                 {
                     string message = $"Farm with Id {producerId} was not found.";
-                    string userFacingMessage = CultureHelper.Exception("FarmNotFound");
-
-                    throw new NotFoundException(message, userFacingMessage);
+                    throw new NotFoundException(message, "FarmNotFound");
                 }
 
                 producerName = farm.Name;
@@ -697,9 +470,7 @@ namespace FarmersMarketplace.Application.Services.Business
                 if (product == null)
                 {
                     string message = $"Product with Id {productId} was not found.";
-                    string userFacingMessage = CultureHelper.Exception("ProductNotFound");
-
-                    throw new NotFoundException(message, userFacingMessage);
+                    throw new NotFoundException(message, "ProductNotFound");
                 }
 
                 Validator.ValidateProducer(accountId, product.ProducerId, product.Producer);
@@ -708,11 +479,5 @@ namespace FarmersMarketplace.Application.Services.Business
             }
             await DbContext.SaveChangesAsync();
         }
-    }
-    
-    class ProductInfo
-    {
-        public string Name { get; set; }
-        public string ArticleNumber { get; set; }
     }
 }

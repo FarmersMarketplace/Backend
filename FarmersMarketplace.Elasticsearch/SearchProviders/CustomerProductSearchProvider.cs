@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using FarmersMarketplace.Application.DataTransferObjects.Product;
-using FarmersMarketplace.Application.Helpers;
 using FarmersMarketplace.Application.ViewModels.Product;
 using FarmersMarketplace.Domain;
 using FarmersMarketplace.Elasticsearch.Documents;
@@ -50,9 +49,7 @@ namespace FarmersMarketplace.Elasticsearch.SearchProviders
             if (!autocompleteResponse.IsValid)
             {
                 string message = $"Products documents was not got successfully for autocomplete from Elasticsearch. Request:\n {JsonConvert.SerializeObject(request)}\n Debug information: {autocompleteResponse.DebugInformation}";
-                string userFacingMessage = CultureHelper.Exception("ProductsNotGotSuccessfully");
-
-                throw new ApplicationException(message, userFacingMessage);
+                throw new ApplicationException(message, "ProductsNotGotSuccessfully");
             }
 
             return autocompleteResponse.Documents.Select(d => d.Name).ToList();
@@ -254,9 +251,7 @@ namespace FarmersMarketplace.Elasticsearch.SearchProviders
             if (!searchResponse.IsValid)
             {
                 string message = $"Products documents was not got successfully from Elasticsearch. Request:\n {JsonConvert.SerializeObject(SearchRequest)}\n Debug information: {searchResponse.DebugInformation}";
-                string userFacingMessage = CultureHelper.Exception("ProductsNotGotSuccessfully");
-
-                throw new ApplicationException(message, userFacingMessage);
+                throw new ApplicationException(message, "ProductsNotGotSuccessfully");
             }
 
             var response = new CustomerProductListVm

@@ -1,4 +1,5 @@
-﻿using Serilog;
+﻿using FarmersMarketplace.Application.Helpers;
+using Serilog;
 using System.Net;
 using System.Text.Json;
 using ApplicationException = FarmersMarketplace.Application.Exceptions.ApplicationException;
@@ -25,7 +26,9 @@ namespace FarmersMarketplace.WebApi.Middlewares
                 Log.ForContext("Environment", ex.Environment)
                     .ForContext("Action", ex.Action)
                     .Error(ex, "{ErrorMessage}", ex.Message);
-                await HandleExceptionAsync(context, ex.UserFacingMessage);
+
+                var userFacingMessage = CultureHelper.Exception(ex.UserFacingMessageKey, ex.Details);
+                await HandleExceptionAsync(context, userFacingMessage);
             }
             catch (Exception ex)
             {

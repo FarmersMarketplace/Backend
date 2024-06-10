@@ -1,8 +1,6 @@
 ﻿using Geocoding;
 using Geocoding.Google;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.Extensions.Configuration;
-using System.Net.Http;
 using Address = FarmersMarketplace.Domain.Address;
 
 namespace FarmersMarketplace.Application.Helpers

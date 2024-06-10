@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using FarmersMarketplace.Application.DataTransferObjects.Dashboard;
 using FarmersMarketplace.Application.Exceptions;
-using FarmersMarketplace.Application.Helpers;
 using FarmersMarketplace.Application.Interfaces;
 using FarmersMarketplace.Application.ViewModels.Dashboard;
 using FarmersMarketplace.Application.ViewModels.Order;
@@ -39,7 +38,7 @@ namespace FarmersMarketplace.Application.Services.Business
             }
 
             var customerIdsHashSet = new HashSet<Guid>(await DbContext.Orders
-                .Where(o => o.ProducerId == producerId 
+                .Where(o => o.ProducerId == producerId
                 && o.Producer == producer)
                 .Select(o => o.CustomerId)
                 .ToListAsync());
@@ -67,9 +66,7 @@ namespace FarmersMarketplace.Application.Services.Business
             if (monthStatistic == null)
             {
                 string message = $"Statistic for month with id {id} was not found.";
-                string userFacingMessage = CultureHelper.Exception("StatisticWithIdNotExist", id.ToString());
-
-                throw new NotFoundException(message, userFacingMessage);
+                throw new NotFoundException(message, "StatisticWithIdNotExist", id.ToString());
             }
 
             var vm = Mapper.Map<DashboardVm>(monthStatistic);
@@ -88,9 +85,7 @@ namespace FarmersMarketplace.Application.Services.Business
                 if (customer == null)
                 {
                     string message = $"Account with Id {monthStatistic.CustomerWithHighestPaymentId} was not found.";
-                    string userFacingMessage = CultureHelper.Exception("AccountNotFound");
-
-                    throw new NotFoundException(message, userFacingMessage);
+                    throw new NotFoundException(message, "AccountNotFound");
                 }
 
                 vm.CustomerInfo.Name = customer.Surname + " " + customer.Surname;

@@ -15,7 +15,8 @@ using DayOfWeek = FarmersMarketplace.Domain.DayOfWeek;
 
 namespace FarmersMarketplace.Application.Services.Business
 {
-    public class AccountService: Service, IAccountService
+
+    public class AccountService : Service, IAccountService
     {
         private readonly CoordinateHelper CoordinateHelper;
         private readonly FileHelper FileHelper;
@@ -40,9 +41,7 @@ namespace FarmersMarketplace.Application.Services.Business
             if (customer == null)
             {
                 string message = $"Account with Id {accountId} was not found.";
-                string userFacingMessage = CultureHelper.Exception("AccountNotFound");
-
-                throw new NotFoundException(message, userFacingMessage);
+                throw new NotFoundException(message, "AccountNotFound");
             }
 
             var vm = Mapper.Map<CustomerVm>(customer);
@@ -59,14 +58,12 @@ namespace FarmersMarketplace.Application.Services.Business
             if (farmer == null)
             {
                 string message = $"Account with Id {accountId} was not found.";
-                string userFacingMessage = CultureHelper.Exception("AccountNotFound");
-
-                throw new NotFoundException(message, userFacingMessage);
+                throw new NotFoundException(message, "AccountNotFound");
             }
 
             var vm = Mapper.Map<FarmerVm>(farmer);
 
-            if(farmer.PaymentTypes != null 
+            if (farmer.PaymentTypes != null
                 && farmer.PaymentTypes.Contains(PaymentType.Online))
             {
                 vm.PaymentData.HasOnlinePayment = true;
@@ -102,9 +99,7 @@ namespace FarmersMarketplace.Application.Services.Business
             if (seller == null)
             {
                 string message = $"Account with Id {accountId} was not found.";
-                string userFacingMessage = CultureHelper.Exception("AccountNotFound");
-
-                throw new NotFoundException(message, userFacingMessage);
+                throw new NotFoundException(message, "AccountNotFound");
             }
 
             var vm = Mapper.Map<SellerVm>(seller);
@@ -131,9 +126,7 @@ namespace FarmersMarketplace.Application.Services.Business
             if (customer == null)
             {
                 string message = $"Account with Id {accountId} was not found.";
-                string userFacingMessage = CultureHelper.Exception("AccountNotFound");
-
-                throw new NotFoundException(message, userFacingMessage);
+                throw new NotFoundException(message, "AccountNotFound");
             }
 
             customer.Name = dto.Name;
@@ -197,9 +190,7 @@ namespace FarmersMarketplace.Application.Services.Business
             if (customer == null)
             {
                 string message = $"Account with Id {accountId} was not found.";
-                string userFacingMessage = CultureHelper.Exception("AccountNotFound");
-
-                throw new NotFoundException(message, userFacingMessage);
+                throw new NotFoundException(message, "AccountNotFound");
             }
 
             if (customer.PaymentData == null)
@@ -223,12 +214,10 @@ namespace FarmersMarketplace.Application.Services.Business
             if (farmer == null)
             {
                 string message = $"Account with Id {accountId} was not found.";
-                string userFacingMessage = CultureHelper.Exception("AccountNotFound");
-
-                throw new NotFoundException(message, userFacingMessage);
+                throw new NotFoundException(message, "AccountNotFound");
             }
 
-            if (farmer.Address == null) 
+            if (farmer.Address == null)
             {
                 farmer.Address = new Address() { Id = Guid.NewGuid() };
                 DbContext.ProducerAddresses.Add(farmer.Address);
@@ -247,7 +236,7 @@ namespace FarmersMarketplace.Application.Services.Business
                 var oldAvatarName = farmer.AvatarName;
                 farmer.AvatarName = await FileHelper.SaveFile(dto.Avatar, Configuration["File:Images:Account"]);
 
-                if(!oldAvatarName.IsNullOrEmpty())
+                if (!oldAvatarName.IsNullOrEmpty())
                     FileHelper.DeleteFile(oldAvatarName, Configuration["File:Images:Account"]);
             }
 
@@ -255,7 +244,7 @@ namespace FarmersMarketplace.Application.Services.Business
             {
                 var addressDto = dto.Address;
                 farmer.Address = farmer.Address ?? new Address();
-                farmer.Address.Note = dto.Address.Note; 
+                farmer.Address.Note = dto.Address.Note;
                 farmer.Address.PostalCode = addressDto.PostalCode;
 
                 if (!AddressEqualToDto(farmer.Address, addressDto))
@@ -285,9 +274,7 @@ namespace FarmersMarketplace.Application.Services.Business
             if (seller == null)
             {
                 string message = $"Account with Id {accountId} was not found.";
-                string userFacingMessage = CultureHelper.Exception("AccountNotFound");
-
-                throw new NotFoundException(message, userFacingMessage);
+                throw new NotFoundException(message, "AccountNotFound");
             }
 
             seller.Name = dto.Name;
@@ -368,7 +355,7 @@ namespace FarmersMarketplace.Application.Services.Business
 
         private async Task UpdateSellerSchedule(Seller seller, ScheduleDto dto)
         {
-            if (seller.Schedule == null) 
+            if (seller.Schedule == null)
             {
                 seller.Schedule = new Schedule() { Id = Guid.NewGuid() };
                 DbContext.Schedules.Add(seller.Schedule);
@@ -400,9 +387,7 @@ namespace FarmersMarketplace.Application.Services.Business
             if (seller == null)
             {
                 string message = $"Account with Id {accountId} was not found.";
-                string userFacingMessage = CultureHelper.Exception("AccountNotFound");
-
-                throw new NotFoundException(message, userFacingMessage);
+                throw new NotFoundException(message, "AccountNotFound");
             }
 
             seller.Categories = dto.Categories ?? seller.Categories;
@@ -419,9 +404,7 @@ namespace FarmersMarketplace.Application.Services.Business
             if (farmer == null)
             {
                 string message = $"Account with Id {accountId} was not found.";
-                string userFacingMessage = CultureHelper.Exception("AccountNotFound");
-
-                throw new NotFoundException(message, userFacingMessage);
+                throw new NotFoundException(message, "AccountNotFound");
             }
 
             if (farmer.PaymentData == null)
@@ -457,12 +440,10 @@ namespace FarmersMarketplace.Application.Services.Business
             if (seller == null)
             {
                 string message = $"Account with Id {accountId} was not found.";
-                string userFacingMessage = CultureHelper.Exception("AccountNotFound");
-
-                throw new NotFoundException(message, userFacingMessage);
+                throw new NotFoundException(message, "AccountNotFound");
             }
 
-            if (seller.PaymentData == null) 
+            if (seller.PaymentData == null)
             {
                 seller.PaymentData = new ProducerPaymentData { Id = Guid.NewGuid() };
                 DbContext.ProducerPaymentData.Add(seller.PaymentData);
@@ -475,7 +456,7 @@ namespace FarmersMarketplace.Application.Services.Business
             seller.PaymentData.CardExpirationYear = dto.CardExpirationYear;
             seller.PaymentData.CardExpirationMonth = dto.CardExpirationMonth;
 
-            if (dto.HasOnlinePayment) 
+            if (dto.HasOnlinePayment)
             {
                 seller.PaymentTypes = new List<PaymentType> { PaymentType.Online, PaymentType.Cash };
             }
@@ -483,7 +464,7 @@ namespace FarmersMarketplace.Application.Services.Business
             {
                 seller.PaymentTypes = new List<PaymentType> { PaymentType.Cash };
             }
-            
+
             await DbContext.SaveChangesAsync();
         }
 
@@ -496,9 +477,7 @@ namespace FarmersMarketplace.Application.Services.Business
             if (customer == null)
             {
                 string message = $"Account with Id {accountId} was not found.";
-                string userFacingMessage = CultureHelper.Exception("AccountNotFound");
-
-                throw new NotFoundException(message, userFacingMessage);
+                throw new NotFoundException(message, "AccountNotFound");
             }
 
             var vm = new CustomerOrderDetailsVm
@@ -510,7 +489,7 @@ namespace FarmersMarketplace.Application.Services.Business
                 PaymentData = Mapper.Map<CustomerPaymentDataVm>(customer.PaymentData)
             };
 
-            if(receivingMethod == ReceivingMethod.Delivery)
+            if (receivingMethod == ReceivingMethod.Delivery)
             {
                 vm.Address = Mapper.Map<CustomerAddressVm>(customer.Address);
             }

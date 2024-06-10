@@ -1,6 +1,5 @@
 ﻿using FarmersMarketplace.Application.DataTransferObjects;
 using FarmersMarketplace.Application.DataTransferObjects.Account;
-using FarmersMarketplace.Application.Helpers;
 using FarmersMarketplace.Application.Services.Business;
 using FarmersMarketplace.Application.ViewModels.Account;
 using FarmersMarketplace.Domain;
@@ -121,9 +120,7 @@ namespace FarmersMarketplace.WebApi.Controllers
             if (string.IsNullOrEmpty(roleStr) || !Enum.TryParse<Role>(roleStr, out var role))
             {
                 string message = $"Failed to retrieve or parse role claim from JWT.";
-                string userFacingMessage = CultureHelper.Exception("IncorrectRole");
-
-                throw new InvalidDataException(message, userFacingMessage);
+                throw new InvalidDataException(message, "IncorrectRole");
             }
 
             await AccountService.DeleteAccount(role, AccountId);
@@ -133,7 +130,7 @@ namespace FarmersMarketplace.WebApi.Controllers
         [HttpGet("{receivingMethod}")]
         [Authorize(Roles = "Customer")]
         [ProducesResponseType(typeof(CustomerOrderDetailsVm), 200)]
-        public async Task<IActionResult> DeleteAccount(ReceivingMethod receivingMethod)
+        public async Task<IActionResult> GetCustomerOrderDetails(ReceivingMethod receivingMethod)
         {
             var vm = await AccountService.GetCustomerOrderDetails(AccountId, receivingMethod);
             return NoContent();

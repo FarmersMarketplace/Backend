@@ -95,10 +95,6 @@ namespace FarmersMarketplace.Elasticsearch.Factories
                             .Name(p => p.ReceivingMethods)
                             .Index(false)
                             .Type(NumberType.Integer))));
-
-            //return descriptor.Mappings(ms => ms
-            //        .Map<ProductDocument>(m => m
-            //            .AutoMap()));
         }
 
         public async Task LoadData(IElasticClient client, IApplicationDbContext dbContext, IMapper mapper)
@@ -110,9 +106,7 @@ namespace FarmersMarketplace.Elasticsearch.Factories
             if (!deleteResponse.IsValid)
             {
                 string message = $"Products documents was not deleted successfully from Elasticsearch.";
-                string userFacingMessage = CultureHelper.Exception("ElasticsearchProductsNotDeleted");
-
-                throw new ApplicationException(message, userFacingMessage);
+                throw new ApplicationException(message, "ElasticsearchProductsNotDeleted");
             }
 
             var products = await dbContext.Products.Include(p => p.Subcategory)
@@ -134,9 +128,7 @@ namespace FarmersMarketplace.Elasticsearch.Factories
                     if (farm == null)
                     {
                         string message = $"Farm with Id {products[i].ProducerId} was not found.";
-                        string userFacingMessage = CultureHelper.Exception("FarmNotFound");
-
-                        throw new NotFoundException(message, userFacingMessage);
+                        throw new NotFoundException(message, "FarmNotFound");
                     }
 
                     documents[i].ProducerName = farm.Name;
@@ -156,9 +148,7 @@ namespace FarmersMarketplace.Elasticsearch.Factories
                     if (seller == null)
                     {
                         string message = $"Account with Id {products[i].ProducerId} was not found.";
-                        string userFacingMessage = CultureHelper.Exception("AccountNotFound");
-
-                        throw new NotFoundException(message, userFacingMessage);
+                        throw new NotFoundException(message, "AccountNotFound");
                     }
 
                     documents[i].ProducerName = seller.Surname + " " + seller.Name;
@@ -184,9 +174,7 @@ namespace FarmersMarketplace.Elasticsearch.Factories
             if (!bulkIndexResponse.IsValid)
             {
                 string message = $"Products documents was not uploaded successfully to Elasticsearch.";
-                string userFacingMessage = CultureHelper.Exception("ElasticsearchProductsNotUpoaded");
-
-                throw new ApplicationException(message, userFacingMessage);
+                throw new ApplicationException(message, "ElasticsearchProductsNotUpoaded");
             }
         }
     }

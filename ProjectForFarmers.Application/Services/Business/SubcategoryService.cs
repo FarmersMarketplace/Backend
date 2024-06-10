@@ -24,9 +24,7 @@ namespace FarmersMarketplace.Application.Services.Business
             if (category == null)
             {
                 string message = $"Category with Id {dto.CategoryId} was not found.";
-                string userFacingMessage = CultureHelper.Exception("CategoryWithIdNotFound", dto.CategoryId.ToString());
-
-                throw new NotFoundException(message, userFacingMessage);
+                throw new NotFoundException(message, "CategoryWithIdNotFound", dto.CategoryId.ToString());
             }
 
             Guid id = Guid.NewGuid();
@@ -41,8 +39,7 @@ namespace FarmersMarketplace.Application.Services.Business
             {
                 string acceptableFormats = string.Join(", ", FileHelper.AllowedImagesExtensions);
                 string message = $"Invalid format of image {dto.Image.FileName}. Acceptable formats: {acceptableFormats}.";
-                string userFacingMessage = CultureHelper.Exception("InvalidImageFormat", dto.Image.FileName, acceptableFormats);
-                throw new NotFoundException(message, userFacingMessage);
+                throw new NotFoundException(message, "InvalidImageFormat", dto.Image.FileName, acceptableFormats);
             }
 
             subcategory.ImageName = await FileHelper.SaveFile(dto.Image, Configuration["File:Images:Product"]);
@@ -58,8 +55,7 @@ namespace FarmersMarketplace.Application.Services.Business
             if (subcategory == null)
             {
                 string message = $"Subcategory with Id {subcategoryId} was not found.";
-                string userFacingMessage = CultureHelper.Exception("SubcategoryWithIdNotFound", subcategoryId.ToString());
-                throw new NotFoundException(message, userFacingMessage);
+                throw new NotFoundException(message, "SubcategoryWithIdNotFound", subcategoryId.ToString());
             }
 
             DbContext.Categories.Remove(subcategory);
@@ -73,8 +69,7 @@ namespace FarmersMarketplace.Application.Services.Business
             if (subcategory == null)
             {
                 string message = $"Subcategory with Id {dto.Id} was not found.";
-                string userFacingMessage = CultureHelper.Exception("SubcategoryWithIdNotFound", dto.Id.ToString());
-                throw new NotFoundException(message, userFacingMessage);
+                throw new NotFoundException(message, "SubcategoryWithIdNotFound", dto.Id.ToString());
             }
 
             subcategory.Name = dto.Name;

@@ -78,9 +78,7 @@ namespace FarmersMarketplace.Application.Services.Business
             if (id != accountId)
             {
                 string message = $"Access denied: Permission denied to modify data.";
-                string userFacingMessage = CultureHelper.Exception("AccessDenied");
-
-                throw new AuthorizationException(message, userFacingMessage);
+                throw new AuthorizationException(message, "AccessDenied");
             }
         }
 
@@ -90,9 +88,7 @@ namespace FarmersMarketplace.Application.Services.Business
             if (farm == null)
             {
                 string message = $"Farm with Id {farmId} was not found.";
-                string userFacingMessage = CultureHelper.Exception("FarmNotFound");
-
-                throw new NotFoundException(message, userFacingMessage);
+                throw new NotFoundException(message, "FarmNotFound");
             }
 
             Validate(ownerId, farm.OwnerId);
@@ -392,8 +388,7 @@ namespace FarmersMarketplace.Application.Services.Business
             if (farm == null) 
             {
                 string message = $"Farm with Id {farmId} was not found.";
-                string userFacingMessage = CultureHelper.Exception("FarmNotFound");
-                throw new NotFoundException(message, userFacingMessage);
+                throw new NotFoundException(message, "FarmNotFound");
             } 
 
             var vm = Mapper.Map<FarmVm>(farm);
@@ -420,9 +415,7 @@ namespace FarmersMarketplace.Application.Services.Business
                 if (category == null)
                 {
                     string message = $"Category with Id {categoryId} was not found.";
-                    string userFacingMessage = CultureHelper.Exception("CategoryNotFound");
-
-                    throw new NotFoundException(message, userFacingMessage);
+                    throw new NotFoundException(message, "CategoryNotFound");
                 }
 
                 vm.Categories.Add(new CategoryLookupVm(category.Id, category.Name));
@@ -434,8 +427,7 @@ namespace FarmersMarketplace.Application.Services.Business
                 if (subcategory == null)
                 {
                     string message = $"Subcategory with Id {subcategoryId} was not found.";
-                    string userFacingMessage = CultureHelper.Exception("SubcategoryNotFound");
-                    throw new NotFoundException(message, userFacingMessage);
+                    throw new NotFoundException(message, "SubcategoryNotFound");
                 }
 
                 vm.Subcategories.Add(new SubcategoryVm(subcategory.Id, subcategory.Name, subcategory.CategoryId));
@@ -485,8 +477,7 @@ namespace FarmersMarketplace.Application.Services.Business
             if (farm == null)
             {
                 string message = $"Farm with Id {dto.FarmId} was not found.";
-                string userFacingMessage = CultureHelper.Exception("FarmNotFound");
-                throw new NotFoundException(message, userFacingMessage);
+                throw new NotFoundException(message, "FarmNotFound");
             }
 
             Validate(ownerId, farm.OwnerId);
@@ -503,9 +494,7 @@ namespace FarmersMarketplace.Application.Services.Business
             if (farm == null)
             {
                 string message = $"Farm with Id {dto.FarmId} was not found.";
-                string userFacingMessage = CultureHelper.Exception("FarmFound");
-
-                throw new NotFoundException(message, userFacingMessage);
+                throw new NotFoundException(message, "FarmFound");
             }
 
             Validate(ownerId, farm.OwnerId);
@@ -567,9 +556,7 @@ namespace FarmersMarketplace.Application.Services.Business
             if (farmer == null)
             {
                 string message = $"Account with Id {ownerId} was not found.";
-                string userFacingMessage = CultureHelper.Exception("AccountNotFound");
-
-                throw new NotFoundException(message, userFacingMessage);
+                throw new NotFoundException(message, "AccountNotFound");
             }
 
             var vm = new CardDataVm
@@ -590,9 +577,7 @@ namespace FarmersMarketplace.Application.Services.Business
             if (farmer == null)
             {
                 string message = $"Account with Id {ownerId} was not found.";
-                string userFacingMessage = CultureHelper.Exception("AccountNotFound");
-
-                throw new NotFoundException(message, userFacingMessage);
+                throw new NotFoundException(message, "AccountNotFound");
             }
 
             var vm = new AccountNumberDataVm

@@ -1,22 +1,21 @@
 ﻿using AutoMapper;
-using FastExcel;
-using Geocoding.Google;
-using Geocoding;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
+using FarmersMarketplace.Application.DataTransferObjects;
 using FarmersMarketplace.Application.DataTransferObjects.Order;
 using FarmersMarketplace.Application.Exceptions;
+using FarmersMarketplace.Application.Filters;
+using FarmersMarketplace.Application.Helpers;
 using FarmersMarketplace.Application.Interfaces;
 using FarmersMarketplace.Application.ViewModels.Order;
 using FarmersMarketplace.Domain;
-using FarmersMarketplace.Application.Helpers;
-using InvalidDataException = FarmersMarketplace.Application.Exceptions.InvalidDataException;
-using Microsoft.IdentityModel.Tokens;
-using Address = FarmersMarketplace.Domain.Address;
-using FarmersMarketplace.Application.DataTransferObjects;
 using FarmersMarketplace.Domain.Orders;
 using FarmersMarketplace.Domain.Payment;
-using FarmersMarketplace.Application.Filters;
+using FastExcel;
+using Geocoding;
+using Geocoding.Google;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Address = FarmersMarketplace.Domain.Address;
+using InvalidDataException = FarmersMarketplace.Application.Exceptions.InvalidDataException;
 
 namespace FarmersMarketplace.Application.Services.Business
 {
@@ -121,9 +120,7 @@ namespace FarmersMarketplace.Application.Services.Business
                 if (account == null)
                 {
                     string message = $"Account with Id {producerId} was not found.";
-                    string userFacingMessage = CultureHelper.Exception("AccountNotFound");
-
-                    throw new NotFoundException(message, userFacingMessage);
+                    throw new NotFoundException(message, "AccountNotFound");
                 }
 
                 producerName = account.Name + " " + account.Surname;
@@ -135,9 +132,7 @@ namespace FarmersMarketplace.Application.Services.Business
                 if (farm == null)
                 {
                     string message = $"Farm with Id {producerId} was not found.";
-                    string userFacingMessage = CultureHelper.Exception("FarmNotFound");
-
-                    throw new NotFoundException(message, userFacingMessage);
+                    throw new NotFoundException(message, "FarmNotFound");
                 }
 
                 producerName = farm.Name;
@@ -157,9 +152,7 @@ namespace FarmersMarketplace.Application.Services.Business
                 if (order == null)
                 {
                     string message = $"Order with id {orderId} was not found.";
-                    string userFacingMessage = CultureHelper.Exception("OrderWithIdNotExist");
-
-                    throw new NotFoundException(message, userFacingMessage);
+                    throw new NotFoundException(message, "OrderWithIdNotExist");
                 }
                 Validator.ValidateProducer(accountId, order.ProducerId, order.Producer);
 
@@ -234,9 +227,7 @@ namespace FarmersMarketplace.Application.Services.Business
                 if (order == null)
                 {
                     string message = $"Order with id {orderId} was not found.";
-                    string userFacingMessage = CultureHelper.Exception("OrderNotExist");
-
-                    throw new NotFoundException(message, userFacingMessage);
+                    throw new NotFoundException(message, "OrderNotExist");
                 }
 
                 Validator.ValidateProducer(accountId, order.ProducerId, order.Producer);
@@ -254,9 +245,7 @@ namespace FarmersMarketplace.Application.Services.Business
             if (order == null)
             {
                 string message = $"Order with id {orderId} was not found.";
-                string userFacingMessage = CultureHelper.Exception("OrderNotExist");
-
-                throw new NotFoundException(message, userFacingMessage);
+                throw new NotFoundException(message, "OrderNotExist");
             }
 
             var vm = Mapper.Map<ProducerOrderVm>(order);
@@ -269,9 +258,7 @@ namespace FarmersMarketplace.Application.Services.Business
                 if (product == null)
                 {
                     string message = $"Product with id {item.ProductId} was not found.";
-                    string userFacingMessage = CultureHelper.Exception("ProductNotExist");
-
-                    throw new NotFoundException(message, userFacingMessage);
+                    throw new NotFoundException(message, "ProductNotExist");
                 }
 
                 var itemVm = new OrderItemVm
@@ -301,9 +288,7 @@ namespace FarmersMarketplace.Application.Services.Business
             if (order == null)
             {
                 string message = $"Order with id {dto.Id} was not found.";
-                string userFacingMessage = CultureHelper.Exception("OrderNotExist");
-
-                throw new NotFoundException(message, userFacingMessage);
+                throw new NotFoundException(message, "OrderNotExist");
             }
 
             Validator.ValidateProducer(accountId, order.ProducerId, order.Producer);
@@ -369,9 +354,7 @@ namespace FarmersMarketplace.Application.Services.Business
             if (order == null)
             {
                 string message = $"Order with id {dto.OrderId} was not found.";
-                string userFacingMessage = CultureHelper.Exception("OrderNotExist");
-
-                throw new NotFoundException(message, userFacingMessage);
+                throw new NotFoundException(message, "OrderNotExist");
             }
 
             Validator.ValidateProducer(accountId, order.ProducerId, order.Producer);
@@ -381,17 +364,13 @@ namespace FarmersMarketplace.Application.Services.Business
             if (product == null)
             {
                 string message = $"Product with id {dto.ProductId} was not found.";
-                string userFacingMessage = CultureHelper.Exception("ProductNotExist");
-
-                throw new NotFoundException(message, userFacingMessage);
+                throw new NotFoundException(message, "ProductNotExist");
             }
 
             if (product.CreationDate > order.ReceiveDate)
             {
                 string message = "Creation date of product cannot be later than receive date.";
-                string userFacingMessage = CultureHelper.Exception("ProductCreationDateIsLaterThanReceiveDate");
-
-                throw new InvalidDataException(message, userFacingMessage);
+                throw new InvalidDataException(message, "ProductCreationDateIsLaterThanReceiveDate");
             }
 
             var item = new OrderItem
@@ -417,9 +396,7 @@ namespace FarmersMarketplace.Application.Services.Business
                 if (order == null)
                 {
                     string message = $"Order with id {orderId} was not found.";
-                    string userFacingMessage = CultureHelper.Exception("OrderNotExist");
-
-                    throw new NotFoundException(message, userFacingMessage);
+                    throw new NotFoundException(message, "OrderNotExist");
                 }
 
                 Validator.ValidateProducer(accountId, order.ProducerId, order.Producer);

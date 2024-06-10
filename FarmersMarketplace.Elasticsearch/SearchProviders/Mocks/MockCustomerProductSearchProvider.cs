@@ -69,9 +69,8 @@ namespace FarmersMarketplace.Elasticsearch.SearchProviders.Mocks
                     if (seller == null)
                     {
                         string message = $"Account with Id {products[i].ProducerId} was not found.";
-                        string userFacingMessage = CultureHelper.Exception("AccountNotFound");
 
-                        throw new NotFoundException(message, userFacingMessage);
+                        throw new NotFoundException(message, "AccountNotFound");
                     }
 
                     producerName = seller.Name + " " + seller.Surname;
