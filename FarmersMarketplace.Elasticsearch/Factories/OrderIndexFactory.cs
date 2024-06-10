@@ -16,9 +16,8 @@ namespace FarmersMarketplace.Elasticsearch.Factories
             .Properties(props => props
                 .Keyword(k => k
                     .Name(order => order.Id))
-                .Number(n => n
-                    .Name(order => order.Number)
-                    .Type(NumberType.Integer))
+                .Text(t => t
+                    .Name(order => order.Number))
                 .Date(d => d
                     .Name(order => order.CreationDate))
                 .Number(n => n
