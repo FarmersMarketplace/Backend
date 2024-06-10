@@ -42,12 +42,12 @@ namespace FarmersMarketplace.Elasticsearch.SearchProviders
                                    .Value(request.Query)
                                    .Boost(4.0)))
                        .Must(m => m
-                        .Term(t => t
-                            .Field(p => p.Producer)
-                            .Value(request.Producer)),
-                        m => m.Term(t => t
-                            .Field(p => p.ProducerId)
-                            .Value(request.ProducerId)))))
+                            .Term(t => t
+                                .Field(p => p.Producer)
+                                .Value(request.Producer)),
+                            m => m.Term(t => t
+                                .Field(p => p.ProducerId)
+                                .Value(request.ProducerId)))))
                .Source(so => so
                    .Includes(i => i
                        .Field(f => f.Name))));
