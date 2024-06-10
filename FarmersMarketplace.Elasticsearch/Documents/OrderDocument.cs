@@ -7,7 +7,7 @@ namespace FarmersMarketplace.Elasticsearch.Documents
     public class OrderDocument
     {
         public Guid Id { get; set; }
-        public uint Number { get; set; }
+        public string Number { get; set; }
         public DateTime CreationDate { get; set; }
         public decimal TotalPayment { get; set; }
         public PaymentType PaymentType { get; set; }
