@@ -223,6 +223,15 @@ namespace FarmersMarketplace.Application.Resources.Exceptions {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Orders documents was not got successfully from Elasticsearch..
+        /// </summary>
+        internal static string OrdersNotGotSuccessfully {
+            get {
+                return ResourceManager.GetString("OrdersNotGotSuccessfully", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The password and confirm password do not match..
         /// </summary>
         internal static string PasswordNotMatchToConfirmPassword {
@@ -259,7 +268,7 @@ namespace FarmersMarketplace.Application.Resources.Exceptions {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Products documents was not got successfully..
+        ///   Looks up a localized string similar to Products documents was not got successfully from Elasticsearch..
         /// </summary>
         internal static string ProductsNotGotSuccessfully {
             get {

@@ -1,4 +1,5 @@
-﻿using FarmersMarketplace.Domain.Orders;
+﻿using FarmersMarketplace.Domain;
+using FarmersMarketplace.Domain.Orders;
 using FarmersMarketplace.Domain.Payment;
 
 namespace FarmersMarketplace.Elasticsearch.Documents
@@ -15,5 +16,8 @@ namespace FarmersMarketplace.Elasticsearch.Documents
         public string CustomerSurname { get; set; }
         public string CustomerPhone { get; set; }
         public string CustomerEmail { get; set; }
+        public Producer Producer { get; set; }
+        public Guid ProducerId { get; set; }
+        public Guid CustomerId { get; set; }
     }
 }

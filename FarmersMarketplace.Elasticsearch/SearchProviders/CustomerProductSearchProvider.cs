@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
+using FarmersMarketplace.Application.DataTransferObjects.Order;
 using FarmersMarketplace.Application.DataTransferObjects.Product;
+using FarmersMarketplace.Application.ViewModels.Order;
 using FarmersMarketplace.Application.ViewModels.Product;
 using FarmersMarketplace.Domain;
 using FarmersMarketplace.Elasticsearch.Documents;
