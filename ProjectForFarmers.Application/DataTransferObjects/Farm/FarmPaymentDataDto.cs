@@ -1,4 +1,5 @@
-﻿using FarmersMarketplace.Domain;
+﻿using FarmersMarketplace.Application.DataTransferObjects.Producers;
+using FarmersMarketplace.Domain;
 
 namespace FarmersMarketplace.Application.DataTransferObjects.Farm
 {

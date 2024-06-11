@@ -178,10 +178,13 @@
     <value>Order was not found.</value>
   </data>
   <data name="OrdersNotGotSuccessfully" xml:space="preserve">
-    <value>Orders documents was not got successfully from Elasticsearch.</value>
+    <value>Orders was not got successfully.</value>
   </data>
   <data name="PasswordNotMatchToConfirmPassword" xml:space="preserve">
     <value>The password and confirm password do not match.</value>
+  </data>
+  <data name="ProducersNotGotSuccessfully" xml:space="preserve">
+    <value>Producers was not got successfully.</value>
   </data>
   <data name="ProductCreationDateIsLaterThanReceiveDate" xml:space="preserve">
     <value>Creation date of product cannot be later than receive date.</value>
@@ -193,7 +196,7 @@
     <value>Product was not found.</value>
   </data>
   <data name="ProductsNotGotSuccessfully" xml:space="preserve">
-    <value>Products documents was not got successfully from Elasticsearch.</value>
+    <value>Products was not got successfully.</value>
   </data>
   <data name="RetrievingDataError" xml:space="preserve">
     <value>An error occurred while retrieving data</value>

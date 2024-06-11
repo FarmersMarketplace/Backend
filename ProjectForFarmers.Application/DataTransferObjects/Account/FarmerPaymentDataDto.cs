@@ -1,4 +1,6 @@
-﻿namespace FarmersMarketplace.Application.DataTransferObjects.Account
+﻿using FarmersMarketplace.Application.DataTransferObjects.Producers;
+
+namespace FarmersMarketplace.Application.DataTransferObjects.Account
 {
     public class FarmerPaymentDataDto : ProducerPaymentDataDto
     {
