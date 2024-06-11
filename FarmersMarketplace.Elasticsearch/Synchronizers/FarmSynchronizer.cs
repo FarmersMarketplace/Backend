@@ -1,41 +1,39 @@
 ﻿using AutoMapper;
 using FarmersMarketplace.Application.Interfaces;
-using FarmersMarketplace.Domain.Orders;
+using FarmersMarketplace.Domain;
 using FarmersMarketplace.Elasticsearch.Documents;
 using Nest;
 
 namespace FarmersMarketplace.Elasticsearch.Synchronizers
 {
-    public class OrderSynchronizer : ISearchSynchronizer<Order>
+    public class FarmSynchronizer : ISearchSynchronizer<Farm>
     {
         private readonly IElasticClient Client;
         private readonly IMapper Mapper;
 
-        public OrderSynchronizer(IElasticClient client, IMapper mapper)
+        public FarmSynchronizer(IElasticClient client, IMapper mapper)
         {
             Client = client;
             Mapper = mapper;
         }
 
-        public async Task Create(Order obj)
+        public async Task Create(Farm obj)
         {
-            var document = Mapper.Map<OrderDocument>(obj);
+            var document = Mapper.Map<ProducerDocument>(obj);
             await Client.IndexDocumentAsync(document);
         }
 
         public async Task Delete(Guid id)
         {
-            await Client.DeleteAsync<OrderDocument>(id);
+            await Client.DeleteAsync<ProducerDocument>(id);
         }
 
-        public async Task Update(Order obj)
+        public async Task Update(Farm obj)
         {
-            var document = Mapper.Map<OrderDocument>(obj);
-
-            await Client.UpdateAsync<OrderDocument, object>(obj.Id, u => u
+            var document = Mapper.Map<ProducerDocument>(obj);
+            await Client.UpdateAsync<ProducerDocument, object>(obj.Id, u => u
                 .Doc(document)
-                .Index(Indecies.Orders));
+                .Index(Indecies.Producers));
         }
     }
-
 }

@@ -1,4 +1,5 @@
-﻿using FarmersMarketplace.Application.Exceptions;
+﻿using AutoMapper;
+using FarmersMarketplace.Application.Exceptions;
 using FarmersMarketplace.Application.Interfaces;
 using FarmersMarketplace.Domain;
 using FarmersMarketplace.Domain.Payment;
@@ -12,37 +13,18 @@ namespace FarmersMarketplace.Elasticsearch.Synchronizers
     {
         private readonly IElasticClient Client;
         private readonly IApplicationDbContext DbContext;
+        private readonly IMapper Mapper;
 
-        public ProductSynchronizer(IElasticClient client, IApplicationDbContext dbContext)
+        public ProductSynchronizer(IElasticClient client, IApplicationDbContext dbContext, IMapper mapper)
         {
             Client = client;
             DbContext = dbContext;
+            Mapper = mapper;
         }
 
         public async Task Create(Product obj)
         {
-            var document = new ProductDocument
-            {
-                Id = obj.Id,
-                Name = obj.Name,
-                ArticleNumber = obj.ArticleNumber,
-                SubcategoryId = obj.SubcategoryId,
-                SubcategoryName = obj.Subcategory?.Name,
-                CategoryName = obj.Category?.Name,
-                Status = obj.Status,
-                Producer = obj.Producer,
-                ProducerId = obj.ProducerId,
-                PackagingType = obj.PackagingType,
-                UnitOfMeasurement = obj.UnitOfMeasurement,
-                PricePerOne = obj.PricePerOne,
-                Count = obj.Count,
-                ExpirationDate = obj.CreationDate.AddDays(obj.ExpirationDays),
-                CreationDate = obj.CreationDate,
-                ImageName = obj.ImagesNames?.FirstOrDefault() ?? "",
-                ReceivingMethods = obj.ReceivingMethods,
-                Rating = obj.Rating,
-                FeedbacksCount = (uint)(obj.Feedbacks?.Count ?? 0),
-            };
+            var document = Mapper.Map<ProductDocument>(obj);
 
             if (obj.Producer == Producer.Farm)
             {

@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using FarmersMarketplace.Application.ViewModels.Order;
 using FarmersMarketplace.Application.ViewModels.Producers;
 using FarmersMarketplace.Domain;
 using FarmersMarketplace.Domain.Accounts;
