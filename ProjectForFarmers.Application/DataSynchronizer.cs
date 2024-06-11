@@ -15,7 +15,6 @@ namespace FarmersMarketplace.Application
 
         public async Task Create(T obj)
         {
-            await CacheSynchronizer.Create(obj);
             await SearchSynchronizer.Create(obj);
         }
 

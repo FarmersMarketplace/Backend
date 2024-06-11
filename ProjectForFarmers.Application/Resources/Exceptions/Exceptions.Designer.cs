@@ -295,6 +295,15 @@ namespace FarmersMarketplace.Application.Resources.Exceptions {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to An error occurred while retrieving data.
+        /// </summary>
+        internal static string RetrievingDataError {
+            get {
+                return ResourceManager.GetString("RetrievingDataError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Source file with name {0} was not found..
         /// </summary>
         internal static string SourceFileNotFound {
