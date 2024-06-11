@@ -15,6 +15,7 @@ namespace FarmersMarketplace.Elasticsearch
             {
                 new ProductIndexFactory(),
                 new OrderIndexFactory(),
+                new ProducerIndexFactory(),
             };
         }
 

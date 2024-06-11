@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using FarmersMarketplace.Application.DataTransferObjects.Producers;
 using FarmersMarketplace.Application.ViewModels.Producers;
-using FarmersMarketplace.Application.ViewModels.Product;
 using FarmersMarketplace.Domain;
 using FarmersMarketplace.Elasticsearch.Documents;
 using Nest;

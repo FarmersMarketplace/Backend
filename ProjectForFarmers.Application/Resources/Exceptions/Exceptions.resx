@@ -147,6 +147,12 @@
   <data name="ElasticsearchOrdersNotUpoaded" xml:space="preserve">
     <value>Orders documents was not uploaded successfully to Elasticsearch.</value>
   </data>
+  <data name="ElasticsearchProducersNotDeleted" xml:space="preserve">
+    <value>Producers documents was not deleted successful from Elasticsearch.</value>
+  </data>
+  <data name="ElasticsearchProducersNotUpoaded" xml:space="preserve">
+    <value>Producers documents was not uploaded successfully to Elasticsearch.</value>
+  </data>
   <data name="ElasticsearchProductsNotDeleted" xml:space="preserve">
     <value>Products documents was not deleted successful from Elasticsearch.</value>
   </data>

@@ -151,6 +151,24 @@ namespace FarmersMarketplace.Application.Resources.Exceptions {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Producers documents was not deleted successful from Elasticsearch..
+        /// </summary>
+        internal static string ElasticsearchProducersNotDeleted {
+            get {
+                return ResourceManager.GetString("ElasticsearchProducersNotDeleted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Producers documents was not uploaded successfully to Elasticsearch..
+        /// </summary>
+        internal static string ElasticsearchProducersNotUpoaded {
+            get {
+                return ResourceManager.GetString("ElasticsearchProducersNotUpoaded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Products documents was not deleted successful from Elasticsearch..
         /// </summary>
         internal static string ElasticsearchProductsNotDeleted {
