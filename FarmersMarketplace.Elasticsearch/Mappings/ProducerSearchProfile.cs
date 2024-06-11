@@ -2,6 +2,7 @@
 using FarmersMarketplace.Application.ViewModels.Producers;
 using FarmersMarketplace.Domain;
 using FarmersMarketplace.Domain.Accounts;
+using FarmersMarketplace.Domain.Payment;
 using FarmersMarketplace.Elasticsearch.Documents;
 
 namespace FarmersMarketplace.Elasticsearch.Mappings
@@ -26,7 +27,8 @@ namespace FarmersMarketplace.Elasticsearch.Mappings
                 .ForMember(document => document.Subcategories, opt => opt.MapFrom(farm => new HashSet<Guid>(farm.Subcategories)))
                 .ForMember(document => document.ImageName, opt => opt.MapFrom(farm => farm.ImagesNames.Count > 0 ? farm.ImagesNames[0] : ""))
                 .ForMember(document => document.FeedbacksCount, opt => opt.MapFrom(farm => farm.Feedbacks.Count))
-                .ForMember(document => document.Rating, opt => opt.MapFrom(farm => farm.Rating));
+                .ForMember(document => document.Rating, opt => opt.MapFrom(farm => farm.Rating))
+                .ForMember(document => document.HasOnlinePayment, opt => opt.MapFrom(farm => farm.PaymentTypes.Count > 0 ? farm.PaymentTypes.Contains(PaymentType.Online) : false));
         }
 
         private void MapSellerToProducerDocument()
@@ -40,7 +42,8 @@ namespace FarmersMarketplace.Elasticsearch.Mappings
                 .ForMember(document => document.Subcategories, opt => opt.MapFrom(seller => new HashSet<Guid>(seller.Subcategories)))
                 .ForMember(document => document.ImageName, opt => opt.MapFrom(seller => seller.ImagesNames.Count > 0 ? seller.ImagesNames[0] : ""))
                 .ForMember(document => document.FeedbacksCount, opt => opt.MapFrom(seller => seller.Feedbacks.Count))
-                .ForMember(document => document.Rating, opt => opt.MapFrom(seller => seller.Rating));
+                .ForMember(document => document.Rating, opt => opt.MapFrom(seller => seller.Rating))
+                .ForMember(document => document.HasOnlinePayment, opt => opt.MapFrom(seller => seller.PaymentTypes.Count > 0 ? seller.PaymentTypes.Contains(PaymentType.Online) : false));
         }
 
         private void MapProducerDocmentToProducerLookupVm()

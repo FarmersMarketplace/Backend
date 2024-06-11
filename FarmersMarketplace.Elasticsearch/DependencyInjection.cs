@@ -6,9 +6,12 @@ using FarmersMarketplace.Application.Interfaces;
 using FarmersMarketplace.Application.ViewModels.Order;
 using FarmersMarketplace.Application.ViewModels.Producers;
 using FarmersMarketplace.Application.ViewModels.Product;
-using FarmersMarketplace.Elasticsearch.Documents;
+using FarmersMarketplace.Domain;
+using FarmersMarketplace.Domain.Accounts;
+using FarmersMarketplace.Domain.Orders;
 using FarmersMarketplace.Elasticsearch.Mappings;
 using FarmersMarketplace.Elasticsearch.SearchProviders;
+using FarmersMarketplace.Elasticsearch.Synchronizers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Nest;
@@ -22,6 +25,8 @@ namespace FarmersMarketplace.Elasticsearch
             services.AddAutoMapper(config =>
             {
                 config.AddProfile(new ProductSearchProfile());
+                config.AddProfile(new OrderSearchProfile());
+                config.AddProfile(new ProducerSearchProfile());
             });
 
             services.AddTransient
@@ -39,6 +44,11 @@ namespace FarmersMarketplace.Elasticsearch
             services.AddTransient
                 <ISearchProvider<GetProducerListDto, ProducerListVm, ProducerAutocompleteDto>,
                 ProducerSearchProvider>();
+
+            services.AddTransient<ISearchSynchronizer<Farm>, FarmSynchronizer>();
+            services.AddTransient<ISearchSynchronizer<Order>, OrderSynchronizer>();
+            services.AddTransient<ISearchSynchronizer<Product>, ProductSynchronizer>();
+            services.AddTransient<ISearchSynchronizer<Seller>, SellerSynchronizer>();
 
             var settings = new ConnectionSettings(new Uri(configuration["ElasticsearchUrl"]))
                 .EnableApiVersioningHeader()

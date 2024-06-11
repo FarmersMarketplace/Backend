@@ -19,7 +19,6 @@ using DayOfWeek = FarmersMarketplace.Domain.DayOfWeek;
 
 namespace FarmersMarketplace.Application.Services.Business
 {
-
     public class FarmService : Service, IFarmService
     {
         private readonly string FarmsImageFolder;
@@ -27,14 +26,16 @@ namespace FarmersMarketplace.Application.Services.Business
         private readonly EmailHelper EmailHelper;
         private readonly JwtService JwtService;
         private readonly CoordinateHelper CoordinateHelper;
+        private readonly ISearchSynchronizer<Farm> FarmSynchronizer;
 
-        public FarmService(IMapper mapper, IApplicationDbContext dbContext, IConfiguration configuration) : base(mapper, dbContext, configuration)
+        public FarmService(IMapper mapper, IApplicationDbContext dbContext, IConfiguration configuration, ISearchSynchronizer<Farm> farmSynchronizer) : base(mapper, dbContext, configuration)
         {
             FarmsImageFolder = Configuration["File:Images:Farm"];
             FileHelper = new FileHelper();
             EmailHelper = new EmailHelper(configuration);
             JwtService = new JwtService(configuration);
             CoordinateHelper = new CoordinateHelper(configuration);
+            FarmSynchronizer = farmSynchronizer;
         }
 
         public async Task Create(CreateFarmDto dto)
@@ -71,6 +72,7 @@ namespace FarmersMarketplace.Application.Services.Business
 
             await DbContext.Farms.AddAsync(farm);
             await DbContext.SaveChangesAsync();
+            await FarmSynchronizer.Create(farm);
         }
 
         public void Validate(Guid? accountId, Guid id)
@@ -108,6 +110,7 @@ namespace FarmersMarketplace.Application.Services.Business
             DbContext.Farms.Remove(farm);
             await FileHelper.DeleteFiles(farm.ImagesNames, FarmsImageFolder);
             await DbContext.SaveChangesAsync();
+            await FarmSynchronizer.Delete(farm.Id);
         }
 
         private async Task<Geocoding.Location> GetCoordinates(AddressDto dto)
@@ -167,6 +170,7 @@ namespace FarmersMarketplace.Application.Services.Business
             await UpdateImages(farm, dto.Images);
 
             await DbContext.SaveChangesAsync();
+            await FarmSynchronizer.Update(farm);
         }
 
         private void UpdateReceivingTypes(Farm farm, UpdateFarmDto dto)
@@ -194,8 +198,6 @@ namespace FarmersMarketplace.Application.Services.Business
 
                 farm.ReceivingMethods = dto.ReceivingMethods;
             }
-
-            
         }
 
         private void LogAndUpdateIfChanged(string propertyName, string oldValue, string newValue, Action updateAction, Guid farmId)

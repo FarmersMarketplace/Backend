@@ -17,11 +17,13 @@ namespace FarmersMarketplace.Application.Services.Auth
     {
         private readonly EmailHelper EmailHelper;
         private readonly JwtService JwtService;
+        private readonly ISearchSynchronizer<Seller> SellerSynchronizer;
 
-        public AuthService(IMapper mapper, IApplicationDbContext dbContext, IConfiguration configuration) : base(mapper, dbContext, configuration)
+        public AuthService(IMapper mapper, IApplicationDbContext dbContext, IConfiguration configuration, ISearchSynchronizer<Seller> sellerSynchronizer) : base(mapper, dbContext, configuration)
         {
             JwtService = new JwtService(configuration);
             EmailHelper = new EmailHelper(configuration);
+            SellerSynchronizer = sellerSynchronizer;
         }
 
         public async Task Register(RegisterDto dto)
@@ -179,7 +181,6 @@ namespace FarmersMarketplace.Application.Services.Auth
         {
             if (dto.Password != dto.ConfirmPassword)
             {
-                
                 string message = $"The password and confirm password do not match.";
                 throw new InvalidDataException(message, "PasswordNotMatchToConfirmPassword");
             }
@@ -223,6 +224,7 @@ namespace FarmersMarketplace.Application.Services.Auth
                 };
 
                 DbContext.Sellers.Add(account);
+                await SellerSynchronizer.Create(account);
             }
             else if (dto.Role == Role.Farmer)
             {

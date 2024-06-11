@@ -11,6 +11,7 @@ namespace FarmersMarketplace.Application.Filters
         public HashSet<string>? UnitsOfMeasurement { get; set; }
         public uint? MinRest { get; set; }
         public uint? MaxRest { get; set; }
+        public bool? HasOnlinePayment { get; set; }
     }
 
 }

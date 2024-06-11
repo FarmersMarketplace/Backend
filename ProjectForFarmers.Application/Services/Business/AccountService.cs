@@ -21,11 +21,13 @@ namespace FarmersMarketplace.Application.Services.Business
     {
         private readonly CoordinateHelper CoordinateHelper;
         private readonly FileHelper FileHelper;
+        private readonly ISearchSynchronizer<Seller> SellerSynchronizer;
 
-        public AccountService(IMapper mapper, IApplicationDbContext dbContext, IConfiguration configuration) : base(mapper, dbContext, configuration)
+        public AccountService(IMapper mapper, IApplicationDbContext dbContext, IConfiguration configuration, ISearchSynchronizer<Seller> sellerSynchronizer) : base(mapper, dbContext, configuration)
         {
             CoordinateHelper = new CoordinateHelper(configuration);
             FileHelper = new FileHelper();
+            SellerSynchronizer = sellerSynchronizer;
         }
 
         public async Task DeleteAccount(Role role, Guid accountId)
@@ -326,6 +328,7 @@ namespace FarmersMarketplace.Application.Services.Business
             seller.FirstSocialPageUrl = dto.FirstSocialPageUrl;
             seller.SecondSocialPageUrl = dto.SecondSocialPageUrl;
             await DbContext.SaveChangesAsync();
+            await SellerSynchronizer.Update(seller);
         }
 
         private async Task UpdateSellerImages(Seller seller, List<Microsoft.AspNetCore.Http.IFormFile> images)

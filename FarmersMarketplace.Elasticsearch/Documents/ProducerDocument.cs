@@ -14,5 +14,6 @@ namespace FarmersMarketplace.Elasticsearch.Documents
         public string ImageName { get; set; }
         public uint FeedbacksCount { get; set; }
         public float Rating { get; set; }
+        public bool HasOnlinePayment { get; set; }
     }
 }
