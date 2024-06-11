@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using FarmersMarketplace.Application.DataTransferObjects;
 using FarmersMarketplace.Application.DataTransferObjects.Account;
+using FarmersMarketplace.Application.DataTransferObjects.Producers;
 using FarmersMarketplace.Application.ViewModels;
 using FarmersMarketplace.Application.ViewModels.Account;
 using FarmersMarketplace.Application.ViewModels.Farm;
