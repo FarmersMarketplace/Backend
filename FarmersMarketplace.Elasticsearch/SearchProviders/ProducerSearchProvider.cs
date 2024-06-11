@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
-using FarmersMarketplace.Application.DataTransferObjects.Order;
-using FarmersMarketplace.Application.DataTransferObjects.Product;
-using FarmersMarketplace.Application.ViewModels.Order;
+using FarmersMarketplace.Application.DataTransferObjects.Producers;
+using FarmersMarketplace.Application.ViewModels.Producers;
 using FarmersMarketplace.Application.ViewModels.Product;
 using FarmersMarketplace.Domain;
 using FarmersMarketplace.Elasticsearch.Documents;
@@ -11,20 +10,20 @@ using ApplicationException = FarmersMarketplace.Application.Exceptions.Applicati
 
 namespace FarmersMarketplace.Elasticsearch.SearchProviders
 {
-    public class CustomerProductSearchProvider : SearchProvider<GetCustomerProductListDto, ProductDocument, CustomerProductListVm, CustomerProductAutocompleteDto>
+    public class ProducerSearchProvider : SearchProvider<GetProducerListDto, ProducerDocument, ProducerListVm, ProducerAutocompleteDto>
     {
         private readonly IMapper Mapper;
 
-        public CustomerProductSearchProvider(IElasticClient client, IMapper mapper) : base(client)
+        public ProducerSearchProvider(IElasticClient client, IMapper mapper) : base(client)
         {
-            SearchDescriptor.Index(Indecies.Products);
+            SearchDescriptor.Index(Indecies.Producers);
             Mapper = mapper;
         }
 
-        public override async Task<List<string>> Autocomplete(CustomerProductAutocompleteDto request)
+        public override async Task<List<string>> Autocomplete(ProducerAutocompleteDto request)
         {
-            var autocompleteResponse = await Client.SearchAsync<ProductDocument>(s => s
-                .Index(Indecies.Products)
+            var autocompleteResponse = await Client.SearchAsync<ProducerDocument>(s => s
+                .Index(Indecies.Producers)
                 .Size(request.Count)
                 .Query(q => q
                     .Bool(b => b
@@ -33,7 +32,7 @@ namespace FarmersMarketplace.Elasticsearch.SearchProviders
                                 .Fields(f => f.Field(p => p.Name))
                                 .Query($"{request.Query}~")
                                 .DefaultOperator(Operator.And)
-                                .Boost(1.0)), 
+                                .Boost(1.0)),
                             sh => sh
                                 .Wildcard(w => w
                                     .Field(f => f.Name)
@@ -50,8 +49,8 @@ namespace FarmersMarketplace.Elasticsearch.SearchProviders
 
             if (!autocompleteResponse.IsValid)
             {
-                string message = $"Products documents was not got successfully for autocomplete from Elasticsearch. Request:\n {JsonConvert.SerializeObject(request)}\n Debug information: {autocompleteResponse.DebugInformation}";
-                throw new ApplicationException(message, "ProductsNotGotSuccessfully");
+                string message = $"Producers documents was not got successfully for autocomplete from Elasticsearch. Request:\n {JsonConvert.SerializeObject(request)}\n Debug information: {autocompleteResponse.DebugInformation}";
+                throw new ApplicationException(message, "ProducersNotGotSuccessfully");
             }
 
             return autocompleteResponse.Documents.Select(d => d.Name).ToList();
@@ -59,81 +58,10 @@ namespace FarmersMarketplace.Elasticsearch.SearchProviders
 
         protected override async Task ApplyFilter()
         {
-            MustQueries.Add(q => q
-                .Bool(b => b
-                    .MustNot(mn => mn
-                        .Term(t => t
-                            .Field(p => p.Status)
-                            .Value(ProductStatus.Private)))));
-
             if (SearchRequest.Filter == null)
                 return;
 
             var filter = SearchRequest.Filter;
-            
-            if (filter.MaxPrice.HasValue)
-            {
-                MustQueries.Add(q => q
-                    .Range(r => r
-                        .Field(fd => fd.PricePerOne)
-                        .LessThanOrEquals((double)filter.MaxPrice)));
-            }
-
-            if (filter.MinPrice.HasValue)
-            {
-                MustQueries.Add(q => q
-                    .Range(r => r
-                        .Field(fd => fd.PricePerOne)
-                        .GreaterThanOrEquals((double)filter.MinPrice)));
-            }
-
-            if (filter.MaxCount.HasValue)
-            {
-                MustQueries.Add(q => q
-                    .Range(r => r
-                        .Field(fd => fd.Count)
-                        .LessThanOrEquals(filter.MaxCount)));
-            }
-
-            if (filter.MinCount.HasValue)
-            {
-                MustQueries.Add(q => q
-                    .Range(r => r
-                        .Field(fd => fd.Count)
-                        .GreaterThanOrEquals(filter.MinCount)));
-            }
-
-            if (filter.MinCreationDate.HasValue)
-            {
-                MustQueries.Add(q => q
-                    .DateRange(r => r
-                        .Field(fd => fd.CreationDate)
-                        .GreaterThanOrEquals((DateTime)filter.MinCreationDate)));
-            }
-
-            if (filter.MaxCreationDate.HasValue)
-            {
-                MustQueries.Add(q => q
-                    .DateRange(r => r
-                        .Field(fd => fd.CreationDate)
-                        .LessThanOrEquals((DateTime)filter.MaxCreationDate)));
-            }
-
-            if (filter.ReceivingMethods != null && filter.ReceivingMethods.Any())
-            {
-                MustQueries.Add(q => q
-                    .Terms(t => t
-                        .Field(fd => fd.ReceivingMethods)
-                        .Terms(filter.ReceivingMethods)));
-            }
-
-            if (filter.OnlyOnlinePayment == true)
-            {
-                MustQueries.Add(q => q
-                    .Term(t => t
-                        .Field(p => p.HasOnlinePayment)
-                        .Value(true)));
-            }
 
             if (filter.Producer.HasValue)
             {
@@ -143,7 +71,7 @@ namespace FarmersMarketplace.Elasticsearch.SearchProviders
                         .Value(filter.Producer)));
             }
 
-            if ((filter.Farms != null && filter.Farms.Any()) 
+            if ((filter.Farms != null && filter.Farms.Any())
                 && (filter.Sellers != null && filter.Sellers.Any()))
             {
                 MustQueries.Add(q => q.Bool(b => b
@@ -153,14 +81,14 @@ namespace FarmersMarketplace.Elasticsearch.SearchProviders
                                 .Field(p => p.Producer)
                                 .Value(Producer.Farm)),
                                 m => m.Terms(t => t
-                                    .Field(p => p.ProducerId)
+                                    .Field(p => p.Id)
                                     .Terms(filter.Farms)),
                         s => s.Bool(b2 => b2
                             .Must(m => m.Term(t => t
                                 .Field(p => p.Producer)
                                 .Value(Producer.Seller)),
                                 m => m.Terms(t => t
-                                    .Field(p => p.ProducerId)
+                                    .Field(p => p.Id)
                                     .Terms(filter.Sellers)))))))));
             }
             else if (filter.Farms != null && filter.Farms.Any())
@@ -170,17 +98,17 @@ namespace FarmersMarketplace.Elasticsearch.SearchProviders
                         .Field(p => p.Producer)
                         .Value(Producer.Farm)),
                         m => m.Terms(t => t
-                            .Field(p => p.ProducerId)
+                            .Field(p => p.Id)
                             .Terms(filter.Farms)))));
             }
-            else if(filter.Sellers != null && filter.Sellers.Any())
+            else if (filter.Sellers != null && filter.Sellers.Any())
             {
                 MustQueries.Add(q => q.Bool(b => b
                     .Must(m => m.Term(t => t
                         .Field(p => p.Producer)
                         .Value(Producer.Seller)),
                         m => m.Terms(t => t
-                            .Field(p => p.ProducerId)
+                            .Field(p => p.Id)
                             .Terms(filter.Sellers)))));
             }
 
@@ -188,7 +116,7 @@ namespace FarmersMarketplace.Elasticsearch.SearchProviders
             {
                 MustQueries.Add(q => q
                     .Terms(t => t
-                        .Field(p => p.SubcategoryId)
+                        .Field(p => p.Subcategories) 
                         .Terms(filter.Subcategories)));
             }
 
@@ -227,12 +155,6 @@ namespace FarmersMarketplace.Elasticsearch.SearchProviders
                                 .DefaultOperator(Operator.And)
                                 .Boost(1.0)),
                             sh => sh
-                            .QueryString(m => m
-                                .Fields(f => f.Field(p => p.ArticleNumber))
-                                .Query(SearchRequest.Query)
-                                .DefaultOperator(Operator.And)
-                                .Fuzziness(Fuzziness.Auto)), 
-                            sh => sh
                                 .Prefix(p => p
                                     .Field(f => f.Name)
                                     .Value(SearchRequest.Query)
@@ -240,30 +162,28 @@ namespace FarmersMarketplace.Elasticsearch.SearchProviders
             }
         }
 
-        protected override async Task<CustomerProductListVm> Execute()
+        protected override async Task<ProducerListVm> Execute()
         {
-            var searchResponse = Client.Search<ProductDocument>(SearchDescriptor);
+            var searchResponse = Client.Search<ProducerDocument>(SearchDescriptor);
 
             if (!searchResponse.IsValid)
             {
-                string message = $"Products documents was not got successfully from Elasticsearch. Request:\n {JsonConvert.SerializeObject(SearchRequest)}\n Debug information: {searchResponse.DebugInformation}";
-                throw new ApplicationException(message, "ProductsNotGotSuccessfully");
+                string message = $"Producers documents was not got successfully from Elasticsearch. Request:\n {JsonConvert.SerializeObject(SearchRequest)}\n Debug information: {searchResponse.DebugInformation}";
+                throw new ApplicationException(message, "ProducersNotGotSuccessfully");
             }
 
-            var response = new CustomerProductListVm
+            var response = new ProducerListVm
             {
-                Products = new List<CustomerProductLookupVm>(searchResponse.Documents.Count),
+                Producers = new List<ProducerLookupVm>(),
             };
 
-            var productList = searchResponse.Documents.ToArray();
-
-            for (int i = 0; i < productList.Length; i++)
+            foreach (var document in searchResponse.Documents)
             {
-                response.Products.Add(Mapper.Map<CustomerProductLookupVm>(productList[i]));
+                var producer = Mapper.Map<ProducerLookupVm>(document);
+                response.Producers.Add(producer);
             }
 
             return response;
         }
     }
-
 }
