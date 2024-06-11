@@ -31,6 +31,6 @@ namespace FarmersMarketplace.Domain
         public Guid? PaymentDataId { get; set; }
         public ProducerPaymentData? PaymentData { get; set; }
         public float Rating { get; set; }
-        public virtual List<ProductFeedback>? Feedbacks { get; set; }
+        public virtual List<ProducerFeedback>? Feedbacks { get; set; }
     }
 }

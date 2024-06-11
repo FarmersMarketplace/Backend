@@ -21,7 +21,7 @@ namespace FarmersMarketplace.Domain.Accounts
         public virtual List<MonthStatistic> Statistics { get; set; }
         public virtual List<Product> Products { get; set; }
         public float Rating { get; set; }
-        public virtual List<ProductFeedback>? Feedbacks { get; set; }
+        public virtual List<ProducerFeedback>? Feedbacks { get; set; }
     }
 
 }
