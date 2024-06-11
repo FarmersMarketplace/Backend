@@ -22,10 +22,12 @@ namespace FarmersMarketplace.Application.Services.Business
     public class OrderService : Service, IOrderService
     {
         private readonly ValidateService Validator;
+        private readonly DataSynchronizer<Order> OrderSynchronizer;
 
-        public OrderService(IMapper mapper, IApplicationDbContext dbContext, IConfiguration configuration) : base(mapper, dbContext, configuration)
+        public OrderService(IMapper mapper, IApplicationDbContext dbContext, IConfiguration configuration, DataSynchronizer<Order> orderSynchronizer) : base(mapper, dbContext, configuration)
         {
             Validator = new ValidateService(DbContext);
+            OrderSynchronizer = orderSynchronizer;
         }
 
         public async Task<(string fileName, byte[] bytes)> ExportToExcel(ExportOrdersDto dto)
@@ -213,6 +215,7 @@ namespace FarmersMarketplace.Application.Services.Business
                 };
 
                 await DbContext.Orders.AddAsync(newOrder);
+                await OrderSynchronizer.Create(newOrder);
             }
 
             await DbContext.SaveChangesAsync();
@@ -233,6 +236,7 @@ namespace FarmersMarketplace.Application.Services.Business
                 Validator.ValidateProducer(accountId, order.ProducerId, order.Producer);
 
                 DbContext.Orders.Remove(order);
+                await OrderSynchronizer.Delete(order.Id);
             }
 
             await DbContext.SaveChangesAsync();
@@ -315,6 +319,7 @@ namespace FarmersMarketplace.Application.Services.Business
             }
 
             await DbContext.SaveChangesAsync();
+            await OrderSynchronizer.Update(order);
         }
 
         private async Task UpdateAddress(Address address, AddressDto dto)
@@ -402,6 +407,7 @@ namespace FarmersMarketplace.Application.Services.Business
                 Validator.ValidateProducer(accountId, order.ProducerId, order.Producer);
 
                 order.Status = status;
+                await OrderSynchronizer.Update(order);
             }
 
             await DbContext.SaveChangesAsync();
