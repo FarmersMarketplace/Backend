@@ -4,6 +4,7 @@ namespace FarmersMarketplace.Application.DataTransferObjects.Producers
 {
     public class GetProducerMarkersDto
     {
+        public string? Query { get; set; }
         public double MaxLatitude { get; set; }
         public double MaxLongitude { get; set; }
         public double MinLatitude { get; set; }

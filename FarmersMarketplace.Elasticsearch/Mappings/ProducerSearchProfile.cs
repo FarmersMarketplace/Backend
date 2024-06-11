@@ -14,6 +14,12 @@ namespace FarmersMarketplace.Elasticsearch.Mappings
             MapProducerDocmentToProducerLookupVm();
             MapSellerToProducerDocument();
             MapFarmToProducerDocument();
+            MapProducerDocumentToProducerMarkerLookupVm();
+        }
+
+        private void MapProducerDocumentToProducerMarkerLookupVm()
+        {
+            CreateMap<ProducerDocument, ProducerMarkerLookupVm>();
         }
 
         private void MapFarmToProducerDocument()
