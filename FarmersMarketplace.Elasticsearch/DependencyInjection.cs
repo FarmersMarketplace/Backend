@@ -1,8 +1,11 @@
 ﻿using AutoMapper;
+using FarmersMarketplace.Application.DataTransferObjects.Order;
 using FarmersMarketplace.Application.DataTransferObjects.Product;
 using FarmersMarketplace.Application.Interfaces;
+using FarmersMarketplace.Application.ViewModels.Order;
 using FarmersMarketplace.Application.ViewModels.Product;
 using FarmersMarketplace.Elasticsearch.Mappings;
+using FarmersMarketplace.Elasticsearch.SearchProviders;
 using FarmersMarketplace.Elasticsearch.SearchProviders.Mocks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
