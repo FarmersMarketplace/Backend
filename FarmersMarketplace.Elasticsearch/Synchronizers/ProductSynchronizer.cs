@@ -126,6 +126,4 @@ namespace FarmersMarketplace.Elasticsearch.Synchronizers
                 .Index(Indecies.Products));
         }
     }
-
-
 }
