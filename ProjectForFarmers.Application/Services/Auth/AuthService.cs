@@ -17,13 +17,15 @@ namespace FarmersMarketplace.Application.Services.Auth
     {
         private readonly EmailHelper EmailHelper;
         private readonly JwtService JwtService;
-        private readonly ISearchSynchronizer<Seller> SellerSynchronizer;
+        private readonly ICacheProvider<Seller> CacheProvider;
+        private readonly ISearchSynchronizer<Seller> SearchSynchronizer;
 
-        public AuthService(IMapper mapper, IApplicationDbContext dbContext, IConfiguration configuration, ISearchSynchronizer<Seller> sellerSynchronizer) : base(mapper, dbContext, configuration)
+        public AuthService(IMapper mapper, IApplicationDbContext dbContext, IConfiguration configuration, ISearchSynchronizer<Seller> sellerSynchronizer, ICacheProvider<Seller> cacheProvider) : base(mapper, dbContext, configuration)
         {
             JwtService = new JwtService(configuration);
             EmailHelper = new EmailHelper(configuration);
-            SellerSynchronizer = sellerSynchronizer;
+            SearchSynchronizer = sellerSynchronizer;
+            CacheProvider = cacheProvider;
         }
 
         public async Task Register(RegisterDto dto)
@@ -224,7 +226,7 @@ namespace FarmersMarketplace.Application.Services.Auth
                 };
 
                 DbContext.Sellers.Add(account);
-                await SellerSynchronizer.Create(account);
+                await SearchSynchronizer.Create(account);
             }
             else if (dto.Role == Role.Farmer)
             {
