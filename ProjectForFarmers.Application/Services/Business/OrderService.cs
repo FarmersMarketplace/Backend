@@ -22,12 +22,14 @@ namespace FarmersMarketplace.Application.Services.Business
     public class OrderService : Service, IOrderService
     {
         private readonly ValidateService Validator;
-        private readonly DataSynchronizer<Order> OrderSynchronizer;
+        private readonly ICacheProvider<Order> CacheProvider;
+        private readonly ISearchSynchronizer<Order> SearchSynchronizer;
 
-        public OrderService(IMapper mapper, IApplicationDbContext dbContext, IConfiguration configuration, DataSynchronizer<Order> orderSynchronizer) : base(mapper, dbContext, configuration)
+        public OrderService(IMapper mapper, IApplicationDbContext dbContext, IConfiguration configuration, ICacheProvider<Order> cacheProvider, ISearchSynchronizer<Order> searchSynchronizer) : base(mapper, dbContext, configuration)
         {
             Validator = new ValidateService(DbContext);
-            OrderSynchronizer = orderSynchronizer;
+            CacheProvider = cacheProvider;
+            SearchSynchronizer = searchSynchronizer;
         }
 
         public async Task<(string fileName, byte[] bytes)> ExportToExcel(ExportOrdersDto dto)
@@ -215,7 +217,7 @@ namespace FarmersMarketplace.Application.Services.Business
                 };
 
                 await DbContext.Orders.AddAsync(newOrder);
-                await OrderSynchronizer.Create(newOrder);
+                await SearchSynchronizer.Create(newOrder);
             }
 
             await DbContext.SaveChangesAsync();
@@ -236,7 +238,8 @@ namespace FarmersMarketplace.Application.Services.Business
                 Validator.ValidateProducer(accountId, order.ProducerId, order.Producer);
 
                 DbContext.Orders.Remove(order);
-                await OrderSynchronizer.Delete(order.Id);
+                await SearchSynchronizer.Delete(order.Id);
+                await CacheProvider.Delete(order.Id);
             }
 
             await DbContext.SaveChangesAsync();
@@ -319,7 +322,8 @@ namespace FarmersMarketplace.Application.Services.Business
             }
 
             await DbContext.SaveChangesAsync();
-            await OrderSynchronizer.Update(order);
+            await CacheProvider.Update(order);
+            await SearchSynchronizer.Update(order);
         }
 
         private async Task UpdateAddress(Address address, AddressDto dto)
@@ -407,7 +411,8 @@ namespace FarmersMarketplace.Application.Services.Business
                 Validator.ValidateProducer(accountId, order.ProducerId, order.Producer);
 
                 order.Status = status;
-                await OrderSynchronizer.Update(order);
+                await CacheProvider.Update(order);
+                await SearchSynchronizer.Update(order);
             }
 
             await DbContext.SaveChangesAsync();

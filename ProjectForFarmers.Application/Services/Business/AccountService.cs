@@ -21,13 +21,15 @@ namespace FarmersMarketplace.Application.Services.Business
     {
         private readonly CoordinateHelper CoordinateHelper;
         private readonly FileHelper FileHelper;
-        private readonly ISearchSynchronizer<Seller> SellerSynchronizer;
+        private readonly ICacheProvider<Seller> CacheProvider;
+        private readonly ISearchSynchronizer<Seller> SearchSynchronizer;
 
-        public AccountService(IMapper mapper, IApplicationDbContext dbContext, IConfiguration configuration, ISearchSynchronizer<Seller> sellerSynchronizer) : base(mapper, dbContext, configuration)
+        public AccountService(IMapper mapper, IApplicationDbContext dbContext, IConfiguration configuration, ISearchSynchronizer<Seller> sellerSynchronizer, ICacheProvider<Seller> cacheProvider) : base(mapper, dbContext, configuration)
         {
             CoordinateHelper = new CoordinateHelper(configuration);
             FileHelper = new FileHelper();
-            SellerSynchronizer = sellerSynchronizer;
+            SearchSynchronizer = sellerSynchronizer;
+            CacheProvider = cacheProvider;
         }
 
         public async Task DeleteAccount(Role role, Guid accountId)
@@ -328,7 +330,8 @@ namespace FarmersMarketplace.Application.Services.Business
             seller.FirstSocialPageUrl = dto.FirstSocialPageUrl;
             seller.SecondSocialPageUrl = dto.SecondSocialPageUrl;
             await DbContext.SaveChangesAsync();
-            await SellerSynchronizer.Update(seller);
+            await SearchSynchronizer.Update(seller);
+            await CacheProvider.Update(seller);
         }
 
         private async Task UpdateSellerImages(Seller seller, List<Microsoft.AspNetCore.Http.IFormFile> images)

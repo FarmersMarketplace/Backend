@@ -22,15 +22,17 @@ namespace FarmersMarketplace.Application.Services.Business
         private readonly string ProductsImagesFolder;
         private readonly string DocumentsFolder;
         private readonly ValidateService Validator;
-        private readonly DataSynchronizer<Product> ProductSynchronizer;
+        private readonly ICacheProvider<Product> CacheProvider;
+        private readonly ISearchSynchronizer<Product> SearchSynchronizer;
 
-        public ProductService(IMapper mapper, IApplicationDbContext dbContext, IConfiguration configuration, DataSynchronizer<Product> productSynchronizer) : base(mapper, dbContext, configuration)
+        public ProductService(IMapper mapper, IApplicationDbContext dbContext, IConfiguration configuration, ICacheProvider<Product> cacheProvider, ISearchSynchronizer<Product> searchSynchronizer) : base(mapper, dbContext, configuration)
         {
             FileHelper = new FileHelper();
             ProductsImagesFolder = Configuration["File:Images:Product"];
             DocumentsFolder = Configuration["File:Documents"];
             Validator = new ValidateService(DbContext);
-            ProductSynchronizer = productSynchronizer;
+            CacheProvider = cacheProvider;
+            SearchSynchronizer = searchSynchronizer;
         }
 
         public async Task Create(CreateProductDto dto)
@@ -84,7 +86,7 @@ namespace FarmersMarketplace.Application.Services.Business
             
             DbContext.Products.Add(product);
             await DbContext.SaveChangesAsync();
-            await ProductSynchronizer.Create(product);
+            await SearchSynchronizer.Create(product);
         }
 
         public async Task Delete(ProductListDto dto, Guid accountId)
@@ -112,8 +114,9 @@ namespace FarmersMarketplace.Application.Services.Business
                     await FileHelper.DeleteFiles(product.ImagesNames, ProductsImagesFolder);
                     await FileHelper.DeleteFiles(product.DocumentsNames, DocumentsFolder);
                     DbContext.Products.Remove(product);
-                    await ProductSynchronizer.Delete(product.Id);
                     await DbContext.SaveChangesAsync();
+                    await SearchSynchronizer.Delete(product.Id);
+                    await CacheProvider.Delete(product.Id);
                 }
             }
         }
@@ -239,7 +242,8 @@ namespace FarmersMarketplace.Application.Services.Business
             }
 
             await DbContext.SaveChangesAsync();
-            await ProductSynchronizer.Update(product);
+            await SearchSynchronizer.Update(product);
+            await CacheProvider.Update(product);
         }
 
         public async Task Duplicate(ProductListDto dto, Guid accountId)

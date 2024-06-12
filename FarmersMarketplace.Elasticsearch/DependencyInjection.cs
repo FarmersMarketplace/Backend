@@ -9,7 +9,6 @@ using FarmersMarketplace.Application.ViewModels.Product;
 using FarmersMarketplace.Domain;
 using FarmersMarketplace.Domain.Accounts;
 using FarmersMarketplace.Domain.Orders;
-using FarmersMarketplace.Elasticsearch.Documents;
 using FarmersMarketplace.Elasticsearch.Mappings;
 using FarmersMarketplace.Elasticsearch.SearchProviders;
 using FarmersMarketplace.Elasticsearch.Synchronizers;
