@@ -1,25 +1,27 @@
 ﻿using FarmersMarketplace.Application.Interfaces;
 using StackExchange.Redis;
 using System.Text.Json;
+using ApplicationException = FarmersMarketplace.Application.Exceptions.ApplicationException;
 
 namespace FarmersMarketplace.Cache.Providers
 {
     public abstract class CacheProvider<T> : ICacheProvider<T>
     {
         private readonly IDatabase Database;
-        private readonly TimeSpan Lifetime = TimeSpan.FromMinutes(5);
+        private readonly TimeSpan Lifetime;
 
         protected CacheProvider(IConnectionMultiplexer redis)
         {
             Database = redis.GetDatabase();
+            Lifetime = TimeSpan.FromMinutes(5);
         }
 
-        public async Task Add(T obj)
+        public async Task Set(T obj)
         {
             Guid id = GetId(obj);
             var key = Key(id);
 
-            if (await Exists(id))
+            if (Exists(id))
             {
                 await Database.KeyExpireAsync(key, Lifetime);
             }
@@ -35,28 +37,39 @@ namespace FarmersMarketplace.Cache.Providers
         {
             var key = Key(id);
 
-            if (await Exists(id))
+            if (Exists(id))
             {
                 await Database.KeyDeleteAsync(key);
             }
         }
 
-        public async Task<bool> Exists(Guid id)
+        public bool Exists(Guid id)
         {
             var key = Key(id);
-            return await Database.KeyExistsAsync(key);
+            return Database.KeyExists(key);
+        }
+
+        public async Task<T> Get(Guid id)
+        {
+            if (Exists(id))
+            {
+                var obj = JsonSerializer.Deserialize<T>(await Database.StringGetAsync(Key(id)));
+                return obj;
+            }
+
+            throw new ApplicationException($"Object of type {typeof(T)} with id {id} was now found in redis.", "ObjectNotFound");
         }
 
         public async Task Update(T obj)
         {
             Guid id = GetId(obj);
 
-            if (await Exists(id))
+            if (Exists(id))
             {
                 await Delete(id);
             }
 
-            await Add(obj);
+            await Set(obj);
         }
 
         protected abstract Guid GetId(T obj);
