@@ -5,10 +5,12 @@ using FarmersMarketplace.Application.Exceptions;
 using FarmersMarketplace.Application.Helpers;
 using FarmersMarketplace.Application.Interfaces;
 using FarmersMarketplace.Application.Services.Auth;
+using FarmersMarketplace.Application.ViewModels.Account;
 using FarmersMarketplace.Application.ViewModels.Category;
 using FarmersMarketplace.Application.ViewModels.Farm;
 using FarmersMarketplace.Application.ViewModels.Subcategory;
 using FarmersMarketplace.Domain;
+using FarmersMarketplace.Domain.Accounts;
 using FarmersMarketplace.Domain.Payment;
 using Geocoding;
 using Geocoding.Google;
@@ -370,6 +372,12 @@ namespace FarmersMarketplace.Application.Services.Business
 
         public async Task<FarmVm> GetForProducer(Guid farmId)
         {
+            if (CacheProvider.Exists(farmId))
+            {
+                var f = await CacheProvider.Get(farmId);
+                return Mapper.Map<FarmVm>(f);
+            }
+
             var farm = await DbContext.Farms
                 .Include(f => f.Owner)
                 .Include(f => f.Address)
@@ -439,6 +447,8 @@ namespace FarmersMarketplace.Application.Services.Business
                 vm.Subcategories.Add(new SubcategoryVm(subcategory.Id, subcategory.Name, subcategory.CategoryId));
             }
 
+            await CacheProvider.Set(farm);
+
             return vm;
         }
 
@@ -492,6 +502,8 @@ namespace FarmersMarketplace.Application.Services.Business
             farm.Subcategories = dto.Subcategories;
 
             await DbContext.SaveChangesAsync();
+            await SearchSynchronizer.Update(farm);
+            await CacheProvider.Update(farm);
         }
 
         public async Task UpdatePaymentData(FarmPaymentDataDto dto, Guid ownerId)
@@ -552,6 +564,8 @@ namespace FarmersMarketplace.Application.Services.Business
             }
 
             await DbContext.SaveChangesAsync();
+            await SearchSynchronizer.Update(farm);
+            await CacheProvider.Update(farm);
         }
 
         public async Task<CardDataVm> CopyOwnerCardData(Guid ownerId)

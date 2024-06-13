@@ -13,6 +13,7 @@ using Hangfire;
 using Hangfire.PostgreSql;
 using FarmersMarketplace.Application.Helpers;
 using FarmersMarketplace.Elasticsearch;
+using FarmersMarketplace.Cache;
 
 namespace FarmersMarketplace.WebApi
 {
@@ -36,6 +37,7 @@ namespace FarmersMarketplace.WebApi
             services.AddApplication(configuration);
             services.AddPersistence(connectionString);
             services.AddElasticsearch(configuration);
+            services.AddRedis(configuration);
 
             services.AddMemoryCache();
 

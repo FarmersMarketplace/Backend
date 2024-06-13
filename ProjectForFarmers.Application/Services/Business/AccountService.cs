@@ -6,6 +6,7 @@ using FarmersMarketplace.Application.Exceptions;
 using FarmersMarketplace.Application.Helpers;
 using FarmersMarketplace.Application.Interfaces;
 using FarmersMarketplace.Application.ViewModels.Account;
+using FarmersMarketplace.Application.ViewModels.Product;
 using FarmersMarketplace.Domain;
 using FarmersMarketplace.Domain.Accounts;
 using FarmersMarketplace.Domain.Payment;
@@ -16,20 +17,25 @@ using DayOfWeek = FarmersMarketplace.Domain.DayOfWeek;
 
 namespace FarmersMarketplace.Application.Services.Business
 {
-
     public class AccountService : Service, IAccountService
     {
         private readonly CoordinateHelper CoordinateHelper;
         private readonly FileHelper FileHelper;
-        private readonly ICacheProvider<Seller> CacheProvider;
+        private readonly ICacheProvider<Seller> SellerCacheProvider;
+        private readonly ICacheProvider<Farmer> FarmerCacheProvider;
+        private readonly ICacheProvider<Customer> CustomerCacheProvider;
         private readonly ISearchSynchronizer<Seller> SearchSynchronizer;
 
-        public AccountService(IMapper mapper, IApplicationDbContext dbContext, IConfiguration configuration, ISearchSynchronizer<Seller> sellerSynchronizer, ICacheProvider<Seller> cacheProvider) : base(mapper, dbContext, configuration)
+        public AccountService(IMapper mapper, IApplicationDbContext dbContext, IConfiguration configuration,
+            ISearchSynchronizer<Seller> sellerSynchronizer, ICacheProvider<Seller> sellerCacheProvider,
+            ICacheProvider<Customer> customerCacheProvider, ICacheProvider<Farmer> farmerCacheProvider) : base(mapper, dbContext, configuration)
         {
             CoordinateHelper = new CoordinateHelper(configuration);
             FileHelper = new FileHelper();
             SearchSynchronizer = sellerSynchronizer;
-            CacheProvider = cacheProvider;
+            SellerCacheProvider = sellerCacheProvider;
+            CustomerCacheProvider = customerCacheProvider;
+            FarmerCacheProvider = farmerCacheProvider;
         }
 
         public async Task DeleteAccount(Role role, Guid accountId)
@@ -39,6 +45,12 @@ namespace FarmersMarketplace.Application.Services.Business
 
         public async Task<CustomerVm> GetCustomer(Guid accountId)
         {
+            if (CustomerCacheProvider.Exists(accountId))
+            {
+                var c = await CustomerCacheProvider.Get(accountId);
+                return Mapper.Map<CustomerVm>(c);
+            }
+
             var customer = await DbContext.Customers.Include(c => c.Address)
                 .Include(c => c.PaymentData)
                 .FirstOrDefaultAsync(a => a.Id == accountId);
@@ -50,12 +62,19 @@ namespace FarmersMarketplace.Application.Services.Business
             }
 
             var vm = Mapper.Map<CustomerVm>(customer);
+            await CustomerCacheProvider.Set(customer);
 
             return vm;
         }
 
         public async Task<FarmerVm> GetFarmer(Guid accountId)
         {
+            if (CustomerCacheProvider.Exists(accountId))
+            {
+                var f = await FarmerCacheProvider.Get(accountId);
+                return Mapper.Map<FarmerVm>(f);
+            }
+
             var farmer = await DbContext.Farmers.Include(c => c.Address)
                 .Include(c => c.PaymentData)
                 .FirstOrDefaultAsync(a => a.Id == accountId);
@@ -78,11 +97,19 @@ namespace FarmersMarketplace.Application.Services.Business
                 vm.PaymentData.HasOnlinePayment = false;
             }
 
+            await FarmerCacheProvider.Set(farmer);
+
             return vm;
         }
 
         public async Task<SellerVm> GetSeller(Guid accountId)
         {
+            if (SellerCacheProvider.Exists(accountId))
+            {
+                var s = await SellerCacheProvider.Get(accountId);
+                return Mapper.Map<SellerVm>(s);
+            }
+
             var seller = await DbContext.Sellers.Include(c => c.Address)
                 .Include(c => c.PaymentData)
                 .Include(c => c.Schedule)
@@ -107,17 +134,8 @@ namespace FarmersMarketplace.Application.Services.Business
                 throw new NotFoundException(message, "AccountNotFound");
             }
 
+            await SellerCacheProvider.Set(seller);
             var vm = Mapper.Map<SellerVm>(seller);
-
-            if (seller.PaymentTypes != null
-                && seller.PaymentTypes.Contains(PaymentType.Online))
-            {
-                vm.PaymentData.HasOnlinePayment = true;
-            }
-            else
-            {
-                vm.PaymentData.HasOnlinePayment = false;
-            }
 
             return vm;
         }
@@ -177,6 +195,7 @@ namespace FarmersMarketplace.Application.Services.Business
             }
 
             await DbContext.SaveChangesAsync();
+            await CustomerCacheProvider.Update(customer);
         }
 
         public bool AddressEqualToDto(Address address, AddressDto dto)
@@ -209,6 +228,7 @@ namespace FarmersMarketplace.Application.Services.Business
             customer.PaymentData.CardExpirationMonth = dto.CardExpirationMonth;
 
             await DbContext.SaveChangesAsync();
+            await CustomerCacheProvider.Update(customer);
         }
 
         public async Task UpdateFarmer(UpdateFarmerDto dto, Guid accountId)
@@ -267,6 +287,7 @@ namespace FarmersMarketplace.Application.Services.Business
             }
 
             await DbContext.SaveChangesAsync();
+            await FarmerCacheProvider.Update(farmer);
         }
 
         public async Task UpdateSeller(UpdateSellerDto dto, Guid accountId)
@@ -331,7 +352,7 @@ namespace FarmersMarketplace.Application.Services.Business
             seller.SecondSocialPageUrl = dto.SecondSocialPageUrl;
             await DbContext.SaveChangesAsync();
             await SearchSynchronizer.Update(seller);
-            await CacheProvider.Update(seller);
+            await SellerCacheProvider.Update(seller);
         }
 
         private async Task UpdateSellerImages(Seller seller, List<Microsoft.AspNetCore.Http.IFormFile> images)
@@ -401,6 +422,8 @@ namespace FarmersMarketplace.Application.Services.Business
             seller.Subcategories = dto.Subcategories ?? seller.Subcategories;
 
             await DbContext.SaveChangesAsync();
+            await SearchSynchronizer.Update(seller);
+            await SellerCacheProvider.Update(seller);
         }
 
         public async Task UpdateFarmerPaymentData(ProducerPaymentDataDto dto, Guid accountId)
@@ -437,6 +460,7 @@ namespace FarmersMarketplace.Application.Services.Business
             farmer.PaymentData.CardExpirationMonth = dto.CardExpirationMonth;
 
             await DbContext.SaveChangesAsync();
+            await FarmerCacheProvider.Update(farmer);
         }
 
         public async Task UpdateSellerPaymentData(ProducerPaymentDataDto dto, Guid accountId)
@@ -473,6 +497,8 @@ namespace FarmersMarketplace.Application.Services.Business
             }
 
             await DbContext.SaveChangesAsync();
+            await SearchSynchronizer.Update(seller);
+            await SellerCacheProvider.Update(seller);
         }
 
         public async Task<CustomerOrderDetailsVm> GetCustomerOrderDetails(Guid accountId, ReceivingMethod receivingMethod)

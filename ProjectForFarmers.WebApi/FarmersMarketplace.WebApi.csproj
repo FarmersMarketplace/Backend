@@ -29,6 +29,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\FarmersMarketplace.Cache\FarmersMarketplace.Cache.csproj" />
     <ProjectReference Include="..\FarmersMarketplace.Elasticsearch\FarmersMarketplace.Elasticsearch.csproj" />
     <ProjectReference Include="..\ProjectForFarmers.Application\FarmersMarketplace.Application.csproj" />
     <ProjectReference Include="..\ProjectForFarmers.Persistence\FarmersMarketplace.Persistence.csproj" />

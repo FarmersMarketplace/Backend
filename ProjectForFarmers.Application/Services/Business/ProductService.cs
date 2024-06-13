@@ -4,9 +4,11 @@ using FarmersMarketplace.Application.Exceptions;
 using FarmersMarketplace.Application.Filters;
 using FarmersMarketplace.Application.Helpers;
 using FarmersMarketplace.Application.Interfaces;
+using FarmersMarketplace.Application.ViewModels.Account;
 using FarmersMarketplace.Application.ViewModels.Product;
 using FarmersMarketplace.Application.ViewModels.Subcategory;
 using FarmersMarketplace.Domain;
+using FarmersMarketplace.Domain.Accounts;
 using FastExcel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -139,6 +141,12 @@ namespace FarmersMarketplace.Application.Services.Business
 
         public async Task<ProducerProductVm> GetForProducer(Guid productId)
         {
+            if (CacheProvider.Exists(productId))
+            {
+                var p = await CacheProvider.Get(productId);
+                return Mapper.Map<ProducerProductVm>(p);
+            }
+
             var product = await DbContext.Products.Include(p => p.Category)
                 .Include(p => p.Subcategory)
                 .FirstAsync(p => p.Id == productId);
@@ -149,6 +157,7 @@ namespace FarmersMarketplace.Application.Services.Business
                 throw new NotFoundException(message, "ProductNotFound");
             }
 
+            await CacheProvider.Set(product);
             var vm = Mapper.Map<ProducerProductVm>(product);
 
             return vm;

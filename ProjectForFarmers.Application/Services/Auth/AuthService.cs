@@ -17,15 +17,13 @@ namespace FarmersMarketplace.Application.Services.Auth
     {
         private readonly EmailHelper EmailHelper;
         private readonly JwtService JwtService;
-        private readonly ICacheProvider<Seller> CacheProvider;
         private readonly ISearchSynchronizer<Seller> SearchSynchronizer;
 
-        public AuthService(IMapper mapper, IApplicationDbContext dbContext, IConfiguration configuration, ISearchSynchronizer<Seller> sellerSynchronizer, ICacheProvider<Seller> cacheProvider) : base(mapper, dbContext, configuration)
+        public AuthService(IMapper mapper, IApplicationDbContext dbContext, IConfiguration configuration, ISearchSynchronizer<Seller> sellerSynchronizer) : base(mapper, dbContext, configuration)
         {
             JwtService = new JwtService(configuration);
             EmailHelper = new EmailHelper(configuration);
             SearchSynchronizer = sellerSynchronizer;
-            CacheProvider = cacheProvider;
         }
 
         public async Task Register(RegisterDto dto)

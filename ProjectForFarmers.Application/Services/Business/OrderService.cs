@@ -247,6 +247,12 @@ namespace FarmersMarketplace.Application.Services.Business
 
         public async Task<ProducerOrderVm> GetForProducer(Guid orderId)
         {
+            if (CacheProvider.Exists(orderId))
+            {
+                var s = await CacheProvider.Get(orderId);
+                return Mapper.Map<ProducerOrderVm>(s);
+            }
+
             var order = await DbContext.Orders.Include(o => o.Items).FirstOrDefaultAsync();
 
             if (order == null)
@@ -284,7 +290,7 @@ namespace FarmersMarketplace.Application.Services.Business
             }
 
             vm.Items = items;
-
+            await CacheProvider.Set(order);
             return vm;
         }
 

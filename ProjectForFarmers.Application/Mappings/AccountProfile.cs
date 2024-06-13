@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using FarmersMarketplace.Application.ViewModels.Account;
 using FarmersMarketplace.Domain.Accounts;
+using FarmersMarketplace.Domain.Payment;
 
 namespace FarmersMarketplace.Application.Mappings
 {
@@ -25,7 +26,9 @@ namespace FarmersMarketplace.Application.Mappings
             CreateMap<Seller, SellerVm>()
                 .ForMember(vm => vm.PaymentData, opt => opt.MapFrom(seller => seller.PaymentData))
                 .ForMember(vm => vm.Address, opt => opt.MapFrom(seller => seller.Address))
-                .ForMember(vm => vm.Schedule, opt => opt.MapFrom(seller => seller.Schedule));
+                .ForMember(vm => vm.Schedule, opt => opt.MapFrom(seller => seller.Schedule))
+                .ForMember(vm => vm.PaymentData.HasOnlinePayment, opt => opt.MapFrom(seller => seller.PaymentTypes != null
+                && seller.PaymentTypes.Contains(PaymentType.Online)));
         }
 
         private void MapCustomerToCustomerVm()

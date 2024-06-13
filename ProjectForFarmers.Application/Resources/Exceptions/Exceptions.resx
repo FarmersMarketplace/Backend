@@ -180,6 +180,9 @@
   <data name="InvalidPassword" xml:space="preserve">
     <value>Invalid password.</value>
   </data>
+  <data name="ObjectNotFound" xml:space="preserve">
+    <value>Object was not found.</value>
+  </data>
   <data name="OrderNotExist" xml:space="preserve">
     <value>Order was not found.</value>
   </data>

@@ -2,9 +2,10 @@
 {
     public interface ICacheProvider<T>
     {
-        Task Add(T obj);
+        Task<T> Get(Guid id);
+        Task Set(T obj);
         Task Update(T obj);
         Task Delete(Guid id);
-        Task<bool> Exists(Guid id);
+        bool Exists(Guid id);
     }
 }
