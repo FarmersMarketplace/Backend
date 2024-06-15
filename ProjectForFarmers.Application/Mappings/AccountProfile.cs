@@ -11,7 +11,16 @@ namespace FarmersMarketplace.Application.Mappings
         {
             MapCustomerToCustomerVm();
             MapSellerToSellerVm();
-            MapFarmerToFarmerVm();
+            MapSellerToSellerForCustomerVm(); 
+            MapFarmerToFarmerVm(); 
+        }
+
+        private void MapSellerToSellerForCustomerVm()
+        {
+            CreateMap<Seller, SellerForCustomerVm>()
+                .ForMember(vm => vm.Feedbacks, opt => opt.MapFrom(seller => seller.Feedbacks))
+                .ForMember(vm => vm.Address, opt => opt.MapFrom(seller => seller.Address))
+                .ForMember(vm => vm.Schedule, opt => opt.MapFrom(seller => seller.Schedule));
         }
 
         private void MapFarmerToFarmerVm()
