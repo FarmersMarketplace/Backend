@@ -20,8 +20,8 @@ namespace FarmersMarketplace.Domain.Accounts
         public List<Guid> Subcategories { get; set; }
         public virtual List<MonthStatistic> Statistics { get; set; }
         public virtual List<Product> Products { get; set; }
-        public float Rating { get; set; }
-        public virtual List<ProducerFeedback>? Feedbacks { get; set; }
+        public Guid FeedbacksId { get; set; }
+        public virtual ProducerFeedbackCollection? Feedbacks { get; set; }
     }
 
 }

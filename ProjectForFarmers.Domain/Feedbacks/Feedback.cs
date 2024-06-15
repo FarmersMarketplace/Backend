@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using FarmersMarketplace.Domain.Accounts;
 
 namespace FarmersMarketplace.Domain.Feedbacks
 {
@@ -12,6 +8,9 @@ namespace FarmersMarketplace.Domain.Feedbacks
         public Guid CustomerId { get; set; }
         public string Comment { get; set; }
         public float Rating { get; set; }
+        public DateTime Date { get; set; }
+        public Guid CollectionId { get; set; }
+        public Customer Customer { get; set; }
     }
 
 }
