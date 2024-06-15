@@ -39,7 +39,7 @@ namespace FarmersMarketplace.Application.Services.Business
                     .OrderByDescending(p => p.OrderCount)
                     .Take(PopularEntitiesCount)
                     .OrderByDescending(p => p.Product.Feedbacks.AverageRating)
-                    .Select(p => Mapper.Map<CustomerProductLookupVm>(p))
+                    .Select(p => Mapper.Map<CustomerProductLookupVm>(p.Product))
                     .ToListAsync();
 
                 ProductIds = popularProducts.Select(p => p.Id).ToHashSet();

@@ -1,6 +1,4 @@
-﻿using FarmersMarketplace.Domain.Accounts;
-
-namespace FarmersMarketplace.Domain.Feedbacks
+﻿namespace FarmersMarketplace.Domain.Feedbacks
 {
     public class Feedback
     {
@@ -10,7 +8,7 @@ namespace FarmersMarketplace.Domain.Feedbacks
         public float Rating { get; set; }
         public DateTime Date { get; set; }
         public Guid CollectionId { get; set; }
-        public Customer Customer { get; set; }
+        public FeedbackType ReviewedEntity { get; set; }
     }
 
 }

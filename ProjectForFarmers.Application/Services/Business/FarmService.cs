@@ -5,13 +5,11 @@ using FarmersMarketplace.Application.Exceptions;
 using FarmersMarketplace.Application.Helpers;
 using FarmersMarketplace.Application.Interfaces;
 using FarmersMarketplace.Application.Services.Auth;
-using FarmersMarketplace.Application.ViewModels.Account;
 using FarmersMarketplace.Application.ViewModels.Category;
 using FarmersMarketplace.Application.ViewModels.Farm;
+using FarmersMarketplace.Application.ViewModels.Producers;
 using FarmersMarketplace.Application.ViewModels.Subcategory;
 using FarmersMarketplace.Domain;
-using FarmersMarketplace.Domain.Accounts;
-using FarmersMarketplace.Domain.Feedbacks;
 using FarmersMarketplace.Domain.Payment;
 using Geocoding;
 using Geocoding.Google;
@@ -31,6 +29,7 @@ namespace FarmersMarketplace.Application.Services.Business
         private readonly CoordinateHelper CoordinateHelper;
         private readonly ICacheProvider<Farm> CacheProvider;
         private readonly ISearchSynchronizer<Farm> SearchSynchronizer;
+        private readonly FarmTrendService TrendService;
 
         public FarmService(IMapper mapper, IApplicationDbContext dbContext, IConfiguration configuration, ISearchSynchronizer<Farm> farmSynchronizer, ICacheProvider<Farm> cacheProvider) : base(mapper, dbContext, configuration)
         {
@@ -41,6 +40,7 @@ namespace FarmersMarketplace.Application.Services.Business
             CoordinateHelper = new CoordinateHelper(configuration);
             SearchSynchronizer = farmSynchronizer;
             CacheProvider = cacheProvider;
+            TrendService = new FarmTrendService(dbContext, mapper, 5, 5);
         }
 
         public async Task Create(CreateFarmDto dto)
@@ -117,6 +117,7 @@ namespace FarmersMarketplace.Application.Services.Business
             await DbContext.SaveChangesAsync();
             await SearchSynchronizer.Delete(farm.Id);
             await CacheProvider.Delete(farm.Id);
+            await TrendService.UpdateIfPopular(farm);
         }
 
         private async Task<Geocoding.Location> GetCoordinates(AddressDto dto)
@@ -178,6 +179,7 @@ namespace FarmersMarketplace.Application.Services.Business
             await DbContext.SaveChangesAsync();
             await SearchSynchronizer.Update(farm);
             await CacheProvider.Update(farm);
+            await TrendService.UpdateIfPopular(farm);
         }
 
         private void UpdateReceivingTypes(Farm farm, UpdateFarmDto dto)
@@ -660,6 +662,12 @@ namespace FarmersMarketplace.Application.Services.Business
             await CacheProvider.Set(farm);
             var vm = Mapper.Map<FarmForCustomerVm>(farm);
 
+            return vm;
+        }
+
+        public async Task<ProducerListVm> GetPopular()
+        {
+            var vm = await TrendService.UpdateAndGet();
             return vm;
         }
     }
