@@ -48,7 +48,7 @@ namespace FarmersMarketplace.Elasticsearch.Mappings
                 .ForMember(document => document.Subcategories, opt => opt.MapFrom(seller => new HashSet<Guid>(seller.Subcategories)))
                 .ForMember(document => document.ImageName, opt => opt.MapFrom(seller => seller.ImagesNames.Count > 0 ? seller.ImagesNames[0] : ""))
                 .ForMember(document => document.FeedbacksCount, opt => opt.MapFrom(seller => seller.Feedbacks.Count))
-                .ForMember(document => document.Rating, opt => opt.MapFrom(seller => seller.Rating))
+                .ForMember(document => document.Rating, opt => opt.MapFrom(seller => seller.Feedbacks.AverageRating))
                 .ForMember(document => document.HasOnlinePayment, opt => opt.MapFrom(seller => seller.PaymentTypes.Count > 0 ? seller.PaymentTypes.Contains(PaymentType.Online) : false));
         }
 

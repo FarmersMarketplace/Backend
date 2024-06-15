@@ -102,7 +102,7 @@ namespace FarmersMarketplace.Elasticsearch.Synchronizers
                     CreationDate = obj.CreationDate,
                     ImageName = obj.ImagesNames?.FirstOrDefault() ?? "",
                     ReceivingMethods = obj.ReceivingMethods,
-                    Rating = obj.Rating,
+                    Rating = obj.Feedbacks.AverageRating,
                     FeedbacksCount = (uint)(obj.Feedbacks?.Count ?? 0),
                 })
                 .Index(Indecies.Products));

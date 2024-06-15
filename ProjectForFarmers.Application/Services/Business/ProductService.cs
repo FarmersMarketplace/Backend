@@ -4,11 +4,9 @@ using FarmersMarketplace.Application.Exceptions;
 using FarmersMarketplace.Application.Filters;
 using FarmersMarketplace.Application.Helpers;
 using FarmersMarketplace.Application.Interfaces;
-using FarmersMarketplace.Application.ViewModels.Account;
 using FarmersMarketplace.Application.ViewModels.Product;
 using FarmersMarketplace.Application.ViewModels.Subcategory;
 using FarmersMarketplace.Domain;
-using FarmersMarketplace.Domain.Accounts;
 using FastExcel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -104,7 +102,7 @@ namespace FarmersMarketplace.Application.Services.Business
                 }
                 Validator.ValidateProducer(accountId, product.ProducerId, product.Producer);
 
-                bool hasOrdersWithProduct = await DbContext.OrdersItems.AnyAsync(oi => oi.ProductId == productId);
+                bool hasOrdersWithProduct = await DbContext.OrderItems.AnyAsync(oi => oi.ProductId == productId);
 
                 if (hasOrdersWithProduct)
                 {
@@ -139,12 +137,12 @@ namespace FarmersMarketplace.Application.Services.Business
             return randomLetters + "-" + randomNumbers;
         }
 
-        public async Task<ProducerProductVm> GetForProducer(Guid productId)
+        public async Task<ProductForProducerVm> GetForProducer(Guid productId)
         {
             if (CacheProvider.Exists(productId))
             {
                 var p = await CacheProvider.Get(productId);
-                return Mapper.Map<ProducerProductVm>(p);
+                return Mapper.Map<ProductForProducerVm>(p);
             }
 
             var product = await DbContext.Products.Include(p => p.Category)
@@ -158,12 +156,10 @@ namespace FarmersMarketplace.Application.Services.Business
             }
 
             await CacheProvider.Set(product);
-            var vm = Mapper.Map<ProducerProductVm>(product);
+            var vm = Mapper.Map<ProductForProducerVm>(product);
 
             return vm;
         }
-
-        
 
         public async Task Update(UpdateProductDto dto, Guid accountId)
         {
@@ -303,9 +299,10 @@ namespace FarmersMarketplace.Application.Services.Business
                 }
 
                 DbContext.Products.Add(newProduct);
+                await CacheProvider.Set(newProduct);
+                await SearchSynchronizer.Create(newProduct);
+                await DbContext.SaveChangesAsync();
             }
-
-            await DbContext.SaveChangesAsync();
         }
 
         public async Task<ProducerProductFilterData> GetProducerProductFilterData(Producer producer, Guid producerId)
@@ -494,8 +491,38 @@ namespace FarmersMarketplace.Application.Services.Business
                 Validator.ValidateProducer(accountId, product.ProducerId, product.Producer);
 
                 product.Status = status;
+
+                await CacheProvider.Update(product);
+                await SearchSynchronizer.Update(product);
             }
+
             await DbContext.SaveChangesAsync();
+        }
+
+        public async Task<ProductForCustomerVm> GetForCustomer(Guid productId)
+        {
+            if (CacheProvider.Exists(productId))
+            {
+                var p = await CacheProvider.Get(productId);
+                return Mapper.Map<ProductForCustomerVm>(p);
+            }
+
+            var product = await DbContext.Products.Include(p => p.Category)
+                .Include(p => p.Subcategory)
+                .Include(p => p.Feedbacks)
+                .FirstAsync(p => p.Id == productId);
+
+            if (product == null)
+            {
+                string message = $"Product with Id {productId} was not found.";
+                throw new NotFoundException(message, "ProductNotFound");
+            }
+
+            await CacheProvider.Set(product);
+            var vm = Mapper.Map<ProductForCustomerVm>(product);
+            vm.PopularProducts = await AuxiliarySearchProvider.GetPopularProducts(Values.PopularProductCountPerRequest);
+
+            return vm;
         }
     }
 }
