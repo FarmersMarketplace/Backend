@@ -6,7 +6,8 @@ namespace FarmersMarketplace.Application.Services.Business
 {
     public interface IOrderService
     {
-       Task<ProducerOrderVm> GetForProducer(Guid orderId);
+       Task<OrderForProducerVm> GetForProducer(Guid orderId);
+       Task<OrderForCustomerVm> GetForCustomer(Guid orderId);
        Task<(string fileName, byte[] bytes)> ExportToExcel(ExportOrdersDto dto);
        Task Duplicate(OrderListDto dto, Guid accountId);
        Task Delete(OrderListDto dto, Guid accountId);

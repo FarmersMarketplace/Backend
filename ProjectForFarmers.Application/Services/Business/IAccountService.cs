@@ -20,5 +20,6 @@ namespace FarmersMarketplace.Application.Services.Business
         Task UpdateSellerPaymentData(ProducerPaymentDataDto dto, Guid accountId);
         Task DeleteAccount(Role role, Guid accountId);
         Task<CustomerOrderDetailsVm> GetCustomerOrderDetails(Guid accountId, ReceivingMethod receivingMethod);
+        Task<SellerForCustomerVm> GetSellerForCustomer(Guid accountId);
     }
 }

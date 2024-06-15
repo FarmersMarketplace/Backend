@@ -11,6 +11,7 @@ using FarmersMarketplace.Application.ViewModels.Farm;
 using FarmersMarketplace.Application.ViewModels.Subcategory;
 using FarmersMarketplace.Domain;
 using FarmersMarketplace.Domain.Accounts;
+using FarmersMarketplace.Domain.Feedbacks;
 using FarmersMarketplace.Domain.Payment;
 using Geocoding;
 using Geocoding.Google;
@@ -370,12 +371,12 @@ namespace FarmersMarketplace.Application.Services.Business
             await DbContext.SaveChangesAsync();
         }
 
-        public async Task<FarmVm> GetForProducer(Guid farmId)
+        public async Task<FarmForProducerVm> GetForProducer(Guid farmId)
         {
             if (CacheProvider.Exists(farmId))
             {
                 var f = await CacheProvider.Get(farmId);
-                return Mapper.Map<FarmVm>(f);
+                return Mapper.Map<FarmForProducerVm>(f);
             }
 
             var farm = await DbContext.Farms
@@ -405,7 +406,7 @@ namespace FarmersMarketplace.Application.Services.Business
                 throw new NotFoundException(message, "FarmNotFound");
             } 
 
-            var vm = Mapper.Map<FarmVm>(farm);
+            var vm = Mapper.Map<FarmForProducerVm>(farm);
 
             if (farm.PaymentTypes != null
                 && farm.PaymentTypes.Contains(PaymentType.Online))
@@ -616,6 +617,48 @@ namespace FarmersMarketplace.Application.Services.Business
             {
                 vm.HasOnlinePayment = false;
             }
+
+            return vm;
+        }
+
+        public async Task<FarmForCustomerVm> GetForCustomer(Guid farmId)
+        {
+            if (CacheProvider.Exists(farmId))
+            {
+                var f = await CacheProvider.Get(farmId);
+                return Mapper.Map<FarmForCustomerVm>(f);
+            }
+
+            var farm = await DbContext.Farms
+                .Include(f => f.Feedbacks)
+                .Include(f => f.Owner)
+                .Include(f => f.Address)
+                .Include(f => f.Schedule)
+                    .ThenInclude(s => s.Monday)
+                .Include(f => f.Schedule)
+                    .ThenInclude(s => s.Tuesday)
+                .Include(f => f.Schedule)
+                    .ThenInclude(s => s.Wednesday)
+                .Include(f => f.Schedule)
+                    .ThenInclude(s => s.Thursday)
+                .Include(f => f.Schedule)
+                    .ThenInclude(s => s.Friday)
+                .Include(f => f.Schedule)
+                    .ThenInclude(s => s.Sunday)
+                .Include(f => f.Schedule)
+                    .ThenInclude(s => s.Saturday)
+                .Include(f => f.PaymentData)
+                .Include(f => f.Logs)
+                .FirstOrDefaultAsync(f => f.Id == farmId);
+
+            if (farm == null)
+            {
+                string message = $"Farm with Id {farmId} was not found.";
+                throw new NotFoundException(message, "FarmNotFound");
+            }
+
+            await CacheProvider.Set(farm);
+            var vm = Mapper.Map<FarmForCustomerVm>(farm);
 
             return vm;
         }

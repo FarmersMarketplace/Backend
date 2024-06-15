@@ -6,9 +6,9 @@ using FarmersMarketplace.Application.Exceptions;
 using FarmersMarketplace.Application.Helpers;
 using FarmersMarketplace.Application.Interfaces;
 using FarmersMarketplace.Application.ViewModels.Account;
-using FarmersMarketplace.Application.ViewModels.Product;
 using FarmersMarketplace.Domain;
 using FarmersMarketplace.Domain.Accounts;
+using FarmersMarketplace.Domain.Feedbacks;
 using FarmersMarketplace.Domain.Payment;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -526,6 +526,45 @@ namespace FarmersMarketplace.Application.Services.Business
             {
                 vm.Address = Mapper.Map<CustomerAddressVm>(customer.Address);
             }
+
+            return vm;
+        }
+
+        public async Task<SellerForCustomerVm> GetSellerForCustomer(Guid accountId)
+        {
+            if (SellerCacheProvider.Exists(accountId))
+            {
+                var s = await SellerCacheProvider.Get(accountId);
+
+                return Mapper.Map<SellerForCustomerVm>(s);
+            }
+
+            var seller = await DbContext.Sellers.Include(c => c.Address)
+                .Include(c => c.Feedbacks)
+                .Include(c => c.Schedule)
+                    .ThenInclude(s => s.Monday)
+                .Include(f => f.Schedule)
+                    .ThenInclude(s => s.Tuesday)
+                .Include(f => f.Schedule)
+                    .ThenInclude(s => s.Wednesday)
+                .Include(f => f.Schedule)
+                    .ThenInclude(s => s.Thursday)
+                .Include(f => f.Schedule)
+                    .ThenInclude(s => s.Friday)
+                .Include(f => f.Schedule)
+                    .ThenInclude(s => s.Sunday)
+                .Include(f => f.Schedule)
+                    .ThenInclude(s => s.Saturday)
+                .FirstOrDefaultAsync(a => a.Id == accountId);
+
+            if (seller == null)
+            {
+                string message = $"Account with Id {accountId} was not found.";
+                throw new NotFoundException(message, "AccountNotFound");
+            }
+
+            await SellerCacheProvider.Set(seller);
+            var vm = Mapper.Map<SellerForCustomerVm>(seller);
 
             return vm;
         }

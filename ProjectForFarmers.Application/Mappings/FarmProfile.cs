@@ -2,10 +2,12 @@
 using FarmersMarketplace.Application.DataTransferObjects;
 using FarmersMarketplace.Application.DataTransferObjects.Farm;
 using FarmersMarketplace.Application.ViewModels;
+using FarmersMarketplace.Application.ViewModels.Account;
 using FarmersMarketplace.Application.ViewModels.Category;
 using FarmersMarketplace.Application.ViewModels.Farm;
 using FarmersMarketplace.Application.ViewModels.Subcategory;
 using FarmersMarketplace.Domain;
+using FarmersMarketplace.Domain.Accounts;
 using FarmersMarketplace.Domain.Payment;
 using System.Net;
 using Address = FarmersMarketplace.Domain.Address;
@@ -19,12 +21,21 @@ namespace FarmersMarketplace.Application.Mappings
         {
             MapCreateFarmDtoToFarm();
             MapFarmToFarmLookupVm();
-            MapFarmToFarmVm();
+            MapFarmToFarmForProducerVm();
+            MapFarmToFarmForCustomerVm();
         }
 
-        private void MapFarmToFarmVm()
+        private void MapFarmToFarmForCustomerVm()
         {
-            CreateMap<Farm, FarmVm>()
+            CreateMap<Farm, FarmForCustomerVm>()
+                .ForMember(vm => vm.Feedbacks, opt => opt.MapFrom(seller => seller.Feedbacks))
+                .ForMember(vm => vm.Address, opt => opt.MapFrom(seller => seller.Address))
+                .ForMember(vm => vm.Schedule, opt => opt.MapFrom(seller => seller.Schedule));
+        }
+
+        private void MapFarmToFarmForProducerVm()
+        {
+            CreateMap<Farm, FarmForProducerVm>()
                 .ForMember(vm => vm.OwnerName, opt => opt.MapFrom(farm => farm.Owner.Name + " " + farm.Owner.Surname))
                 .ForMember(vm => vm.Address, opt => opt.MapFrom(farm => farm.Address))
                 .ForMember(vm => vm.Schedule, opt => opt.MapFrom(farm => farm.Schedule))
