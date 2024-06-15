@@ -2,7 +2,7 @@
 
 namespace FarmersMarketplace.Application.ViewModels.Product
 {
-    public class ProducerProductVm
+    public class ProductForProducerVm
     {
         public Guid Id { get; set; }
         public string Name { get; set; }

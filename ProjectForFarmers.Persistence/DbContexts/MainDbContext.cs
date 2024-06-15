@@ -21,7 +21,7 @@ namespace FarmersMarketplace.Persistence.DbContexts
         public DbSet<DayOfWeek> DaysOfWeek { get; set; }
         public DbSet<Schedule> Schedules { get; set; }
         public DbSet<MonthStatistic> MonthesStatistics { get; set; }
-        public DbSet<OrderItem> OrdersItems { get; set; }
+        public DbSet<OrderItem> OrderItems { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<Subcategory> Subcategories { get; set; }
         public DbSet<Product> Products { get; set; }

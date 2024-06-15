@@ -25,8 +25,8 @@ namespace FarmersMarketplace.Domain
         public DateTime CreationDate { get; set; }
         public List<string> DocumentsNames { get; set; }
         public List<ReceivingMethod> ReceivingMethods { get; set; }
-        public float Rating { get; set; }
-        public virtual List<ProductFeedback>? Feedbacks { get; set; }
+        public Guid FeedbacksId { get; set; }
+        public virtual ProductFeedbackCollection? Feedbacks { get; set; }
     }
 
 }
