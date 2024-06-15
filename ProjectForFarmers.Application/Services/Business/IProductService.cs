@@ -12,8 +12,8 @@ namespace FarmersMarketplace.Application.Services.Business
         Task Delete(ProductListDto dto, Guid accountId);
         Task ChangeStatus(ProductListDto dto, ProductStatus status, Guid accountId);
         Task Duplicate(ProductListDto dto, Guid accountId);
-        Task<ProducerProductVm> GetForProducer(Guid productId);
-        //Task<OptionListVm> Autocomplete(ProductAutocompleteDto dto);
+        Task<ProductForProducerVm> GetForProducer(Guid productId);
+        Task<ProductForCustomerVm> GetForCustomer(Guid productId);
         Task<ProducerProductFilterData> GetProducerProductFilterData(Producer producer, Guid producerId);
         Task<(string fileName, byte[] bytes)> ExportToExcel(ExportProductsDto dto);
     }

@@ -1,5 +1,6 @@
 ﻿using FarmersMarketplace.Domain;
 using FarmersMarketplace.Domain.Accounts;
+using FarmersMarketplace.Domain.Feedbacks;
 using FarmersMarketplace.Domain.Orders;
 using FarmersMarketplace.Domain.Payment;
 using Microsoft.EntityFrameworkCore;
@@ -19,13 +20,16 @@ namespace FarmersMarketplace.Application.Interfaces
         DbSet<DayOfWeek> DaysOfWeek { get; set; }
         DbSet<Schedule> Schedules { get; set; }
         DbSet<MonthStatistic> MonthesStatistics { get; set; }
-        DbSet<OrderItem> OrdersItems { get; set; }
+        DbSet<OrderItem> OrderItems { get; set; }
         DbSet<Category> Categories { get; set; }
         DbSet<Subcategory> Subcategories { get; set; }
         DbSet<Product> Products { get; set; }
         DbSet<ProducerPaymentData> ProducerPaymentData { get; set; }
         DbSet<CustomerPaymentData> CustomerPaymentData { get; set; }
         DbSet<FarmLog> FarmsLogs { get; set; }
+        DbSet<Feedback> Feedbacks { get; set; }
+        DbSet<ProducerFeedbackCollection> ProducerFeedbackCollections { get; set; }
+        DbSet<ProductFeedbackCollection> ProductFeedbackCollections { get; set; }
         Task<int> SaveChangesAsync(CancellationToken token);
         Task<int> SaveChangesAsync();
     }

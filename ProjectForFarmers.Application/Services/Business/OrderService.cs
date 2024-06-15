@@ -245,12 +245,12 @@ namespace FarmersMarketplace.Application.Services.Business
             await DbContext.SaveChangesAsync();
         }
 
-        public async Task<ProducerOrderVm> GetForProducer(Guid orderId)
+        public async Task<OrderForProducerVm> GetForProducer(Guid orderId)
         {
             if (CacheProvider.Exists(orderId))
             {
                 var s = await CacheProvider.Get(orderId);
-                return Mapper.Map<ProducerOrderVm>(s);
+                return Mapper.Map<OrderForProducerVm>(s);
             }
 
             var order = await DbContext.Orders.Include(o => o.Items).FirstOrDefaultAsync();
@@ -261,7 +261,7 @@ namespace FarmersMarketplace.Application.Services.Business
                 throw new NotFoundException(message, "OrderNotExist");
             }
 
-            var vm = Mapper.Map<ProducerOrderVm>(order);
+            var vm = Mapper.Map<OrderForProducerVm>(order);
             var items = new List<OrderItemVm>();
 
             foreach (var item in order.Items)

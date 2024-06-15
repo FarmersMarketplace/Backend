@@ -110,7 +110,7 @@ namespace FarmersMarketplace.Elasticsearch.SearchProviders.Mocks
                     FeedbacksCount = (products[i].Feedbacks != null)
                         ? (uint)products[i].Feedbacks.Count
                         : 0,
-                    Rating = products[i].Rating,
+                    Rating = products[i].Feedbacks.AverageRating,
                     PricePerOne = products[i].PricePerOne,
                     Status = products[i].Status
                 });
