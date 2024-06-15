@@ -24,6 +24,7 @@ namespace FarmersMarketplace.Application.Services.Business
         private readonly ValidateService Validator;
         private readonly ICacheProvider<Product> CacheProvider;
         private readonly ISearchSynchronizer<Product> SearchSynchronizer;
+        private readonly ProductTrendService TrendService;
 
         public ProductService(IMapper mapper, IApplicationDbContext dbContext, IConfiguration configuration, ICacheProvider<Product> cacheProvider, ISearchSynchronizer<Product> searchSynchronizer) : base(mapper, dbContext, configuration)
         {
@@ -33,6 +34,7 @@ namespace FarmersMarketplace.Application.Services.Business
             Validator = new ValidateService(DbContext);
             CacheProvider = cacheProvider;
             SearchSynchronizer = searchSynchronizer;
+            TrendService = new ProductTrendService(dbContext, mapper, 5, 5);
         }
 
         public async Task Create(CreateProductDto dto)
@@ -117,6 +119,7 @@ namespace FarmersMarketplace.Application.Services.Business
                     await DbContext.SaveChangesAsync();
                     await SearchSynchronizer.Delete(product.Id);
                     await CacheProvider.Delete(product.Id);
+                    await TrendService.UpdateIfPopular(product);
                 }
             }
         }
@@ -249,6 +252,7 @@ namespace FarmersMarketplace.Application.Services.Business
             await DbContext.SaveChangesAsync();
             await SearchSynchronizer.Update(product);
             await CacheProvider.Update(product);
+            await TrendService.UpdateIfPopular(product);
         }
 
         public async Task Duplicate(ProductListDto dto, Guid accountId)
@@ -520,8 +524,14 @@ namespace FarmersMarketplace.Application.Services.Business
 
             await CacheProvider.Set(product);
             var vm = Mapper.Map<ProductForCustomerVm>(product);
-            vm.PopularProducts = await AuxiliarySearchProvider.GetPopularProducts(Values.PopularProductCountPerRequest);
+            vm.PopularProducts = await TrendService.UpdateAndGet();
 
+            return vm;
+        }
+
+        public async Task<CustomerProductListVm> GetPopularProducts()
+        {
+            var vm = await TrendService.UpdateAndGet();
             return vm;
         }
     }
