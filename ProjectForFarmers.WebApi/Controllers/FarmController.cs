@@ -21,7 +21,7 @@ namespace FarmersMarketplace.WebApi.Controllers
         }
 
         [HttpGet("{farmId}")]
-        [ProducesResponseType(typeof(FarmVm), 200)]
+        [ProducesResponseType(typeof(FarmForProducerVm), 200)]
         public async Task<IActionResult> GetForProducer([FromRoute] Guid farmId)
         {
             var request = await FarmService.GetForProducer(farmId);

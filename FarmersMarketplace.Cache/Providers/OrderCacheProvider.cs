@@ -3,7 +3,7 @@ using Order = FarmersMarketplace.Domain.Orders.Order;
 
 namespace FarmersMarketplace.Cache.Providers
 {
-    public class OrderCacheProvider : CacheProvider<Order>
+    public class OrderCacheProvider : BaseCacheProvider<Order>
     {
         public OrderCacheProvider(IConnectionMultiplexer redis) : base(redis)
         {

@@ -3,7 +3,7 @@ using StackExchange.Redis;
 
 namespace FarmersMarketplace.Cache.Providers
 {
-    public class CustomerCacheProvider : CacheProvider<Customer>
+    public class CustomerCacheProvider : BaseCacheProvider<Customer>
     {
         public CustomerCacheProvider(IConnectionMultiplexer redis) : base(redis)
         {
