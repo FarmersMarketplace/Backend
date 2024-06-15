@@ -2,8 +2,8 @@
 {
     public class FeedbackCollection
     {
-        public int Count => Body.Count;
-        public List<Feedback> Body { get; set; }
+        public int Count => Feedbacks.Count;
+        public List<Feedback> Feedbacks { get; set; }
         public float AverageRating { get; set; }
         public int OneRatingCount { get; set; }
         public int TwoRatingCount { get; set; }
@@ -13,19 +13,19 @@
 
         public FeedbackCollection()
         {
-            Body = new List<Feedback>();
+            Feedbacks = new List<Feedback>();
         }
 
         public void Add(Feedback feedback)
         {
-            Body.Add(feedback);
+            Feedbacks.Add(feedback);
             UpdateRatingCounts(feedback, true);
             UpdateAverageRating();
         }
 
         public bool Remove(Feedback feedback)
         {
-            bool removed = Body.Remove(feedback);
+            bool removed = Feedbacks.Remove(feedback);
             if (removed)
             {
                 UpdateRatingCounts(feedback, false);
@@ -36,11 +36,11 @@
 
         public Feedback this[int index]
         {
-            get => Body[index];
+            get => Feedbacks[index];
             set
             {
-                UpdateRatingCounts(Body[index], false);
-                Body[index] = value;
+                UpdateRatingCounts(Feedbacks[index], false);
+                Feedbacks[index] = value;
                 UpdateRatingCounts(value, true);
                 UpdateAverageRating();
             }
@@ -73,7 +73,7 @@
 
         private void UpdateAverageRating()
         {
-            AverageRating = Body.Average(f => f.Rating);
+            AverageRating = Feedbacks.Average(f => f.Rating);
         }
     }
 }
