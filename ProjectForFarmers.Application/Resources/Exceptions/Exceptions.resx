@@ -171,6 +171,9 @@
   <data name="FarmNotFound" xml:space="preserve">
     <value>Farm was not found.</value>
   </data>
+  <data name="FeedbacksNotGotSuccessfully" xml:space="preserve">
+    <value>Feedbacks was not got successfully.</value>
+  </data>
   <data name="FileCreatingError" xml:space="preserve">
     <value>An error occurred while creating the file.</value>
   </data>

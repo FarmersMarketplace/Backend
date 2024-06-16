@@ -223,6 +223,15 @@ namespace FarmersMarketplace.Application.Resources.Exceptions {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Feedbacks was not got successfully..
+        /// </summary>
+        internal static string FeedbacksNotGotSuccessfully {
+            get {
+                return ResourceManager.GetString("FeedbacksNotGotSuccessfully", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to An error occurred while creating the file..
         /// </summary>
         internal static string FileCreatingError {

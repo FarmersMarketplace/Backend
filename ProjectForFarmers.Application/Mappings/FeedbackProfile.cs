@@ -15,7 +15,7 @@ namespace FarmersMarketplace.Application.Mappings
 
         private void MapFeedbackToFeedbackVm()
         {
-            CreateMap<Feedback, FeedbackVm>()
+            CreateMap<Feedback, FeedbackForEntityVm>()
                 .ForMember(vm => vm.CustomerName, opt => opt.MapFrom(feedback => feedback.Customer.Name + " " + feedback.Customer.Surname));
         }
 
