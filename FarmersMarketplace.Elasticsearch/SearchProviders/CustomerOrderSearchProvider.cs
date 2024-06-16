@@ -8,7 +8,7 @@ using ApplicationException = FarmersMarketplace.Application.Exceptions.Applicati
 
 namespace FarmersMarketplace.Elasticsearch.SearchProviders
 {
-    public class CustomerOrderSearchProvider : SearchProvider<GetCustomerOrderListDto, OrderDocument, CustomerOrderListVm, CustomerOrderAutocompleteDto>
+    public class CustomerOrderSearchProvider : BaseSearchProvider<GetCustomerOrderListDto, OrderDocument, CustomerOrderListVm, CustomerOrderAutocompleteDto>
     {
         private readonly IMapper Mapper;
 

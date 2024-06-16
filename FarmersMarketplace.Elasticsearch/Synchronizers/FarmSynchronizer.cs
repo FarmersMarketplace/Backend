@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using FarmersMarketplace.Application.Interfaces;
 using FarmersMarketplace.Domain;
-using FarmersMarketplace.Domain.Accounts;
 using FarmersMarketplace.Domain.Payment;
 using FarmersMarketplace.Elasticsearch.Documents;
 using Nest;

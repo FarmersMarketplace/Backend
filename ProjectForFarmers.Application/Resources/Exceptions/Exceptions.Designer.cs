@@ -223,6 +223,15 @@ namespace FarmersMarketplace.Application.Resources.Exceptions {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Feedback was not found..
+        /// </summary>
+        internal static string FeedbackNotFound {
+            get {
+                return ResourceManager.GetString("FeedbackNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Feedbacks was not got successfully..
         /// </summary>
         internal static string FeedbacksNotGotSuccessfully {
@@ -417,6 +426,15 @@ namespace FarmersMarketplace.Application.Resources.Exceptions {
         internal static string SubcategoryWithIdNotFound {
             get {
                 return ResourceManager.GetString("SubcategoryWithIdNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An error occurred while updating data..
+        /// </summary>
+        internal static string UpdateDataError {
+            get {
+                return ResourceManager.GetString("UpdateDataError", resourceCulture);
             }
         }
     }

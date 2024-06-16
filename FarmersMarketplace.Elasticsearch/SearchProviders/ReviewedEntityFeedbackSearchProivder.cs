@@ -8,7 +8,7 @@ using ApplicationException = FarmersMarketplace.Application.Exceptions.Applicati
 
 namespace FarmersMarketplace.Elasticsearch.SearchProviders
 {
-    public class ReviewedEntityFeedbackSearchProivder : SearchProvider<GetReviewedEntityFeedbackListDto, FeedbackDocument, ReviewedEntityFeedbackListVm, object>
+    public class ReviewedEntityFeedbackSearchProivder : BaseSearchProvider<GetReviewedEntityFeedbackListDto, FeedbackDocument, ReviewedEntityFeedbackListVm, object>
     {
         private readonly IMapper Mapper;
 

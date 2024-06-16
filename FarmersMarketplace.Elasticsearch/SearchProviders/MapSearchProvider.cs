@@ -9,7 +9,7 @@ using ApplicationException = FarmersMarketplace.Application.Exceptions.Applicati
 
 namespace FarmersMarketplace.Elasticsearch.SearchProviders
 {
-    public class MapSearchProvider : SearchProvider<GetProducerMarkersDto, ProducerDocument, ProducerMarkerListVm, ProducerAutocompleteDto>
+    public class MapSearchProvider : BaseSearchProvider<GetProducerMarkersDto, ProducerDocument, ProducerMarkerListVm, ProducerAutocompleteDto>
     {
         private readonly IMapper Mapper;
 

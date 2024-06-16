@@ -2,6 +2,7 @@
 {
     public class FeedbackCollection
     {
+        public Guid Id { get; set; }
         public int Count => Feedbacks.Count;
         public List<Feedback> Feedbacks { get; set; }
         public float AverageRating { get; set; }

@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
+using FarmersMarketplace.Application.DataTransferObjects.Feedback;
 using FarmersMarketplace.Application.DataTransferObjects.Order;
 using FarmersMarketplace.Application.DataTransferObjects.Producers;
 using FarmersMarketplace.Application.DataTransferObjects.Product;
 using FarmersMarketplace.Application.Interfaces;
+using FarmersMarketplace.Application.ViewModels.Feedback;
 using FarmersMarketplace.Application.ViewModels.Order;
 using FarmersMarketplace.Application.ViewModels.Producers;
 using FarmersMarketplace.Application.ViewModels.Product;
@@ -47,6 +49,12 @@ namespace FarmersMarketplace.Elasticsearch
             services.AddTransient
                 <ISearchProvider<GetProducerMarkersDto, ProducerMarkerListVm, ProducerAutocompleteDto>,
                 MapSearchProvider>();
+            services.AddTransient
+               <ISearchProvider<GetReviewedEntityFeedbackListDto, ReviewedEntityFeedbackListVm, object>,
+               ReviewedEntityFeedbackSearchProivder>();
+            services.AddTransient
+                <ISearchProvider<GetCustomerFeedbackListDto, CustomerFeedbackListVm, object>,
+                CustomerFeedbackSearchProvider>();
 
             services.AddTransient<ISearchSynchronizer<Farm>, FarmSynchronizer>();
             services.AddTransient<ISearchSynchronizer<Order>, OrderSynchronizer>();

@@ -3,14 +3,14 @@ using Nest;
 
 namespace FarmersMarketplace.Elasticsearch.SearchProviders
 {
-    public abstract class SearchProvider<TRequest, TDocument, TResponse, TAutocompleteRequest> : ISearchProvider<TRequest, TResponse, TAutocompleteRequest> where TDocument : class
+    public abstract class BaseSearchProvider<TRequest, TDocument, TResponse, TAutocompleteRequest> : ISearchProvider<TRequest, TResponse, TAutocompleteRequest> where TDocument : class
     {
         protected readonly IElasticClient Client;
         protected List<Func<QueryContainerDescriptor<TDocument>, QueryContainer>> MustQueries { get; set; }
         protected readonly SearchDescriptor<TDocument> SearchDescriptor;
         protected TRequest SearchRequest { get; set; }
 
-        public SearchProvider(IElasticClient client)
+        public BaseSearchProvider(IElasticClient client)
         {
             SearchDescriptor = new SearchDescriptor<TDocument>();
             Client = client;

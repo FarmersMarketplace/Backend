@@ -171,6 +171,9 @@
   <data name="FarmNotFound" xml:space="preserve">
     <value>Farm was not found.</value>
   </data>
+  <data name="FeedbackNotFound" xml:space="preserve">
+    <value>Feedback was not found.</value>
+  </data>
   <data name="FeedbacksNotGotSuccessfully" xml:space="preserve">
     <value>Feedbacks was not got successfully.</value>
   </data>
@@ -236,5 +239,8 @@
   </data>
   <data name="SubcategoryWithIdNotFound" xml:space="preserve">
     <value>Subcategory with Id {0} was not found.</value>
+  </data>
+  <data name="UpdateDataError" xml:space="preserve">
+    <value>An error occurred while updating data.</value>
   </data>
 </root>
