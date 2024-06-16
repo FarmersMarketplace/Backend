@@ -53,6 +53,9 @@ namespace FarmersMarketplace.Persistence.DbContexts
             modelBuilder.ApplyConfiguration(new ProductConfiguration());
             modelBuilder.ApplyConfiguration(new CustomerPaymentDataConfiguration());
             modelBuilder.ApplyConfiguration(new FarmLogConfiguration());
+            modelBuilder.ApplyConfiguration(new FeedbackConfiguration());
+            modelBuilder.ApplyConfiguration(new ProducerFeedbackCollectionConfiguration());
+            modelBuilder.ApplyConfiguration(new ProductFeedbackCollectionConfiguration());
 
             base.OnModelCreating(modelBuilder);
         }
