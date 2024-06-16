@@ -11,6 +11,8 @@ namespace FarmersMarketplace.Elasticsearch.Mappings
         {
             MapFeedbackToFeedbackDocument();
             MapFeedbackDocumentToFeedbackForEntityVm();
+            MapFeedbackDocumentToFeedbackForCustomerVm();
+
         }
 
         private void MapFeedbackToFeedbackDocument()
@@ -24,13 +26,12 @@ namespace FarmersMarketplace.Elasticsearch.Mappings
 
         private void MapFeedbackDocumentToFeedbackForEntityVm()
         {
-            CreateMap<FeedbackDocument, FeedbackForEntityVm>()
-                .ForMember(vm => vm.Id, opt => opt.MapFrom(document => document.Id))
-                .ForMember(vm => vm.CustomerName, opt => opt.MapFrom(document => document.CustomerName))
-                .ForMember(vm => vm.Comment, opt => opt.MapFrom(document => document.Comment))
-                .ForMember(vm => vm.Rating, opt => opt.MapFrom(document => document.Rating))
-                .ForMember(vm => vm.Date, opt => opt.MapFrom(document => document.Date))
-                .ForMember(vm => vm.CustomerImage, opt => opt.MapFrom(document => document.CustomerImage));
+            CreateMap<FeedbackDocument, FeedbackForEntityVm>();
+        }
+
+        private void MapFeedbackDocumentToFeedbackForCustomerVm()
+        {
+            CreateMap<FeedbackDocument, FeedbackForCustomerVm>();
         }
 
     }

@@ -8,17 +8,17 @@ using ApplicationException = FarmersMarketplace.Application.Exceptions.Applicati
 
 namespace FarmersMarketplace.Elasticsearch.SearchProviders
 {
-    public class ReviewedEntityFeedbackSearchProivder : SearchProvider<GetReviewedEntityFeedbackListDto, FeedbackDocument, ReviewedEntityFeedbackListVm, object>
+    public class CustomerFeedbackSearchProvider : SearchProvider<GetCustomerFeedbackListDto, FeedbackDocument, CustomerFeedbackListVm, object>
     {
         private readonly IMapper Mapper;
 
-        public ReviewedEntityFeedbackSearchProivder(IElasticClient client, IMapper mapper) : base(client)
+        public CustomerFeedbackSearchProvider(IElasticClient client, IMapper mapper) : base(client)
         {
             Mapper = mapper;
             SearchDescriptor.Index(Indecies.Feedbacks);
         }
 
-        public override async Task<List<string>> Autocomplete(object request)
+        public override Task<List<string>> Autocomplete(object request)
         {
             throw new NotImplementedException();
         }
@@ -29,11 +29,8 @@ namespace FarmersMarketplace.Elasticsearch.SearchProviders
                 .Bool(b => b
                     .Must(m => m
                         .Term(t => t
-                            .Field(p => p.ReviewedEntity)
-                            .Value(SearchRequest.Type)),
-                    m => m.Term(t => t
-                        .Field(p => p.ReviewedEntityId)
-                        .Value(SearchRequest.ReviewedEntityId)))));
+                            .Field(p => p.CustomerId)
+                            .Value(SearchRequest.CustomerId)))));
         }
 
         protected override async Task ApplyPagination()
@@ -43,7 +40,7 @@ namespace FarmersMarketplace.Elasticsearch.SearchProviders
         }
 
         protected override async Task ApplyQuery()
-        { 
+        {
         }
 
         protected override async Task ApplySorting()
@@ -52,7 +49,7 @@ namespace FarmersMarketplace.Elasticsearch.SearchProviders
                 .Descending(f => f.Date));
         }
 
-        protected override async Task<ReviewedEntityFeedbackListVm> Execute()
+        protected override async Task<CustomerFeedbackListVm> Execute()
         {
             var searchResponse = Client.Search<FeedbackDocument>(SearchDescriptor);
 
@@ -63,16 +60,16 @@ namespace FarmersMarketplace.Elasticsearch.SearchProviders
                 throw new ApplicationException(message, "FeedbacksNotGotSuccessfully");
             }
 
-            var response = new ReviewedEntityFeedbackListVm
+            var response = new CustomerFeedbackListVm
             {
-                Feedbacks = new List<FeedbackForEntityVm>(),
+                Feedbacks = new List<FeedbackForCustomerVm>(),
             };
 
             var feedbacksList = searchResponse.Documents.ToArray();
 
             for (int i = 0; i < feedbacksList.Length; i++)
             {
-                response.Feedbacks.Add(Mapper.Map<FeedbackForEntityVm>(feedbacksList[i]));
+                response.Feedbacks.Add(Mapper.Map<FeedbackForCustomerVm>(feedbacksList[i]));
             }
 
             return response;
