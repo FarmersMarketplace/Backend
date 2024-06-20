@@ -8,7 +8,6 @@ using FarmersMarketplace.Application.Interfaces;
 using FarmersMarketplace.Application.ViewModels.Account;
 using FarmersMarketplace.Domain;
 using FarmersMarketplace.Domain.Accounts;
-using FarmersMarketplace.Domain.Feedbacks;
 using FarmersMarketplace.Domain.Payment;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;

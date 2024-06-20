@@ -156,9 +156,7 @@ namespace FarmersMarketplace.Application.Services.Business
             if (farm == null)
             {
                 string message = $"Farm with Id {dto.Id} was not found.";
-                string userFacingMessage = CultureHelper.Exception("FarmNotFound");
-
-                throw new NotFoundException(message, userFacingMessage);
+                throw new NotFoundException(message, "FarmNotFound");
             }
 
             Validate(ownerId, farm.OwnerId);

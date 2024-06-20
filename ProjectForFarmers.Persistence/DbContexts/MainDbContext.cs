@@ -1,6 +1,7 @@
 ﻿using FarmersMarketplace.Application.Interfaces;
 using FarmersMarketplace.Domain;
 using FarmersMarketplace.Domain.Accounts;
+using FarmersMarketplace.Domain.Feedbacks;
 using FarmersMarketplace.Domain.Orders;
 using FarmersMarketplace.Domain.Payment;
 using FarmersMarketplace.Persistence.EntityTypeConfigurations;
@@ -28,6 +29,9 @@ namespace FarmersMarketplace.Persistence.DbContexts
         public DbSet<ProducerPaymentData> ProducerPaymentData { get; set; }
         public DbSet<CustomerPaymentData> CustomerPaymentData { get; set; }
         public DbSet<FarmLog> FarmsLogs { get; set; }
+        public DbSet<Feedback> Feedbacks { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public DbSet<ProducerFeedbackCollection> ProducerFeedbackCollections { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public DbSet<ProductFeedbackCollection> ProductFeedbackCollections { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
         public MainDbContext(DbContextOptions<MainDbContext> options) : base(options)
         {

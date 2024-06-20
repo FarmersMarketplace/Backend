@@ -5,6 +5,7 @@ using FarmersMarketplace.Application.Exceptions;
 using FarmersMarketplace.Application.Filters;
 using FarmersMarketplace.Application.Helpers;
 using FarmersMarketplace.Application.Interfaces;
+using FarmersMarketplace.Application.ViewModels;
 using FarmersMarketplace.Application.ViewModels.Order;
 using FarmersMarketplace.Domain;
 using FarmersMarketplace.Domain.Orders;
@@ -24,12 +25,14 @@ namespace FarmersMarketplace.Application.Services.Business
         private readonly ValidateService Validator;
         private readonly ICacheProvider<Order> CacheProvider;
         private readonly ISearchSynchronizer<Order> SearchSynchronizer;
+        private readonly LiqpayService LiqpayService;
 
         public OrderService(IMapper mapper, IApplicationDbContext dbContext, IConfiguration configuration, ICacheProvider<Order> cacheProvider, ISearchSynchronizer<Order> searchSynchronizer) : base(mapper, dbContext, configuration)
         {
             Validator = new ValidateService(DbContext);
             CacheProvider = cacheProvider;
             SearchSynchronizer = searchSynchronizer;
+            LiqpayService = new LiqpayService(configuration);
         }
 
         public async Task<(string fileName, byte[] bytes)> ExportToExcel(ExportOrdersDto dto)
@@ -253,7 +256,7 @@ namespace FarmersMarketplace.Application.Services.Business
                 return Mapper.Map<OrderForProducerVm>(s);
             }
 
-            var order = await DbContext.Orders.Include(o => o.Items).FirstOrDefaultAsync();
+            var order = await DbContext.Orders.Include(o => o.Items).FirstOrDefaultAsync(o => o.Id == orderId);
 
             if (order == null)
             {
@@ -279,7 +282,7 @@ namespace FarmersMarketplace.Application.Services.Business
                     Id = item.Id,
                     Name = product.Name,
                     Count = item.Count,
-                    PhotoName = product.ImagesNames.Count > 0 ? product.ImagesNames[0] : null,
+                    ImageName = product.ImagesNames.Count > 0 ? product.ImagesNames[0] : null,
                     PricePerOne = item.PricePerOne,
                     TotalPrice = product.PricePerOne * item.Count,
                     ArticleNumber = product.ArticleNumber,
@@ -422,6 +425,162 @@ namespace FarmersMarketplace.Application.Services.Business
             }
 
             await DbContext.SaveChangesAsync();
+        }
+
+        public async Task<OrderForCustomerVm> GetForCustomer(Guid orderId)
+        {
+            if (CacheProvider.Exists(orderId))
+            {
+                var o = await CacheProvider.Get(orderId);
+                return Mapper.Map<OrderForCustomerVm>(o);
+            }
+
+            var order = await DbContext.Orders.Include(o => o.Items).FirstOrDefaultAsync(o => o.Id == orderId);
+
+            if (order == null)
+            {
+                string message = $"Order with id {orderId} was not found.";
+                throw new NotFoundException(message, "OrderNotExist");
+            }
+
+            var vm = await FormOrderForCustomer(order);
+            var items = new List<OrderItemVm>();
+
+            foreach (var item in order.Items)
+            {
+                var product = await DbContext.Products.FirstOrDefaultAsync(p => p.Id == item.ProductId);
+
+                if (product == null)
+                {
+                    string message = $"Product with id {item.ProductId} was not found.";
+                    throw new NotFoundException(message, "ProductNotExist");
+                }
+
+                var itemVm = new OrderItemVm
+                {
+                    Id = item.Id,
+                    Name = product.Name,
+                    Count = item.Count,
+                    ImageName = product.ImagesNames.Count > 0 ? product.ImagesNames[0] : null,
+                    PricePerOne = item.PricePerOne,
+                    TotalPrice = product.PricePerOne * item.Count,
+                    ArticleNumber = product.ArticleNumber,
+                    UnitOfMeasurement = product.UnitOfMeasurement,
+                };
+
+                items.Add(itemVm);
+            }
+
+            vm.Items = items;
+            await CacheProvider.Set(order);
+            return vm;
+        }
+
+        private async Task<OrderForCustomerVm> FormOrderForCustomer(Order order)
+        {
+            var vm = Mapper.Map<OrderForCustomerVm>(order);
+
+            if(order.Producer == Producer.Farm)
+            {
+                var farm = await DbContext.Farms.Include(f => f.Address)
+                    .FirstOrDefaultAsync(f => f.Id == order.ProducerId);
+
+                if (farm == null)
+                {
+                    string message = $"Farm with Id {order.ProducerId} was not found.";
+                    throw new NotFoundException(message, "FarmNotFound");
+                }
+
+                vm.ProducerName = farm.Name;
+                vm.ProducerAddress = Mapper.Map<AddressVm>(farm.Address);
+                vm.ProducerImageName = farm.ImagesNames.Count > 0 ? farm.ImagesNames[0] : "";
+            }
+            else if(order.Producer == Producer.Seller)
+            {
+                var seller = await DbContext.Sellers.Include(s => s.Address)
+                    .FirstOrDefaultAsync(a => a.Id == order.ProducerId);
+
+                if (seller == null)
+                {
+                    string message = $"Account with Id {order.ProducerId} was not found.";
+                    throw new NotFoundException(message, "AccountNotFound");
+                }
+
+                vm.ProducerName = seller.Name + " " + seller.Surname;
+                vm.ProducerImageName = seller.ImagesNames.Count > 0 ? seller.ImagesNames[0] : "";
+                vm.ProducerAddress = Mapper.Map<AddressVm>(seller.Address);
+            }
+
+            return vm;
+        }
+
+        public async Task Create(CreateOrderDto dto)
+        {
+            var items = await DbContext.OrderItems.Where(i => dto.OrderItemsIds.Contains(i.Id)).ToListAsync();
+
+            var order = new Order
+            {
+                Id = Guid.NewGuid(),
+                CreationDate = DateTime.UtcNow,
+                ReceiveDate = dto.ReceiveDate,
+                TotalPayment = items.Sum(i => i.TotalPrice),
+                PaymentType = dto.PaymentType,
+                ReceivingMethod = dto.ReceivingMethod,
+                Producer = dto.Producer,
+                Status = OrderStatus.New,
+                ProducerId = dto.ProducerId,
+                CustomerId = dto.CustomerId,
+                CustomerName = dto.CustomerName,
+                CustomerSurname = dto.CustomerSurname,
+                CustomerPhone = dto.CustomerPhone,
+                CustomerAdditionalPhone = dto.CustomerAdditionalPhone,
+                Items = items,
+            };
+
+            if(dto.ReceivingMethod == ReceivingMethod.Delivery)
+            {
+                var address = Mapper.Map<CustomerAddress>(dto.DeliveryPoint);
+                order.DeliveryPoint = address;
+                string receiverCard = "";
+
+                if (order.Producer == Producer.Farm)
+                {
+                    var farm = await DbContext.Farms.Include(f => f.PaymentData)
+                        .FirstOrDefaultAsync(f => f.Id == order.ProducerId);
+
+                    if (farm == null)
+                    {
+                        string message = $"Farm with Id {order.ProducerId} was not found.";
+                        throw new NotFoundException(message, "FarmNotFound");
+                    }
+
+                    receiverCard = farm.PaymentData.CardNumber;
+                }
+                else if (order.Producer == Producer.Seller)
+                {
+                    var seller = await DbContext.Sellers.Include(s => s.Address)
+                        .FirstOrDefaultAsync(a => a.Id == order.ProducerId);
+
+                    if (seller == null)
+                    {
+                        string message = $"Account with Id {order.ProducerId} was not found.";
+                        throw new NotFoundException(message, "AccountNotFound");
+                    }
+
+                    receiverCard = seller.PaymentData.CardNumber;
+                }
+
+                await LiqpayService.Pay(dto.PaymentData, order.TotalPayment, order.Id, receiverCard);
+                order.PaymentStatus = PaymentStatus.Paid;
+            }
+            else if(dto.ReceivingMethod == ReceivingMethod.SelfPickUp)
+            {
+                order.PaymentStatus = PaymentStatus.Unpaid;
+            }
+
+            await DbContext.Orders.AddAsync(order);
+            await DbContext.SaveChangesAsync();
+            await SearchSynchronizer.Create(order);
         }
     }
 

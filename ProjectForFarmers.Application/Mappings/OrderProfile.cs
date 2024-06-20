@@ -19,7 +19,14 @@ namespace FarmersMarketplace.Application.Mappings
             MapOrderGroupStatisticToOrderGroupStatisticVm();
             MapMonthStatisticToDashboardVm();
             MapOrderToOrderLookupVm();
-            MapOrderToOrderVm();
+            MapOrderToOrderForProducerVm();
+            MapOrderToOrderForCustomerVm();
+        }
+
+        private void MapOrderToOrderForCustomerVm()
+        {
+            CreateMap<Order, OrderForProducerVm>()
+                .ForMember(vm => vm.Number, opt => opt.MapFrom(order => order.Number.ToString("D7")))
         }
 
         private void MapMonthStatisticToDashboardVm()
@@ -55,7 +62,7 @@ namespace FarmersMarketplace.Application.Mappings
                 .ForMember(vm => vm.Status, opt => opt.MapFrom(order => order.Status));
         }
 
-        private void MapOrderToOrderVm()
+        private void MapOrderToOrderForProducerVm()
         {
             CreateMap<Order, OrderForProducerVm>()
                 .ForMember(vm => vm.Id, opt => opt.MapFrom(order => order.Id))

@@ -6,6 +6,7 @@ namespace FarmersMarketplace.Application.Services.Business
 {
     public interface IOrderService
     {
+       Task Create(CreateOrderDto dto);
        Task<OrderForProducerVm> GetForProducer(Guid orderId);
        Task<OrderForCustomerVm> GetForCustomer(Guid orderId);
        Task<(string fileName, byte[] bytes)> ExportToExcel(ExportOrdersDto dto);
