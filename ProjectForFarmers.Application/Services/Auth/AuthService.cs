@@ -299,8 +299,48 @@ namespace FarmersMarketplace.Application.Services.Auth
 
         public async Task<LoginVm> AuthenticateWithGoogle(AuthenticateWithGoogleDto dto)
         {
-            throw new NotImplementedException("Set role");
             Payload payload = await GoogleJsonWebSignature.ValidateAsync(dto.GoogleIdToken);
+
+            if (dto.Role == Role.Customer)
+            {
+                var customer = new Customer
+                {
+                    Email = payload.Email,
+                    Name = payload.GivenName,
+                    Surname = payload.FamilyName,
+                };
+
+                await DbContext.Customers.AddAsync(customer);
+                return new LoginVm(await JwtService.Authenticate(customer.Id, Role.Customer), Role.Customer, customer.Id);
+            }
+            else if (dto.Role == Role.Farmer)
+            {
+                var farmer = new Farmer
+                {
+                    Email = payload.Email,
+                    Name = payload.GivenName,
+                    Surname = payload.FamilyName,
+                };
+
+                await DbContext.Farmers.AddAsync(farmer);
+                return new LoginVm(await JwtService.Authenticate(farmer.Id, Role.Farmer), Role.Farmer, farmer.Id);
+            }
+            else if (dto.Role == Role.Seller)
+            {
+                var seller = new Seller
+                {
+                    Email = payload.Email,
+                    Name = payload.GivenName,
+                    Surname = payload.FamilyName,
+                };
+
+                await DbContext.Sellers.AddAsync(seller);
+                return new LoginVm(await JwtService.Authenticate(seller.Id, Role.Seller), Role.Seller, seller.Id);
+            }
+            else 
+            {
+                throw new InvalidDataException("Role is incorrect", "IncorrectRole");
+            }
         }
     }
 }
