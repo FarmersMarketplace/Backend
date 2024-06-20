@@ -1,10 +1,9 @@
 ﻿using FarmersMarketplace.Application.DataTransferObjects.Farm;
 using FarmersMarketplace.Application.Services.Business;
+using FarmersMarketplace.Application.ViewModels.Farm;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
-using FarmersMarketplace.Application.ViewModels.Farm;
-using FarmersMarketplace.Application.DataTransferObjects;
 
 namespace FarmersMarketplace.WebApi.Controllers
 {

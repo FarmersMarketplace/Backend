@@ -53,7 +53,7 @@ namespace FarmersMarketplace.Application.Services.Auth
 
         public async Task<Account> GetAccount(Guid accountId)
         {
-            var customer = await DbContext.Customers.FirstOrDefaultAsync(a => a.Id == accountId);
+            var customer = await DbContext.Customers.FindAsync(accountId);
 
             if (customer != null)
             {
@@ -61,7 +61,7 @@ namespace FarmersMarketplace.Application.Services.Auth
             }
             else
             {
-                var seller = await DbContext.Sellers.FirstOrDefaultAsync(a => a.Id == accountId);
+                var seller = await DbContext.Sellers.FindAsync(accountId);
 
                 if (seller != null)
                 {
@@ -69,7 +69,7 @@ namespace FarmersMarketplace.Application.Services.Auth
                 }
                 else
                 {
-                    var farmer = await DbContext.Farmers.FirstOrDefaultAsync(a => a.Id == accountId);
+                    var farmer = await DbContext.Farmers.FindAsync(accountId);
 
                     if (farmer != null)
                     {
@@ -305,6 +305,7 @@ namespace FarmersMarketplace.Application.Services.Auth
             {
                 var customer = new Customer
                 {
+                    Id = Guid.NewGuid(),
                     Email = payload.Email,
                     Name = payload.GivenName,
                     Surname = payload.FamilyName,
@@ -317,6 +318,7 @@ namespace FarmersMarketplace.Application.Services.Auth
             {
                 var farmer = new Farmer
                 {
+                    Id = Guid.NewGuid(),
                     Email = payload.Email,
                     Name = payload.GivenName,
                     Surname = payload.FamilyName,
@@ -329,6 +331,7 @@ namespace FarmersMarketplace.Application.Services.Auth
             {
                 var seller = new Seller
                 {
+                    Id = Guid.NewGuid(),
                     Email = payload.Email,
                     Name = payload.GivenName,
                     Surname = payload.FamilyName,

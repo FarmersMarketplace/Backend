@@ -29,6 +29,7 @@ namespace FarmersMarketplace.Elasticsearch
                 config.AddProfile(new ProductSearchProfile());
                 config.AddProfile(new OrderSearchProfile());
                 config.AddProfile(new ProducerSearchProfile());
+                config.AddProfile(new FeedbackSearchProfile());
             });
 
             services.AddTransient

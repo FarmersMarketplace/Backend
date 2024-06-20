@@ -14,5 +14,6 @@ namespace FarmersMarketplace.Application.Services.Business
         Task UpdateFarmCategoriesAndSubcategories(UpdateFarmCategoriesAndSubcategoriesDto dto, Guid ownerId);
         Task<CardDataVm> CopyOwnerCardData(Guid ownerId);
         Task<AccountNumberDataVm> CopyOwnerAccountNumberData(Guid ownerId);
+        Task<FarmListVm> GetAllForProducer(Guid userId);
     }
 }

@@ -118,10 +118,18 @@ namespace FarmersMarketplace.WebApi.Controllers
         }
 
         [HttpGet]
-        [ProducesResponseType(typeof(ProductForProducerVm), 200)]
-        public async Task<IActionResult> CustomerAutocomplete([FromQuery] CustomerProductAutocompleteDto dto)
+        [ProducesResponseType(typeof(List<string>), 200)]
+        public async Task<IActionResult> AutocompleteForCustomer([FromQuery] CustomerProductAutocompleteDto dto)
         {
             var request = await CustomerSearchProvider.Autocomplete(dto);
+            return Ok(request);
+        }
+
+        [HttpGet]
+        [ProducesResponseType(typeof(List<string>), 200)]
+        public async Task<IActionResult> AutocompleteForProducer([FromQuery] ProducerProductAutocompleteDto dto)
+        {
+            var request = await ProducerSearchProvider.Autocomplete(dto);
             return Ok(request);
         }
     }
