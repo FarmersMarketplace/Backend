@@ -124,9 +124,8 @@ namespace FarmersMarketplace.Application.Services.Business
         {
             var key = Configuration["Geocoding:Apikey"];
             IGeocoder geocoder = new GoogleGeocoder() { ApiKey = key };
-            //var request = await geocoder.GeocodeAsync($"{address.Region} oblast, {address.District} district, {address.Settlement} street {address.Street}, {address.HouseNumber}, Ukraine");
-            //var coords = request.FirstOrDefault().Coordinates;
-            var coords = new Location(50, 50);
+            var request = await geocoder.GeocodeAsync($"{dto.Region} oblast, {dto.District} district, {dto.Settlement} street {dto.Street}, {dto.HouseNumber}, Ukraine");
+            var coords = request.FirstOrDefault().Coordinates;
 
             return coords;
         }

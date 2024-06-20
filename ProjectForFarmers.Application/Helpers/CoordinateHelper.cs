@@ -20,8 +20,8 @@ namespace FarmersMarketplace.Application.Helpers
         {
             var key = Configuration["Geocoding:Apikey"];
             IGeocoder geocoder = new GoogleGeocoder() { ApiKey = key };
-            //var request = await geocoder.GeocodeAsync($"{address.Region} oblast, {address.District} district, {address.Settlement} street {address.Street}, {address.HouseNumber}, Ukraine");
-            //var coords = request.FirstOrDefault().Coordinates;
+            var request = await geocoder.GeocodeAsync($"{address.Region} oblast, {address.District} district, {address.Settlement} street {address.Street}, {address.HouseNumber}, Ukraine");
+            var coords = request.FirstOrDefault().Coordinates;
             var coords = new Location(50, 50);
 
             return coords;
