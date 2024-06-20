@@ -39,12 +39,9 @@ namespace FarmersMarketplace.WebApi
             services.AddElasticsearch(configuration);
             services.AddRedis(configuration);
 
-            services.AddMemoryCache();
-
             Log.Logger = new LoggerConfiguration().WriteTo.PostgreSQL(connectionString, "Logs", needAutoCreateTable: true)
                .MinimumLevel.Information().CreateLogger();
             Log.Information("The program has started.");
-
             
             services.AddControllers(options =>
             {

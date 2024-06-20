@@ -26,7 +26,7 @@ namespace FarmersMarketplace.Application.Mappings
         private void MapOrderToOrderForCustomerVm()
         {
             CreateMap<Order, OrderForProducerVm>()
-                .ForMember(vm => vm.Number, opt => opt.MapFrom(order => order.Number.ToString("D7")))
+                .ForMember(vm => vm.Number, opt => opt.MapFrom(order => order.Number.ToString("D7")));
         }
 
         private void MapMonthStatisticToDashboardVm()

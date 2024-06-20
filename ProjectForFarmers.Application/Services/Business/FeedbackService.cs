@@ -1,8 +1,6 @@
 ﻿using FarmersMarketplace.Application.DataTransferObjects.Feedback;
 using FarmersMarketplace.Application.Exceptions;
 using FarmersMarketplace.Application.Interfaces;
-using FarmersMarketplace.Domain;
-using FarmersMarketplace.Domain.Accounts;
 using FarmersMarketplace.Domain.Feedbacks;
 using Microsoft.EntityFrameworkCore;
 
@@ -103,7 +101,7 @@ namespace FarmersMarketplace.Application.Services.Business
             }
             else if(feedback.CustomerId != customerId)
             {
-                string message = $"Access for customer with Id {customerId} to feedback {feedback.Id} with Id {producerId} denied: Permission denied to modify data.";
+                string message = $"Access for customer with Id {customerId} to feedback with Id {feedback.Id} denied: Permission denied to modify data.";
                 throw new AuthorizationException(message, "AccessDenied");
             }
 
@@ -118,7 +116,7 @@ namespace FarmersMarketplace.Application.Services.Business
 
             if (feedback.CustomerId != customerId)
             {
-                string message = $"Access for customer with Id {customerId} to feedback {feedback.Id} with Id {producerId} denied: Permission denied to modify data.";
+                string message = $"Access for customer with Id {customerId} to feedback with Id {feedback.Id} denied: Permission denied to modify data.";
                 throw new AuthorizationException(message, "AccessDenied");
             }
 

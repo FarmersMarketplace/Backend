@@ -75,6 +75,7 @@ namespace FarmersMarketplace.WebApi.Controllers
 
         [HttpPut]
         [Authorize(Roles = "Farmer")]
+        [ProducesResponseType(204)]
         public async Task<IActionResult> Update([FromForm] UpdateFarmDto dto)
         {
             await FarmService.Update(dto, AccountId);
