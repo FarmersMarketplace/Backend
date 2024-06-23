@@ -21,9 +21,7 @@ namespace FarmersMarketplace.Application.Services.Business
                 if (producerId != accountId)
                 {
                     string message = $"Access for account with Id {accountId} to producer {producer.ToString()} with Id {producerId} denied: Permission denied to modify data.";
-                    string userFacingMessage = CultureHelper.Exception("AccessDenied");
-
-                    throw new AuthorizationException(message, userFacingMessage);
+                    throw new AuthorizationException(message, "AccessDenied");
                 }
             }
             else if (producer == Producer.Farm)
@@ -32,16 +30,12 @@ namespace FarmersMarketplace.Application.Services.Business
                 if (farm == null)
                 {
                     string message = $"Farm with Id {producerId} was not found.";
-                    string userFacingMessage = CultureHelper.Exception("FarmNotFound", producerId.ToString());
-
-                    throw new NotFoundException(message, userFacingMessage);
+                    throw new NotFoundException(message, "FarmNotFound", producerId.ToString());
                 }
                 if (farm.OwnerId != accountId)
                 {
                     string message = $"Access for account with Id {accountId} to producer {producer.ToString()} with Id {producerId} denied: Permission denied to modify data.";
-                    string userFacingMessage = CultureHelper.Exception("AccessDenied");
-
-                    throw new AuthorizationException(message, userFacingMessage);
+                    throw new AuthorizationException(message, "AccessDenied");
                 }
             }
             else

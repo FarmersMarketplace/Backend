@@ -12,7 +12,7 @@ namespace FarmersMarketplace.Application.DataTransferObjects.Order
     {
         public Guid ProducerId { get; set; }
         public Producer Producer { get; set; }
-        public OrderFilter? Filter { get; set; }
+        public ProducerOrderFilter? Filter { get; set; }
     }
 
 }

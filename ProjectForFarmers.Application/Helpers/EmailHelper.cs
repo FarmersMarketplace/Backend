@@ -1,7 +1,6 @@
-﻿using System.Net.Mail;
+﻿using Microsoft.Extensions.Configuration;
 using System.Net;
-using FarmersMarketplace.Application.DataTransferObjects.Auth;
-using Microsoft.Extensions.Configuration;
+using System.Net.Mail;
 
 namespace FarmersMarketplace.Application.Helpers
 {

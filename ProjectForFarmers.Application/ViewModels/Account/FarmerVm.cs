@@ -1,4 +1,4 @@
-﻿using FarmersMarketplace.Domain;
+﻿using FarmersMarketplace.Domain.Accounts;
 using System;
 using System.Collections.Generic;
 using System.Linq;

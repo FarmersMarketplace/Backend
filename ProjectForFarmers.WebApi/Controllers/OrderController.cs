@@ -4,7 +4,10 @@ using FarmersMarketplace.Application.Services.Business;
 using FarmersMarketplace.Application.ViewModels.Dashboard;
 using FarmersMarketplace.Application.ViewModels.Order;
 using System.Security.Claims;
-using FarmersMarketplace.Domain;
+using FarmersMarketplace.Domain.Orders;
+using FarmersMarketplace.Application.Interfaces;
+using FarmersMarketplace.Application.DataTransferObjects.Product;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FarmersMarketplace.WebApi.Controllers
 {
@@ -13,26 +16,71 @@ namespace FarmersMarketplace.WebApi.Controllers
     public class OrderController : ControllerBase
     {
         private readonly IOrderService OrderService;
+        private readonly ISearchProvider<GetProducerOrderListDto, ProducerOrderListVm, ProducerOrderAutocompleteDto> ProducerSearchProdvider;
+        private readonly ISearchProvider<GetCustomerOrderListDto, CustomerOrderListVm, CustomerOrderAutocompleteDto> CustomerSearchProdvider;
         private Guid AccountId => Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
 
-        public OrderController(IOrderService orderService, IConfiguration configuration)
+        public OrderController(IOrderService orderService, ISearchProvider<GetCustomerOrderListDto, CustomerOrderListVm, CustomerOrderAutocompleteDto> customerSearchProdvider, ISearchProvider<GetProducerOrderListDto, ProducerOrderListVm, ProducerOrderAutocompleteDto> producerSearchProdvider, IConfiguration configuration)
         {
             OrderService = orderService;
+            ProducerSearchProdvider = producerSearchProdvider;
+            CustomerSearchProdvider = customerSearchProdvider;
         }
 
         [HttpGet("{orderId}")]
-        [ProducesResponseType(typeof(OrderVm), 200)]
-        public async Task<IActionResult> Get([FromRoute] Guid orderId)
+        [ProducesResponseType(typeof(OrderForProducerVm), 200)]
+        public async Task<IActionResult> GetForProducer([FromRoute] Guid orderId)
         {
-            var vm = await OrderService.Get(orderId);
+            var vm = await OrderService.GetForProducer(orderId);
+            return Ok(vm);
+        }
+
+        [HttpGet("{orderId}")]
+        [ProducesResponseType(typeof(OrderForProducerVm), 200)]
+        public async Task<IActionResult> GetForCustomer([FromRoute] Guid orderId)
+        {
+            var vm = await OrderService.GetForCustomer(orderId);
+            return Ok(vm);
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Customer")]
+        [ProducesResponseType(204)]
+        public async Task<IActionResult> Create([FromBody] CreateOrderDto dto)
+        {
+            await OrderService.Create(dto);
+            return NoContent();
+        }
+
+        [HttpGet]
+        [ProducesResponseType(typeof(ProducerOrderListVm), 200)]
+        public async Task<IActionResult> GetAllForProducer([FromQuery] GetProducerOrderListDto dto)
+        {
+            var vm = await ProducerSearchProdvider.Search(dto);
             return Ok(vm);
         }
 
         [HttpGet]
-        [ProducesResponseType(typeof(OrderListVm), 200)]
-        public async Task<IActionResult> GetAll([FromQuery] GetOrderListDto dto)
+        [ProducesResponseType(typeof(ProducerOrderListVm), 200)]
+        public async Task<IActionResult> GetAllForCustomer([FromQuery] GetCustomerOrderListDto dto)
         {
-            var vm = await OrderService.GetAll(dto);
+            var vm = await CustomerSearchProdvider.Search(dto);
+            return Ok(vm);
+        }
+
+        [HttpGet]
+        [ProducesResponseType(typeof(ProducerOrderListVm), 200)]
+        public async Task<IActionResult> AutocompleteForProducer([FromQuery] ProducerOrderAutocompleteDto dto)
+        {
+            var vm = await ProducerSearchProdvider.Autocomplete(dto);
+            return Ok(vm);
+        }
+
+        [HttpGet]
+        [ProducesResponseType(typeof(ProducerOrderListVm), 200)]
+        public async Task<IActionResult> AutocompleteForCustomer([FromQuery] CustomerOrderAutocompleteDto dto)
+        {
+            var vm = await CustomerSearchProdvider.Autocomplete(dto);
             return Ok(vm);
         }
 

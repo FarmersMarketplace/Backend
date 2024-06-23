@@ -1,5 +1,9 @@
 ﻿using FarmersMarketplace.Application.Interfaces;
 using FarmersMarketplace.Domain;
+using FarmersMarketplace.Domain.Accounts;
+using FarmersMarketplace.Domain.Feedbacks;
+using FarmersMarketplace.Domain.Orders;
+using FarmersMarketplace.Domain.Payment;
 using FarmersMarketplace.Persistence.EntityTypeConfigurations;
 using Microsoft.EntityFrameworkCore;
 using DayOfWeek = FarmersMarketplace.Domain.DayOfWeek;
@@ -8,7 +12,6 @@ namespace FarmersMarketplace.Persistence.DbContexts
 {
     public class MainDbContext : DbContext, IApplicationDbContext
     {
-        //public DbSet<Account> Accounts { get; set; }
         public DbSet<Customer> Customers { get; set; }
         public DbSet<Seller> Sellers { get; set; }
         public DbSet<Farmer> Farmers { get; set; }
@@ -19,13 +22,16 @@ namespace FarmersMarketplace.Persistence.DbContexts
         public DbSet<DayOfWeek> DaysOfWeek { get; set; }
         public DbSet<Schedule> Schedules { get; set; }
         public DbSet<MonthStatistic> MonthesStatistics { get; set; }
-        public DbSet<OrderItem> OrdersItems { get; set; }
+        public DbSet<OrderItem> OrderItems { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<Subcategory> Subcategories { get; set; }
         public DbSet<Product> Products { get; set; }
         public DbSet<ProducerPaymentData> ProducerPaymentData { get; set; }
         public DbSet<CustomerPaymentData> CustomerPaymentData { get; set; }
         public DbSet<FarmLog> FarmsLogs { get; set; }
+        public DbSet<Feedback> Feedbacks { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public DbSet<ProducerFeedbackCollection> ProducerFeedbackCollections { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public DbSet<ProductFeedbackCollection> ProductFeedbackCollections { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
         public MainDbContext(DbContextOptions<MainDbContext> options) : base(options)
         {
@@ -51,6 +57,9 @@ namespace FarmersMarketplace.Persistence.DbContexts
             modelBuilder.ApplyConfiguration(new ProductConfiguration());
             modelBuilder.ApplyConfiguration(new CustomerPaymentDataConfiguration());
             modelBuilder.ApplyConfiguration(new FarmLogConfiguration());
+            modelBuilder.ApplyConfiguration(new FeedbackConfiguration());
+            modelBuilder.ApplyConfiguration(new ProducerFeedbackCollectionConfiguration());
+            modelBuilder.ApplyConfiguration(new ProductFeedbackCollectionConfiguration());
 
             base.OnModelCreating(modelBuilder);
         }

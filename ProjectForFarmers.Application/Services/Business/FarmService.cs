@@ -7,8 +7,10 @@ using FarmersMarketplace.Application.Interfaces;
 using FarmersMarketplace.Application.Services.Auth;
 using FarmersMarketplace.Application.ViewModels.Category;
 using FarmersMarketplace.Application.ViewModels.Farm;
+using FarmersMarketplace.Application.ViewModels.Producers;
 using FarmersMarketplace.Application.ViewModels.Subcategory;
 using FarmersMarketplace.Domain;
+using FarmersMarketplace.Domain.Payment;
 using Geocoding;
 using Geocoding.Google;
 using Microsoft.AspNetCore.Http;
@@ -25,14 +27,20 @@ namespace FarmersMarketplace.Application.Services.Business
         private readonly EmailHelper EmailHelper;
         private readonly JwtService JwtService;
         private readonly CoordinateHelper CoordinateHelper;
+        private readonly ICacheProvider<Farm> CacheProvider;
+        private readonly ISearchSynchronizer<Farm> SearchSynchronizer;
+        private readonly FarmTrendService TrendService;
 
-        public FarmService(IMapper mapper, IApplicationDbContext dbContext, IConfiguration configuration) : base(mapper, dbContext, configuration)
+        public FarmService(IMapper mapper, IApplicationDbContext dbContext, IConfiguration configuration, ISearchSynchronizer<Farm> farmSynchronizer, ICacheProvider<Farm> cacheProvider) : base(mapper, dbContext, configuration)
         {
             FarmsImageFolder = Configuration["File:Images:Farm"];
             FileHelper = new FileHelper();
             EmailHelper = new EmailHelper(configuration);
             JwtService = new JwtService(configuration);
             CoordinateHelper = new CoordinateHelper(configuration);
+            SearchSynchronizer = farmSynchronizer;
+            CacheProvider = cacheProvider;
+            TrendService = new FarmTrendService(dbContext, mapper, 5, 5);
         }
 
         public async Task Create(CreateFarmDto dto)
@@ -52,11 +60,7 @@ namespace FarmersMarketplace.Application.Services.Business
             {
                 farm.ImagesNames = new List<string>();
             }
-            string token = await JwtService.EmailConfirmationToken(farm.Id, dto.ContactEmail);
-            var owner = await DbContext.Farmers.FirstOrDefaultAsync(a => a.Id == farm.OwnerId);
 
-            string message = EmailContentBuilder.FarmEmailConfirmationMessageBody(farm.Name, owner.Name, owner.Surname, dto.ContactEmail, token);
-            await EmailHelper.SendEmail(message, dto.ContactEmail, "Farm Email Confirmation");
             await DbContext.SaveChangesAsync();
 
             var farmLog = new FarmLog
@@ -73,6 +77,7 @@ namespace FarmersMarketplace.Application.Services.Business
 
             await DbContext.Farms.AddAsync(farm);
             await DbContext.SaveChangesAsync();
+            await SearchSynchronizer.Create(farm);
         }
 
         public void Validate(Guid? accountId, Guid id)
@@ -80,9 +85,7 @@ namespace FarmersMarketplace.Application.Services.Business
             if (id != accountId)
             {
                 string message = $"Access denied: Permission denied to modify data.";
-                string userFacingMessage = CultureHelper.Exception("AccessDenied");
-
-                throw new AuthorizationException(message, userFacingMessage);
+                throw new AuthorizationException(message, "AccessDenied");
             }
         }
 
@@ -92,9 +95,7 @@ namespace FarmersMarketplace.Application.Services.Business
             if (farm == null)
             {
                 string message = $"Farm with Id {farmId} was not found.";
-                string userFacingMessage = CultureHelper.Exception("FarmNotFound");
-
-                throw new NotFoundException(message, userFacingMessage);
+                throw new NotFoundException(message, "FarmNotFound");
             }
 
             Validate(ownerId, farm.OwnerId);
@@ -114,13 +115,18 @@ namespace FarmersMarketplace.Application.Services.Business
             DbContext.Farms.Remove(farm);
             await FileHelper.DeleteFiles(farm.ImagesNames, FarmsImageFolder);
             await DbContext.SaveChangesAsync();
+            await SearchSynchronizer.Delete(farm.Id);
+            await CacheProvider.Delete(farm.Id);
+            await TrendService.UpdateIfPopular(farm);
         }
 
-        private async Task<Location> GetCoordinates(AddressDto dto)
+        private async Task<Geocoding.Location> GetCoordinates(AddressDto dto)
         {
-            IGeocoder geocoder = new GoogleGeocoder() { ApiKey = Configuration["Geocoding:Apikey"] };
+            var key = Configuration["Geocoding:Apikey"];
+            IGeocoder geocoder = new GoogleGeocoder() { ApiKey = key };
             var request = await geocoder.GeocodeAsync($"{dto.Region} oblast, {dto.District} district, {dto.Settlement} street {dto.Street}, {dto.HouseNumber}, Ukraine");
             var coords = request.FirstOrDefault().Coordinates;
+
             return coords;
         }
 
@@ -149,21 +155,13 @@ namespace FarmersMarketplace.Application.Services.Business
             if (farm == null)
             {
                 string message = $"Farm with Id {dto.Id} was not found.";
-                string userFacingMessage = CultureHelper.Exception("FarmNotFound");
-
-                throw new NotFoundException(message, userFacingMessage);
+                throw new NotFoundException(message, "FarmNotFound");
             }
 
             Validate(ownerId, farm.OwnerId);
 
             LogAndUpdateIfChanged("Name", farm.Name, dto.Name, () => farm.Name = dto.Name, farm.Id);
             LogAndUpdateIfChanged("Description", farm.Description, dto.Description, () => farm.Description = dto.Description, farm.Id);
-            LogAndUpdateIfChanged("ContactEmail", farm.ContactEmail, dto.ContactEmail, async () => 
-            {
-                string token = await JwtService.EmailConfirmationToken(farm.Id, dto.ContactEmail);
-                string message = EmailContentBuilder.FarmEmailConfirmationMessageBody(farm.Name, farm.Owner.Name, farm.Owner.Surname, dto.ContactEmail, token);
-                await EmailHelper.SendEmail(message, dto.ContactEmail, "Farm Email Confirmation");
-            }, farm.Id);
             LogAndUpdateIfChanged("ContactPhone", farm.Phone, dto.ContactPhone, () => farm.Phone = dto.ContactPhone, farm.Id);
             LogAndUpdateIfChanged("SocialPageUrl", farm.FirstSocialPageUrl, dto.FirstSocialPageUrl, () => farm.FirstSocialPageUrl = dto.FirstSocialPageUrl, farm.Id);
             LogAndUpdateIfChanged("SocialPageUrl", farm.SecondSocialPageUrl, dto.SecondSocialPageUrl, () => farm.SecondSocialPageUrl = dto.SecondSocialPageUrl, farm.Id);
@@ -176,6 +174,9 @@ namespace FarmersMarketplace.Application.Services.Business
             await UpdateImages(farm, dto.Images);
 
             await DbContext.SaveChangesAsync();
+            await SearchSynchronizer.Update(farm);
+            await CacheProvider.Update(farm);
+            await TrendService.UpdateIfPopular(farm);
         }
 
         private void UpdateReceivingTypes(Farm farm, UpdateFarmDto dto)
@@ -203,8 +204,6 @@ namespace FarmersMarketplace.Application.Services.Business
 
                 farm.ReceivingMethods = dto.ReceivingMethods;
             }
-
-            
         }
 
         private void LogAndUpdateIfChanged(string propertyName, string oldValue, string newValue, Action updateAction, Guid farmId)
@@ -371,8 +370,14 @@ namespace FarmersMarketplace.Application.Services.Business
             await DbContext.SaveChangesAsync();
         }
 
-        public async Task<FarmVm> Get(Guid farmId)
+        public async Task<FarmForProducerVm> GetForProducer(Guid farmId)
         {
+            if (CacheProvider.Exists(farmId))
+            {
+                var f = await CacheProvider.Get(farmId);
+                return Mapper.Map<FarmForProducerVm>(f);
+            }
+
             var farm = await DbContext.Farms
                 .Include(f => f.Owner)
                 .Include(f => f.Address)
@@ -397,13 +402,22 @@ namespace FarmersMarketplace.Application.Services.Business
             if (farm == null) 
             {
                 string message = $"Farm with Id {farmId} was not found.";
-                string userFacingMessage = CultureHelper.Exception("FarmNotFound");
-                throw new NotFoundException(message, userFacingMessage);
+                throw new NotFoundException(message, "FarmNotFound");
             } 
 
-            var vm = Mapper.Map<FarmVm>(farm);
+            var vm = Mapper.Map<FarmForProducerVm>(farm);
 
-            foreach(var log in farm.Logs)
+            if (farm.PaymentTypes != null
+                && farm.PaymentTypes.Contains(PaymentType.Online))
+            {
+                vm.PaymentData.HasOnlinePayment = true;
+            }
+            else
+            {
+                vm.PaymentData.HasOnlinePayment = false;
+            }
+
+            foreach (var log in farm.Logs)
             {
                 var logVm = new FarmLogVm(GetMessage(log), log.CreationDate);
                 vm.Logs.Add(logVm);
@@ -415,9 +429,7 @@ namespace FarmersMarketplace.Application.Services.Business
                 if (category == null)
                 {
                     string message = $"Category with Id {categoryId} was not found.";
-                    string userFacingMessage = CultureHelper.Exception("CategoryNotFound");
-
-                    throw new NotFoundException(message, userFacingMessage);
+                    throw new NotFoundException(message, "CategoryNotFound");
                 }
 
                 vm.Categories.Add(new CategoryLookupVm(category.Id, category.Name));
@@ -429,12 +441,13 @@ namespace FarmersMarketplace.Application.Services.Business
                 if (subcategory == null)
                 {
                     string message = $"Subcategory with Id {subcategoryId} was not found.";
-                    string userFacingMessage = CultureHelper.Exception("SubcategoryNotFound");
-                    throw new NotFoundException(message, userFacingMessage);
+                    throw new NotFoundException(message, "SubcategoryNotFound");
                 }
 
                 vm.Subcategories.Add(new SubcategoryVm(subcategory.Id, subcategory.Name, subcategory.CategoryId));
             }
+
+            await CacheProvider.Set(farm);
 
             return vm;
         }
@@ -461,7 +474,7 @@ namespace FarmersMarketplace.Application.Services.Business
             return message;
         }
 
-        public async Task<FarmListVm> GetAll(Guid userId)
+        public async Task<FarmListVm> GetAllForProducer(Guid userId)
         {
             var farms = DbContext.Farms.Where(f => f.OwnerId == userId).ToArray();
             var response = new FarmListVm();
@@ -480,8 +493,7 @@ namespace FarmersMarketplace.Application.Services.Business
             if (farm == null)
             {
                 string message = $"Farm with Id {dto.FarmId} was not found.";
-                string userFacingMessage = CultureHelper.Exception("FarmNotFound");
-                throw new NotFoundException(message, userFacingMessage);
+                throw new NotFoundException(message, "FarmNotFound");
             }
 
             Validate(ownerId, farm.OwnerId);
@@ -490,17 +502,17 @@ namespace FarmersMarketplace.Application.Services.Business
             farm.Subcategories = dto.Subcategories;
 
             await DbContext.SaveChangesAsync();
+            await SearchSynchronizer.Update(farm);
+            await CacheProvider.Update(farm);
         }
 
-        public async Task UpdatePaymentData(UpdateProducerPaymentDataDto dto, Guid ownerId)
+        public async Task UpdatePaymentData(FarmPaymentDataDto dto, Guid ownerId)
         {
-            var farm = await DbContext.Farms.FirstOrDefaultAsync(f => f.Id == dto.ProducerId);
+            var farm = await DbContext.Farms.FirstOrDefaultAsync(f => f.Id == dto.FarmId);
             if (farm == null)
             {
-                string message = $"Farm with Id {dto.ProducerId} was not found.";
-                string userFacingMessage = CultureHelper.Exception("FarmFound");
-
-                throw new NotFoundException(message, userFacingMessage);
+                string message = $"Farm with Id {dto.FarmId} was not found.";
+                throw new NotFoundException(message, "FarmFound");
             }
 
             Validate(ownerId, farm.OwnerId);
@@ -508,18 +520,18 @@ namespace FarmersMarketplace.Application.Services.Business
             if (farm.PaymentData == null)
                 farm.PaymentData = new ProducerPaymentData();
 
-            if(dto.PaymentData != null)
-            {
-                LogAndUpdateIfChanged("CardNumber", farm.PaymentData.CardNumber, dto.PaymentData.CardNumber, () => farm.PaymentData.CardNumber = dto.PaymentData.CardNumber, farm.Id);
-                LogAndUpdateIfChanged("AccountNumber", farm.PaymentData.AccountNumber, dto.PaymentData.AccountNumber, () => farm.PaymentData.AccountNumber = dto.PaymentData.AccountNumber, farm.Id);
-                LogAndUpdateIfChanged("BankUSREOU", farm.PaymentData.BankUSREOU, dto.PaymentData.BankUSREOU, () => farm.PaymentData.BankUSREOU = dto.PaymentData.BankUSREOU, farm.Id);
-                LogAndUpdateIfChanged("BIC", farm.PaymentData.BIC, dto.PaymentData.BIC, () => farm.PaymentData.BIC = dto.PaymentData.BIC, farm.Id);
-                LogAndUpdateIfChanged("HolderFullName", farm.PaymentData.HolderFullName, dto.PaymentData.HolderFullName, () => farm.PaymentData.HolderFullName = dto.PaymentData.HolderFullName, farm.Id);
-                LogAndUpdateIfChanged("CardExpirationYear", farm.PaymentData.CardExpirationYear, dto.PaymentData.CardExpirationYear, () => farm.PaymentData.CardExpirationYear = dto.PaymentData.CardExpirationYear, farm.Id);
-                LogAndUpdateIfChanged("CardExpirationMonth", farm.PaymentData.CardExpirationMonth, dto.PaymentData.CardExpirationMonth, () => farm.PaymentData.CardExpirationMonth = dto.PaymentData.CardExpirationMonth, farm.Id);
-            }
+            if(dto.MainPaymentData == null)
+                dto.MainPaymentData = MainPaymentData.Card;
 
-            if(farm.ReceivingMethods == null) 
+            LogAndUpdateIfChanged("CardNumber", farm.PaymentData.CardNumber, dto.CardNumber, () => farm.PaymentData.CardNumber = dto.CardNumber, farm.Id);
+            LogAndUpdateIfChanged("AccountNumber", farm.PaymentData.AccountNumber, dto.AccountNumber, () => farm.PaymentData.AccountNumber = dto.AccountNumber, farm.Id);
+            LogAndUpdateIfChanged("BankUSREOU", farm.PaymentData.BankUSREOU, dto.BankUSREOU, () => farm.PaymentData.BankUSREOU = dto.BankUSREOU, farm.Id);
+            LogAndUpdateIfChanged("BIC", farm.PaymentData.BIC, dto.BIC, () => farm.PaymentData.BIC = dto.BIC, farm.Id);
+            LogAndUpdateIfChanged("CardExpirationYear", farm.PaymentData.CardExpirationYear, dto.CardExpirationYear, () => farm.PaymentData.CardExpirationYear = dto.CardExpirationYear, farm.Id);
+            LogAndUpdateIfChanged("CardExpirationMonth", farm.PaymentData.CardExpirationMonth, dto.CardExpirationMonth, () => farm.PaymentData.CardExpirationMonth = dto.CardExpirationMonth, farm.Id);
+            LogAndUpdateIfChanged("MainPaymentData", farm.PaymentData.MainPaymentData.ToString(), dto.MainPaymentData.ToString(), () => farm.PaymentData.MainPaymentData = (MainPaymentData)dto.MainPaymentData, farm.Id);
+
+            if (farm.ReceivingMethods == null) 
                 farm.PaymentTypes = new List<PaymentType>() { PaymentType.Cash };  
 
             if (dto.HasOnlinePayment 
@@ -552,6 +564,108 @@ namespace FarmersMarketplace.Application.Services.Business
             }
 
             await DbContext.SaveChangesAsync();
+            await SearchSynchronizer.Update(farm);
+            await CacheProvider.Update(farm);
+        }
+
+        public async Task<CardDataVm> CopyOwnerCardData(Guid ownerId)
+        {
+            var farmer = await DbContext.Farmers.Include(c => c.PaymentData)
+                .FirstOrDefaultAsync(a => a.Id == ownerId);
+
+            if (farmer == null)
+            {
+                string message = $"Account with Id {ownerId} was not found.";
+                throw new NotFoundException(message, "AccountNotFound");
+            }
+
+            var vm = new CardDataVm
+            {
+                CardNumber = farmer.PaymentData.CardNumber,
+                CardExpirationMonth = farmer.PaymentData.CardExpirationMonth,
+                CardExpirationYear = farmer.PaymentData.CardExpirationYear,
+            };
+
+            return vm;
+        }
+
+        public async Task<AccountNumberDataVm> CopyOwnerAccountNumberData(Guid ownerId)
+        {
+            var farmer = await DbContext.Farmers.Include(c => c.PaymentData)
+                .FirstOrDefaultAsync(a => a.Id == ownerId);
+
+            if (farmer == null)
+            {
+                string message = $"Account with Id {ownerId} was not found.";
+                throw new NotFoundException(message, "AccountNotFound");
+            }
+
+            var vm = new AccountNumberDataVm
+            {
+                AccountNumber = farmer.PaymentData.AccountNumber,
+                BankUSREOU = farmer.PaymentData.BankUSREOU,
+                BIC = farmer.PaymentData.BIC,
+            };
+
+            if (farmer.PaymentTypes != null
+                && farmer.PaymentTypes.Contains(PaymentType.Online))
+            {
+                vm.HasOnlinePayment = true;
+            }
+            else
+            {
+                vm.HasOnlinePayment = false;
+            }
+
+            return vm;
+        }
+
+        public async Task<FarmForCustomerVm> GetForCustomer(Guid farmId)
+        {
+            if (CacheProvider.Exists(farmId))
+            {
+                var f = await CacheProvider.Get(farmId);
+                return Mapper.Map<FarmForCustomerVm>(f);
+            }
+
+            var farm = await DbContext.Farms
+                .Include(f => f.Feedbacks)
+                .Include(f => f.Owner)
+                .Include(f => f.Address)
+                .Include(f => f.Schedule)
+                    .ThenInclude(s => s.Monday)
+                .Include(f => f.Schedule)
+                    .ThenInclude(s => s.Tuesday)
+                .Include(f => f.Schedule)
+                    .ThenInclude(s => s.Wednesday)
+                .Include(f => f.Schedule)
+                    .ThenInclude(s => s.Thursday)
+                .Include(f => f.Schedule)
+                    .ThenInclude(s => s.Friday)
+                .Include(f => f.Schedule)
+                    .ThenInclude(s => s.Sunday)
+                .Include(f => f.Schedule)
+                    .ThenInclude(s => s.Saturday)
+                .Include(f => f.PaymentData)
+                .Include(f => f.Logs)
+                .FirstOrDefaultAsync(f => f.Id == farmId);
+
+            if (farm == null)
+            {
+                string message = $"Farm with Id {farmId} was not found.";
+                throw new NotFoundException(message, "FarmNotFound");
+            }
+
+            await CacheProvider.Set(farm);
+            var vm = Mapper.Map<FarmForCustomerVm>(farm);
+
+            return vm;
+        }
+
+        public async Task<ProducerListVm> GetPopular()
+        {
+            var vm = await TrendService.UpdateAndGet();
+            return vm;
         }
     }
 }

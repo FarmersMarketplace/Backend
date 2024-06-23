@@ -1,10 +1,7 @@
-﻿using FarmersMarketplace.Application.DataTransferObjects.Catefory;
+﻿using FarmersMarketplace.Application.DataTransferObjects.Account;
+using FarmersMarketplace.Application.DataTransferObjects.Catefory;
 using FarmersMarketplace.Application.ViewModels.Category;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using FarmersMarketplace.Domain;
 
 namespace FarmersMarketplace.Application.Services.Business
 {
@@ -14,5 +11,6 @@ namespace FarmersMarketplace.Application.Services.Business
         Task Update(Guid categoryId, CategoryDto dto);
         Task Delete(Guid categoryId);
         Task<CategoryListVm> GetAll();
+        Task<CategoriesAndSubcategoriesVm> GetProducerData(Guid producerId, Producer producer);
     }
 }

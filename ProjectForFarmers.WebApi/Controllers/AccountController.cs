@@ -1,11 +1,9 @@
-﻿using FarmersMarketplace.Application.DataTransferObjects;
-using FarmersMarketplace.Application.DataTransferObjects.Account;
-using FarmersMarketplace.Application.Exceptions;
-using FarmersMarketplace.Application.Helpers;
+﻿using FarmersMarketplace.Application.DataTransferObjects.Account;
+using FarmersMarketplace.Application.DataTransferObjects.Producers;
 using FarmersMarketplace.Application.Services.Business;
 using FarmersMarketplace.Application.ViewModels.Account;
-using FarmersMarketplace.Application.ViewModels.Auth;
 using FarmersMarketplace.Domain;
+using FarmersMarketplace.Domain.Accounts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -106,7 +104,7 @@ namespace FarmersMarketplace.WebApi.Controllers
         [HttpPut]
         [Authorize(Roles = "Seller")]
         [ProducesResponseType(204)]
-        public async Task<IActionResult> UpdateSellerPaymentData([FromBody] UpdateProducerPaymentDataDto dto)
+        public async Task<IActionResult> UpdateSellerPaymentData([FromBody] ProducerPaymentDataDto dto)
         {
             await AccountService.UpdateSellerPaymentData(dto, AccountId);
             return NoContent();
@@ -122,12 +120,19 @@ namespace FarmersMarketplace.WebApi.Controllers
             if (string.IsNullOrEmpty(roleStr) || !Enum.TryParse<Role>(roleStr, out var role))
             {
                 string message = $"Failed to retrieve or parse role claim from JWT.";
-                string userFacingMessage = CultureHelper.Exception("IncorrectRole");
-
-                throw new InvalidDataException(message, userFacingMessage);
+                throw new InvalidDataException(message, "IncorrectRole");
             }
 
             await AccountService.DeleteAccount(role, AccountId);
+            return NoContent();
+        }
+
+        [HttpGet("{receivingMethod}")]
+        [Authorize(Roles = "Customer")]
+        [ProducesResponseType(typeof(CustomerOrderDetailsVm), 200)]
+        public async Task<IActionResult> GetCustomerOrderDetails(ReceivingMethod receivingMethod)
+        {
+            var vm = await AccountService.GetCustomerOrderDetails(AccountId, receivingMethod);
             return NoContent();
         }
     }

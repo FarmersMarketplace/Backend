@@ -1,20 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace FarmersMarketplace.Application.Exceptions
+﻿namespace FarmersMarketplace.Application.Exceptions
 {
     public class ApplicationException : Exception
     {
-        public string UserFacingMessage { get; set; }
+        public string UserFacingMessageKey { get; set; }
+        public string[] Details { get; set; }
         public string? Environment {  get; set; }
         public string? Action { get; set; }
 
-        public ApplicationException(string message, string userFacingMessage) : base(message) 
+        public ApplicationException(string message, string userFacingMessageKey, params string[] details) : base(message) 
         {  
-            UserFacingMessage = userFacingMessage;
+            UserFacingMessageKey = userFacingMessageKey;
+            details = Details;
         }
 
         public ApplicationException() : base()
@@ -22,9 +18,9 @@ namespace FarmersMarketplace.Application.Exceptions
             
         }
 
-        public ApplicationException(string message, string userFacingMessage, string? environment, string? action) : base(message) 
+        public ApplicationException(string message, string userFacingMessageKey, string? environment, string? action) : base(message) 
         {
-            UserFacingMessage = userFacingMessage;
+            UserFacingMessageKey = userFacingMessageKey;
             Environment = environment;
             Action = action;
         }

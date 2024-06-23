@@ -17,6 +17,5 @@ namespace FarmersMarketplace.Application.Services
         Task ResetPassword(Guid accountId, string? email, ResetPasswordDto dto);
         Task ForgotPassword(ForgotPasswordDto dto);
         Task<LoginVm> AuthenticateWithGoogle(AuthenticateWithGoogleDto dto);
-        Task ConfirmFarmEmail(Guid farmId, string email);
     }
 }

@@ -6,7 +6,6 @@ namespace FarmersMarketplace.Application.DataTransferObjects.Farm
     {
         public string Name { get; set; }
         public string Description { get; set; }
-        public string ContactEmail { get; set; }
         public string ContactPhone { get; set; }
         public string? AdditionalPhone { get; set; }
         public string? FirstSocialPageUrl { get; set; }

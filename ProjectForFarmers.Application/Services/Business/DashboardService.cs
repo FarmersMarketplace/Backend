@@ -1,14 +1,13 @@
 ﻿using AutoMapper;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Configuration;
 using FarmersMarketplace.Application.DataTransferObjects.Dashboard;
 using FarmersMarketplace.Application.Exceptions;
-using FarmersMarketplace.Application.Helpers;
 using FarmersMarketplace.Application.Interfaces;
 using FarmersMarketplace.Application.ViewModels.Dashboard;
 using FarmersMarketplace.Application.ViewModels.Order;
 using FarmersMarketplace.Domain;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Configuration;
 
 namespace FarmersMarketplace.Application.Services.Business
 {
@@ -25,7 +24,7 @@ namespace FarmersMarketplace.Application.Services.Business
 
         public async Task<OptionListVm> CustomerAutocomplete(Guid producerId, Producer producer, string query, int count)
         {
-            var cacheKey = CacheHelper.GenerateCacheKey(producerId, producer, "customers");
+            var cacheKey = "";
             var vm = new OptionListVm();
 
             if (MemoryCache.TryGetValue(cacheKey, out List<string> cachedCustomerNames))
@@ -39,7 +38,7 @@ namespace FarmersMarketplace.Application.Services.Business
             }
 
             var customerIdsHashSet = new HashSet<Guid>(await DbContext.Orders
-                .Where(o => o.ProducerId == producerId 
+                .Where(o => o.ProducerId == producerId
                 && o.Producer == producer)
                 .Select(o => o.CustomerId)
                 .ToListAsync());
@@ -67,12 +66,30 @@ namespace FarmersMarketplace.Application.Services.Business
             if (monthStatistic == null)
             {
                 string message = $"Statistic for month with id {id} was not found.";
-                string userFacingMessage = CultureHelper.Exception("StatisticWithIdNotExist", id.ToString());
-
-                throw new NotFoundException(message, userFacingMessage);
+                throw new NotFoundException(message, "StatisticWithIdNotExist", id.ToString());
             }
 
             var vm = Mapper.Map<DashboardVm>(monthStatistic);
+
+            vm.CustomerInfo = new CustomerInfoVm
+            {
+                Payment = monthStatistic.HighestCustomerPayment,
+                PaymentPercentage = monthStatistic.HighestCustomerPaymentPercentage,
+                Name = ""
+            };
+
+            if (monthStatistic.CustomerWithHighestPaymentId != null)
+            {
+                var customer = await DbContext.Customers.FirstOrDefaultAsync(a => a.Id == monthStatistic.CustomerWithHighestPaymentId);
+
+                if (customer == null)
+                {
+                    string message = $"Account with Id {monthStatistic.CustomerWithHighestPaymentId} was not found.";
+                    throw new NotFoundException(message, "AccountNotFound");
+                }
+
+                vm.CustomerInfo.Name = customer.Surname + " " + customer.Surname;
+            }
 
             return vm;
         }

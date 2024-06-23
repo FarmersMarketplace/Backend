@@ -23,7 +23,7 @@ namespace FarmersMarketplace.Persistence.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("FarmersMarketplace.Domain.Account", b =>
+            modelBuilder.Entity("FarmersMarketplace.Domain.Accounts.Account", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
@@ -141,32 +141,6 @@ namespace FarmersMarketplace.Persistence.Migrations
                     b.ToTable("Categories", (string)null);
                 });
 
-            modelBuilder.Entity("FarmersMarketplace.Domain.CustomerPaymentData", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("CVV")
-                        .HasColumnType("text");
-
-                    b.Property<string>("CardExpirationMonth")
-                        .HasColumnType("text");
-
-                    b.Property<string>("CardExpirationYear")
-                        .HasColumnType("text");
-
-                    b.Property<string>("CardNumber")
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Id")
-                        .IsUnique();
-
-                    b.ToTable("CustomerPaymentData", (string)null);
-                });
-
             modelBuilder.Entity("FarmersMarketplace.Domain.DayOfWeek", b =>
                 {
                     b.Property<Guid>("Id")
@@ -211,9 +185,6 @@ namespace FarmersMarketplace.Persistence.Migrations
                     b.Property<List<Guid>>("Categories")
                         .HasColumnType("uuid[]");
 
-                    b.Property<string>("ContactEmail")
-                        .HasColumnType("text");
-
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("timestamp with time zone");
 
@@ -242,6 +213,9 @@ namespace FarmersMarketplace.Persistence.Migrations
 
                     b.Property<string>("Phone")
                         .HasColumnType("text");
+
+                    b.Property<float>("Rating")
+                        .HasColumnType("real");
 
                     b.Property<int[]>("ReceivingMethods")
                         .HasColumnType("integer[]");
@@ -307,6 +281,41 @@ namespace FarmersMarketplace.Persistence.Migrations
                     b.ToTable("FarmsLogs", (string)null);
                 });
 
+            modelBuilder.Entity("FarmersMarketplace.Domain.Feedbacks.ProductFeedback", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Comment")
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("CustomerId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("FarmId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("uuid");
+
+                    b.Property<float>("Rating")
+                        .HasColumnType("real");
+
+                    b.Property<Guid?>("SellerId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FarmId");
+
+                    b.HasIndex("ProductId");
+
+                    b.HasIndex("SellerId");
+
+                    b.ToTable("ProductFeedback");
+                });
+
             modelBuilder.Entity("FarmersMarketplace.Domain.MonthStatistic", b =>
                 {
                     b.Property<Guid>("Id")
@@ -336,6 +345,9 @@ namespace FarmersMarketplace.Persistence.Migrations
 
                     b.Property<Guid>("NewOrdersStatisticId")
                         .HasColumnType("uuid");
+
+                    b.Property<decimal>("PreviousMonthTotalRevenue")
+                        .HasColumnType("numeric");
 
                     b.Property<Guid>("ProcessingOrdersStatisticId")
                         .HasColumnType("uuid");
@@ -388,7 +400,24 @@ namespace FarmersMarketplace.Persistence.Migrations
                     b.ToTable("MonthesStatistics", (string)null);
                 });
 
-            modelBuilder.Entity("FarmersMarketplace.Domain.Order", b =>
+            modelBuilder.Entity("FarmersMarketplace.Domain.OrderGroupStatistic", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<long>("Count")
+                        .HasColumnType("bigint");
+
+                    b.Property<float>("PercentageChange")
+                        .HasColumnType("real");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("OrderGroupStatistic");
+                });
+
+            modelBuilder.Entity("FarmersMarketplace.Domain.Orders.Order", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -397,8 +426,20 @@ namespace FarmersMarketplace.Persistence.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<string>("CustomerAdditionalPhone")
+                        .HasColumnType("text");
+
                     b.Property<Guid>("CustomerId")
                         .HasColumnType("uuid");
+
+                    b.Property<string>("CustomerName")
+                        .HasColumnType("text");
+
+                    b.Property<string>("CustomerPhone")
+                        .HasColumnType("text");
+
+                    b.Property<string>("CustomerSurname")
+                        .HasColumnType("text");
 
                     b.Property<Guid?>("DeliveryPointId")
                         .HasColumnType("uuid");
@@ -425,7 +466,7 @@ namespace FarmersMarketplace.Persistence.Migrations
                     b.Property<DateTime>("ReceiveDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int>("ReceivingType")
+                    b.Property<int>("ReceivingMethod")
                         .HasColumnType("integer");
 
                     b.Property<int>("Status")
@@ -449,24 +490,7 @@ namespace FarmersMarketplace.Persistence.Migrations
                     b.ToTable("Orders", (string)null);
                 });
 
-            modelBuilder.Entity("FarmersMarketplace.Domain.OrderGroupStatistic", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<long>("Count")
-                        .HasColumnType("bigint");
-
-                    b.Property<float>("PercentageChange")
-                        .HasColumnType("real");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("OrderGroupStatistic");
-                });
-
-            modelBuilder.Entity("FarmersMarketplace.Domain.OrderItem", b =>
+            modelBuilder.Entity("FarmersMarketplace.Domain.Orders.OrderItem", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -477,6 +501,9 @@ namespace FarmersMarketplace.Persistence.Migrations
 
                     b.Property<Guid>("OrderId")
                         .HasColumnType("uuid");
+
+                    b.Property<decimal>("PricePerOne")
+                        .HasColumnType("numeric");
 
                     b.Property<Guid>("ProductId")
                         .HasColumnType("uuid");
@@ -492,7 +519,33 @@ namespace FarmersMarketplace.Persistence.Migrations
                     b.ToTable("OrdersItems", (string)null);
                 });
 
-            modelBuilder.Entity("FarmersMarketplace.Domain.ProducerPaymentData", b =>
+            modelBuilder.Entity("FarmersMarketplace.Domain.Payment.CustomerPaymentData", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("CVV")
+                        .HasColumnType("text");
+
+                    b.Property<string>("CardExpirationMonth")
+                        .HasColumnType("text");
+
+                    b.Property<string>("CardExpirationYear")
+                        .HasColumnType("text");
+
+                    b.Property<string>("CardNumber")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Id")
+                        .IsUnique();
+
+                    b.ToTable("CustomerPaymentData", (string)null);
+                });
+
+            modelBuilder.Entity("FarmersMarketplace.Domain.Payment.ProducerPaymentData", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -516,8 +569,8 @@ namespace FarmersMarketplace.Persistence.Migrations
                     b.Property<string>("CardNumber")
                         .HasColumnType("text");
 
-                    b.Property<string>("HolderFullName")
-                        .HasColumnType("text");
+                    b.Property<int>("MainPaymentData")
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -553,8 +606,8 @@ namespace FarmersMarketplace.Persistence.Migrations
                     b.Property<List<string>>("DocumentsNames")
                         .HasColumnType("text[]");
 
-                    b.Property<DateTime>("ExpirationDate")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<long>("ExpirationDays")
+                        .HasColumnType("bigint");
 
                     b.Property<Guid?>("FarmId")
                         .HasColumnType("uuid");
@@ -580,6 +633,12 @@ namespace FarmersMarketplace.Persistence.Migrations
 
                     b.Property<Guid>("ProducerId")
                         .HasColumnType("uuid");
+
+                    b.Property<float>("Rating")
+                        .HasColumnType("real");
+
+                    b.Property<int[]>("ReceivingMethods")
+                        .HasColumnType("integer[]");
 
                     b.Property<Guid?>("SellerId")
                         .HasColumnType("uuid");
@@ -679,6 +738,9 @@ namespace FarmersMarketplace.Persistence.Migrations
                     b.Property<Guid>("CategoryId")
                         .HasColumnType("uuid");
 
+                    b.Property<string>("ImageName")
+                        .HasColumnType("text");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
@@ -690,15 +752,18 @@ namespace FarmersMarketplace.Persistence.Migrations
                     b.ToTable("Subcategories", (string)null);
                 });
 
-            modelBuilder.Entity("FarmersMarketplace.Domain.Customer", b =>
+            modelBuilder.Entity("FarmersMarketplace.Domain.Accounts.Customer", b =>
                 {
-                    b.HasBaseType("FarmersMarketplace.Domain.Account");
+                    b.HasBaseType("FarmersMarketplace.Domain.Accounts.Account");
 
                     b.Property<Guid?>("AddressId")
                         .HasColumnType("uuid");
 
                     b.Property<string>("AvatarName")
                         .HasColumnType("text");
+
+                    b.Property<List<Guid>>("FavouriteProducts")
+                        .HasColumnType("uuid[]");
 
                     b.Property<Guid?>("PaymentDataId")
                         .HasColumnType("uuid");
@@ -712,9 +777,9 @@ namespace FarmersMarketplace.Persistence.Migrations
                     b.ToTable("Customers", (string)null);
                 });
 
-            modelBuilder.Entity("FarmersMarketplace.Domain.Farmer", b =>
+            modelBuilder.Entity("FarmersMarketplace.Domain.Accounts.Farmer", b =>
                 {
-                    b.HasBaseType("FarmersMarketplace.Domain.Account");
+                    b.HasBaseType("FarmersMarketplace.Domain.Accounts.Account");
 
                     b.Property<Guid?>("AddressId")
                         .HasColumnType("uuid");
@@ -725,6 +790,9 @@ namespace FarmersMarketplace.Persistence.Migrations
                     b.Property<Guid?>("PaymentDataId")
                         .HasColumnType("uuid");
 
+                    b.Property<int[]>("PaymentTypes")
+                        .HasColumnType("integer[]");
+
                     b.HasIndex("AddressId")
                         .IsUnique();
 
@@ -734,9 +802,9 @@ namespace FarmersMarketplace.Persistence.Migrations
                     b.ToTable("Farmers", (string)null);
                 });
 
-            modelBuilder.Entity("FarmersMarketplace.Domain.Seller", b =>
+            modelBuilder.Entity("FarmersMarketplace.Domain.Accounts.Seller", b =>
                 {
-                    b.HasBaseType("FarmersMarketplace.Domain.Account");
+                    b.HasBaseType("FarmersMarketplace.Domain.Accounts.Account");
 
                     b.Property<Guid?>("AddressId")
                         .HasColumnType("uuid");
@@ -755,6 +823,9 @@ namespace FarmersMarketplace.Persistence.Migrations
 
                     b.Property<int[]>("PaymentTypes")
                         .HasColumnType("integer[]");
+
+                    b.Property<float>("Rating")
+                        .HasColumnType("real");
 
                     b.Property<int[]>("ReceivingMethods")
                         .HasColumnType("integer[]");
@@ -798,13 +869,13 @@ namespace FarmersMarketplace.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("FarmersMarketplace.Domain.Account", "Owner")
+                    b.HasOne("FarmersMarketplace.Domain.Accounts.Farmer", "Owner")
                         .WithMany()
                         .HasForeignKey("OwnerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("FarmersMarketplace.Domain.ProducerPaymentData", "PaymentData")
+                    b.HasOne("FarmersMarketplace.Domain.Payment.ProducerPaymentData", "PaymentData")
                         .WithOne()
                         .HasForeignKey("FarmersMarketplace.Domain.Farm", "PaymentDataId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -831,6 +902,23 @@ namespace FarmersMarketplace.Persistence.Migrations
                         .HasForeignKey("FarmId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("FarmersMarketplace.Domain.Feedbacks.ProductFeedback", b =>
+                {
+                    b.HasOne("FarmersMarketplace.Domain.Farm", null)
+                        .WithMany("Feedbacks")
+                        .HasForeignKey("FarmId");
+
+                    b.HasOne("FarmersMarketplace.Domain.Product", null)
+                        .WithMany("Feedbacks")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("FarmersMarketplace.Domain.Accounts.Seller", null)
+                        .WithMany("Feedbacks")
+                        .HasForeignKey("SellerId");
                 });
 
             modelBuilder.Entity("FarmersMarketplace.Domain.MonthStatistic", b =>
@@ -863,7 +951,7 @@ namespace FarmersMarketplace.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("FarmersMarketplace.Domain.Seller", null)
+                    b.HasOne("FarmersMarketplace.Domain.Accounts.Seller", null)
                         .WithMany("Statistics")
                         .HasForeignKey("SellerId");
 
@@ -884,9 +972,9 @@ namespace FarmersMarketplace.Persistence.Migrations
                     b.Navigation("TotalActivityStatistic");
                 });
 
-            modelBuilder.Entity("FarmersMarketplace.Domain.Order", b =>
+            modelBuilder.Entity("FarmersMarketplace.Domain.Orders.Order", b =>
                 {
-                    b.HasOne("FarmersMarketplace.Domain.Account", "Customer")
+                    b.HasOne("FarmersMarketplace.Domain.Accounts.Customer", "Customer")
                         .WithMany()
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -901,9 +989,9 @@ namespace FarmersMarketplace.Persistence.Migrations
                     b.Navigation("DeliveryPoint");
                 });
 
-            modelBuilder.Entity("FarmersMarketplace.Domain.OrderItem", b =>
+            modelBuilder.Entity("FarmersMarketplace.Domain.Orders.OrderItem", b =>
                 {
-                    b.HasOne("FarmersMarketplace.Domain.Order", null)
+                    b.HasOne("FarmersMarketplace.Domain.Orders.Order", null)
                         .WithMany("Items")
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -922,7 +1010,7 @@ namespace FarmersMarketplace.Persistence.Migrations
                         .WithMany("Products")
                         .HasForeignKey("FarmId");
 
-                    b.HasOne("FarmersMarketplace.Domain.Seller", null)
+                    b.HasOne("FarmersMarketplace.Domain.Accounts.Seller", null)
                         .WithMany("Products")
                         .HasForeignKey("SellerId");
 
@@ -1001,49 +1089,49 @@ namespace FarmersMarketplace.Persistence.Migrations
                     b.Navigation("Category");
                 });
 
-            modelBuilder.Entity("FarmersMarketplace.Domain.Customer", b =>
+            modelBuilder.Entity("FarmersMarketplace.Domain.Accounts.Customer", b =>
                 {
                     b.HasOne("FarmersMarketplace.Domain.CustomerAddress", "Address")
                         .WithOne()
-                        .HasForeignKey("FarmersMarketplace.Domain.Customer", "AddressId");
+                        .HasForeignKey("FarmersMarketplace.Domain.Accounts.Customer", "AddressId");
 
-                    b.HasOne("FarmersMarketplace.Domain.CustomerPaymentData", "PaymentData")
+                    b.HasOne("FarmersMarketplace.Domain.Payment.CustomerPaymentData", "PaymentData")
                         .WithOne()
-                        .HasForeignKey("FarmersMarketplace.Domain.Customer", "PaymentDataId");
+                        .HasForeignKey("FarmersMarketplace.Domain.Accounts.Customer", "PaymentDataId");
 
                     b.Navigation("Address");
 
                     b.Navigation("PaymentData");
                 });
 
-            modelBuilder.Entity("FarmersMarketplace.Domain.Farmer", b =>
+            modelBuilder.Entity("FarmersMarketplace.Domain.Accounts.Farmer", b =>
                 {
                     b.HasOne("FarmersMarketplace.Domain.Address", "Address")
                         .WithOne()
-                        .HasForeignKey("FarmersMarketplace.Domain.Farmer", "AddressId");
+                        .HasForeignKey("FarmersMarketplace.Domain.Accounts.Farmer", "AddressId");
 
-                    b.HasOne("FarmersMarketplace.Domain.ProducerPaymentData", "PaymentData")
+                    b.HasOne("FarmersMarketplace.Domain.Payment.ProducerPaymentData", "PaymentData")
                         .WithOne()
-                        .HasForeignKey("FarmersMarketplace.Domain.Farmer", "PaymentDataId");
+                        .HasForeignKey("FarmersMarketplace.Domain.Accounts.Farmer", "PaymentDataId");
 
                     b.Navigation("Address");
 
                     b.Navigation("PaymentData");
                 });
 
-            modelBuilder.Entity("FarmersMarketplace.Domain.Seller", b =>
+            modelBuilder.Entity("FarmersMarketplace.Domain.Accounts.Seller", b =>
                 {
                     b.HasOne("FarmersMarketplace.Domain.Address", "Address")
                         .WithOne()
-                        .HasForeignKey("FarmersMarketplace.Domain.Seller", "AddressId");
+                        .HasForeignKey("FarmersMarketplace.Domain.Accounts.Seller", "AddressId");
 
-                    b.HasOne("FarmersMarketplace.Domain.ProducerPaymentData", "PaymentData")
+                    b.HasOne("FarmersMarketplace.Domain.Payment.ProducerPaymentData", "PaymentData")
                         .WithOne()
-                        .HasForeignKey("FarmersMarketplace.Domain.Seller", "PaymentDataId");
+                        .HasForeignKey("FarmersMarketplace.Domain.Accounts.Seller", "PaymentDataId");
 
                     b.HasOne("FarmersMarketplace.Domain.Schedule", "Schedule")
                         .WithOne()
-                        .HasForeignKey("FarmersMarketplace.Domain.Seller", "ScheduleId")
+                        .HasForeignKey("FarmersMarketplace.Domain.Accounts.Seller", "ScheduleId")
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("Address");
@@ -1060,6 +1148,8 @@ namespace FarmersMarketplace.Persistence.Migrations
 
             modelBuilder.Entity("FarmersMarketplace.Domain.Farm", b =>
                 {
+                    b.Navigation("Feedbacks");
+
                     b.Navigation("Logs");
 
                     b.Navigation("Products");
@@ -1067,13 +1157,20 @@ namespace FarmersMarketplace.Persistence.Migrations
                     b.Navigation("Statistics");
                 });
 
-            modelBuilder.Entity("FarmersMarketplace.Domain.Order", b =>
+            modelBuilder.Entity("FarmersMarketplace.Domain.Orders.Order", b =>
                 {
                     b.Navigation("Items");
                 });
 
-            modelBuilder.Entity("FarmersMarketplace.Domain.Seller", b =>
+            modelBuilder.Entity("FarmersMarketplace.Domain.Product", b =>
                 {
+                    b.Navigation("Feedbacks");
+                });
+
+            modelBuilder.Entity("FarmersMarketplace.Domain.Accounts.Seller", b =>
+                {
+                    b.Navigation("Feedbacks");
+
                     b.Navigation("Products");
 
                     b.Navigation("Statistics");

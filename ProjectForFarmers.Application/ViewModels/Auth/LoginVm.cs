@@ -1,4 +1,4 @@
-﻿using FarmersMarketplace.Domain;
+﻿using FarmersMarketplace.Domain.Accounts;
 
 namespace FarmersMarketplace.Application.ViewModels.Auth
 {

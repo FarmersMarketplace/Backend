@@ -1,10 +1,9 @@
 ﻿using FarmersMarketplace.Application.DataTransferObjects.Farm;
 using FarmersMarketplace.Application.Services.Business;
+using FarmersMarketplace.Application.ViewModels.Farm;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
-using FarmersMarketplace.Application.ViewModels.Farm;
-using FarmersMarketplace.Application.DataTransferObjects;
 
 namespace FarmersMarketplace.WebApi.Controllers
 {
@@ -21,20 +20,37 @@ namespace FarmersMarketplace.WebApi.Controllers
         }
 
         [HttpGet("{farmId}")]
-        [ProducesResponseType(typeof(FarmVm), 200)]
-        public async Task<IActionResult> Get([FromRoute] Guid farmId)
+        [ProducesResponseType(typeof(FarmForProducerVm), 200)]
+        public async Task<IActionResult> GetForProducer([FromRoute] Guid farmId)
         {
-            var request = await FarmService.Get(farmId);
+            var request = await FarmService.GetForProducer(farmId);
             return Ok(request);
         }
 
         [HttpGet]
         [Authorize(Roles = "Farmer")]
-        [ProducesResponseType(typeof(FarmListVm), 200)]
-        public async Task<IActionResult> GetAll()
+        [ProducesResponseType(typeof(AccountNumberDataVm), 200)]
+        public async Task<IActionResult> CopyOwnerAccountNumberData()
         {
-            var userId = AccountId;
-            var vm = await FarmService.GetAll(userId);
+            var vm = await FarmService.CopyOwnerAccountNumberData(AccountId);
+            return Ok(vm);
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "Farmer")]
+        [ProducesResponseType(typeof(CardDataVm), 200)]
+        public async Task<IActionResult> CopyOwnerCardData()
+        {
+            var vm = await FarmService.CopyOwnerCardData(AccountId);
+            return Ok(vm);
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "Farmer")]
+        [ProducesResponseType(typeof(FarmListVm), 200)]
+        public async Task<IActionResult> GetAllForProducer()
+        {
+            var vm = await FarmService.GetAllForProducer(AccountId);
             return Ok(vm);
         }
 
@@ -59,6 +75,7 @@ namespace FarmersMarketplace.WebApi.Controllers
 
         [HttpPut]
         [Authorize(Roles = "Farmer")]
+        [ProducesResponseType(204)]
         public async Task<IActionResult> Update([FromForm] UpdateFarmDto dto)
         {
             await FarmService.Update(dto, AccountId);
@@ -77,7 +94,7 @@ namespace FarmersMarketplace.WebApi.Controllers
         [HttpPut]
         [Authorize(Roles = "Farmer")]
         [ProducesResponseType(204)]
-        public async Task<IActionResult> UpdateSettings([FromBody] UpdateProducerPaymentDataDto dto)
+        public async Task<IActionResult> UpdatePaymentData([FromBody] FarmPaymentDataDto dto)
         {
             await FarmService.UpdatePaymentData(dto, AccountId);
             return NoContent();

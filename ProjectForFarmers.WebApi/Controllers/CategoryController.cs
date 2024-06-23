@@ -1,9 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using FarmersMarketplace.Application.DataTransferObjects.Catefory;
-using FarmersMarketplace.Application.DataTransferObjects.Farm;
+﻿using FarmersMarketplace.Application.DataTransferObjects.Catefory;
 using FarmersMarketplace.Application.Services.Business;
 using FarmersMarketplace.Application.ViewModels.Category;
-using FarmersMarketplace.Application.ViewModels.Farm;
+using FarmersMarketplace.Domain;
+using Microsoft.AspNetCore.Mvc;
 
 namespace FarmersMarketplace.WebApi.Controllers
 {
@@ -48,6 +47,14 @@ namespace FarmersMarketplace.WebApi.Controllers
         public async Task<IActionResult> GetAll()
         {
             var vm = await CategoryService.GetAll();
+            return Ok(vm);
+        }
+
+        [HttpGet("{producerId}/{producer}")]
+        [ProducesResponseType(typeof(CategoriesAndSubcategoriesVm), 200)]
+        public async Task<IActionResult> GetProducerData([FromRoute] Guid producerId,[FromRoute] Producer producer)
+        {
+            var vm = await CategoryService.GetProducerData(producerId, producer);
             return Ok(vm);
         }
     }

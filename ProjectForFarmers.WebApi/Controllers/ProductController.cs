@@ -1,10 +1,11 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using FarmersMarketplace.Application.DataTransferObjects.Product;
+﻿using FarmersMarketplace.Application.DataTransferObjects.Product;
+using FarmersMarketplace.Application.Interfaces;
 using FarmersMarketplace.Application.Services.Business;
 using FarmersMarketplace.Application.ViewModels.Dashboard;
 using FarmersMarketplace.Application.ViewModels.Product;
 using FarmersMarketplace.Domain;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
 namespace FarmersMarketplace.WebApi.Controllers
@@ -14,26 +15,32 @@ namespace FarmersMarketplace.WebApi.Controllers
     public class ProductController : ControllerBase
     {
         private readonly IProductService ProductService;
+        private readonly ISearchProvider<GetProducerProductListDto, ProducerProductListVm, ProducerProductAutocompleteDto> ProducerSearchProvider;
+        private readonly ISearchProvider<GetCustomerProductListDto, CustomerProductListVm, CustomerProductAutocompleteDto> CustomerSearchProvider;
         private Guid AccountId => Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
 
-        public ProductController(IProductService productService)
+        public ProductController(IProductService productService, 
+            ISearchProvider<GetProducerProductListDto, ProducerProductListVm, ProducerProductAutocompleteDto> producerSearchProvider,
+            ISearchProvider<GetCustomerProductListDto, CustomerProductListVm, CustomerProductAutocompleteDto> customerSearchProvider)
         {
             ProductService = productService;
+            ProducerSearchProvider = producerSearchProvider;
+            CustomerSearchProvider = customerSearchProvider;
         }
 
         [HttpGet("{productId}")]
-        [ProducesResponseType(typeof(ProductVm), 200)]
-        public async Task<IActionResult> Get([FromRoute] Guid productId)
+        [ProducesResponseType(typeof(ProductForProducerVm), 200)]
+        public async Task<IActionResult> GetForProducer([FromRoute] Guid productId)
         {
-            var request = await ProductService.Get(productId);
+            var request = await ProductService.GetForProducer(productId);
             return Ok(request);
         }
 
         [HttpGet("{product}/{productId}")]
-        [ProducesResponseType(typeof(ProductVm), 200)]
-        public async Task<IActionResult> GetFilterData([FromRoute] Guid productId, [FromRoute] Producer producer)
+        [ProducesResponseType(typeof(ProductForProducerVm), 200)]
+        public async Task<IActionResult> GetProducerProductFilterData([FromRoute] Guid productId, [FromRoute] Producer producer)
         {
-            var request = await ProductService.GetFilterData(producer, productId);
+            var request = await ProductService.GetProducerProductFilterData(producer, productId);
             return Ok(request);
         }
 
@@ -51,10 +58,18 @@ namespace FarmersMarketplace.WebApi.Controllers
 
         [HttpGet]
         [Authorize(Roles = "Farmer, Seller")]
-        [ProducesResponseType(typeof(ProductListVm), 200)]
-        public async Task<IActionResult> GetAll([FromQuery] GetProductListDto dto)
+        [ProducesResponseType(typeof(ProducerProductListVm), 200)]
+        public async Task<IActionResult> GetAllForProducer([FromQuery] GetProducerProductListDto dto)
         {
-            var request = await ProductService.GetAll(dto);
+            var request = await ProducerSearchProvider.Search(dto);
+            return Ok(request);
+        }
+
+        [HttpGet]
+        [ProducesResponseType(typeof(CustomerProductListVm), 200)]
+        public async Task<IActionResult> GetAllForCustomer([FromBody] GetCustomerProductListDto dto)
+        {
+            var request = await CustomerSearchProvider.Search(dto);
             return Ok(request);
         }
 
@@ -103,10 +118,18 @@ namespace FarmersMarketplace.WebApi.Controllers
         }
 
         [HttpGet]
-        [ProducesResponseType(typeof(ProductVm), 200)]
-        public async Task<IActionResult> Autocomplete([FromQuery] ProductAutocompleteDto dto)
+        [ProducesResponseType(typeof(List<string>), 200)]
+        public async Task<IActionResult> AutocompleteForCustomer([FromQuery] CustomerProductAutocompleteDto dto)
         {
-            var request = await ProductService.Autocomplete(dto);
+            var request = await CustomerSearchProvider.Autocomplete(dto);
+            return Ok(request);
+        }
+
+        [HttpGet]
+        [ProducesResponseType(typeof(List<string>), 200)]
+        public async Task<IActionResult> AutocompleteForProducer([FromQuery] ProducerProductAutocompleteDto dto)
+        {
+            var request = await ProducerSearchProvider.Autocomplete(dto);
             return Ok(request);
         }
     }

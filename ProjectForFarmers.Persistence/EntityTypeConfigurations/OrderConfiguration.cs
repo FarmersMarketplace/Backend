@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore;
-using FarmersMarketplace.Domain;
+using FarmersMarketplace.Domain.Orders;
 
 namespace FarmersMarketplace.Persistence.EntityTypeConfigurations
 {
@@ -23,12 +23,7 @@ namespace FarmersMarketplace.Persistence.EntityTypeConfigurations
             builder.Property(order => order.TotalPayment).IsRequired();
             builder.Property(order => order.PaymentType).IsRequired();
             builder.Property(order => order.PaymentStatus).IsRequired();
-            builder.Property(order => order.ReceivingType).IsRequired();
-
-            builder.HasOne(order => order.Customer)
-                .WithMany() 
-                .HasForeignKey(order => order.CustomerId)
-                .IsRequired();
+            builder.Property(order => order.ReceivingMethod).IsRequired();
 
             builder.HasOne(order => order.DeliveryPoint)
                 .WithMany()

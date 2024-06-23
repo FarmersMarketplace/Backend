@@ -1,30 +1,40 @@
 ﻿using AutoMapper;
 using FarmersMarketplace.Application.DataTransferObjects;
 using FarmersMarketplace.Application.DataTransferObjects.Account;
+using FarmersMarketplace.Application.DataTransferObjects.Producers;
 using FarmersMarketplace.Application.Exceptions;
 using FarmersMarketplace.Application.Helpers;
 using FarmersMarketplace.Application.Interfaces;
-using FarmersMarketplace.Application.ViewModels;
 using FarmersMarketplace.Application.ViewModels.Account;
-using FarmersMarketplace.Application.ViewModels.Farm;
 using FarmersMarketplace.Domain;
+using FarmersMarketplace.Domain.Accounts;
+using FarmersMarketplace.Domain.Payment;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using System;
 using DayOfWeek = FarmersMarketplace.Domain.DayOfWeek;
 
 namespace FarmersMarketplace.Application.Services.Business
 {
-    public class AccountService: Service, IAccountService
+    public class AccountService : Service, IAccountService
     {
         private readonly CoordinateHelper CoordinateHelper;
         private readonly FileHelper FileHelper;
+        private readonly ICacheProvider<Seller> SellerCacheProvider;
+        private readonly ICacheProvider<Farmer> FarmerCacheProvider;
+        private readonly ICacheProvider<Customer> CustomerCacheProvider;
+        private readonly ISearchSynchronizer<Seller> SearchSynchronizer;
 
-        public AccountService(IMapper mapper, IApplicationDbContext dbContext, IConfiguration configuration) : base(mapper, dbContext, configuration)
+        public AccountService(IMapper mapper, IApplicationDbContext dbContext, IConfiguration configuration,
+            ISearchSynchronizer<Seller> sellerSynchronizer, ICacheProvider<Seller> sellerCacheProvider,
+            ICacheProvider<Customer> customerCacheProvider, ICacheProvider<Farmer> farmerCacheProvider) : base(mapper, dbContext, configuration)
         {
             CoordinateHelper = new CoordinateHelper(configuration);
             FileHelper = new FileHelper();
+            SearchSynchronizer = sellerSynchronizer;
+            SellerCacheProvider = sellerCacheProvider;
+            CustomerCacheProvider = customerCacheProvider;
+            FarmerCacheProvider = farmerCacheProvider;
         }
 
         public async Task DeleteAccount(Role role, Guid accountId)
@@ -34,6 +44,12 @@ namespace FarmersMarketplace.Application.Services.Business
 
         public async Task<CustomerVm> GetCustomer(Guid accountId)
         {
+            if (CustomerCacheProvider.Exists(accountId))
+            {
+                var c = await CustomerCacheProvider.Get(accountId);
+                return Mapper.Map<CustomerVm>(c);
+            }
+
             var customer = await DbContext.Customers.Include(c => c.Address)
                 .Include(c => c.PaymentData)
                 .FirstOrDefaultAsync(a => a.Id == accountId);
@@ -41,18 +57,23 @@ namespace FarmersMarketplace.Application.Services.Business
             if (customer == null)
             {
                 string message = $"Account with Id {accountId} was not found.";
-                string userFacingMessage = CultureHelper.Exception("AccountNotFound");
-
-                throw new NotFoundException(message, userFacingMessage);
+                throw new NotFoundException(message, "AccountNotFound");
             }
 
             var vm = Mapper.Map<CustomerVm>(customer);
+            await CustomerCacheProvider.Set(customer);
 
             return vm;
         }
 
         public async Task<FarmerVm> GetFarmer(Guid accountId)
         {
+            if (CustomerCacheProvider.Exists(accountId))
+            {
+                var f = await FarmerCacheProvider.Get(accountId);
+                return Mapper.Map<FarmerVm>(f);
+            }
+
             var farmer = await DbContext.Farmers.Include(c => c.Address)
                 .Include(c => c.PaymentData)
                 .FirstOrDefaultAsync(a => a.Id == accountId);
@@ -60,18 +81,34 @@ namespace FarmersMarketplace.Application.Services.Business
             if (farmer == null)
             {
                 string message = $"Account with Id {accountId} was not found.";
-                string userFacingMessage = CultureHelper.Exception("AccountNotFound");
-
-                throw new NotFoundException(message, userFacingMessage);
+                throw new NotFoundException(message, "AccountNotFound");
             }
 
             var vm = Mapper.Map<FarmerVm>(farmer);
+
+            if (farmer.PaymentTypes != null
+                && farmer.PaymentTypes.Contains(PaymentType.Online))
+            {
+                vm.PaymentData.HasOnlinePayment = true;
+            }
+            else
+            {
+                vm.PaymentData.HasOnlinePayment = false;
+            }
+
+            await FarmerCacheProvider.Set(farmer);
 
             return vm;
         }
 
         public async Task<SellerVm> GetSeller(Guid accountId)
         {
+            if (SellerCacheProvider.Exists(accountId))
+            {
+                var s = await SellerCacheProvider.Get(accountId);
+                return Mapper.Map<SellerVm>(s);
+            }
+
             var seller = await DbContext.Sellers.Include(c => c.Address)
                 .Include(c => c.PaymentData)
                 .Include(c => c.Schedule)
@@ -93,11 +130,10 @@ namespace FarmersMarketplace.Application.Services.Business
             if (seller == null)
             {
                 string message = $"Account with Id {accountId} was not found.";
-                string userFacingMessage = CultureHelper.Exception("AccountNotFound");
-
-                throw new NotFoundException(message, userFacingMessage);
+                throw new NotFoundException(message, "AccountNotFound");
             }
 
+            await SellerCacheProvider.Set(seller);
             var vm = Mapper.Map<SellerVm>(seller);
 
             return vm;
@@ -112,9 +148,7 @@ namespace FarmersMarketplace.Application.Services.Business
             if (customer == null)
             {
                 string message = $"Account with Id {accountId} was not found.";
-                string userFacingMessage = CultureHelper.Exception("AccountNotFound");
-
-                throw new NotFoundException(message, userFacingMessage);
+                throw new NotFoundException(message, "AccountNotFound");
             }
 
             customer.Name = dto.Name;
@@ -160,6 +194,7 @@ namespace FarmersMarketplace.Application.Services.Business
             }
 
             await DbContext.SaveChangesAsync();
+            await CustomerCacheProvider.Update(customer);
         }
 
         public bool AddressEqualToDto(Address address, AddressDto dto)
@@ -178,9 +213,7 @@ namespace FarmersMarketplace.Application.Services.Business
             if (customer == null)
             {
                 string message = $"Account with Id {accountId} was not found.";
-                string userFacingMessage = CultureHelper.Exception("AccountNotFound");
-
-                throw new NotFoundException(message, userFacingMessage);
+                throw new NotFoundException(message, "AccountNotFound");
             }
 
             if (customer.PaymentData == null)
@@ -194,6 +227,7 @@ namespace FarmersMarketplace.Application.Services.Business
             customer.PaymentData.CardExpirationMonth = dto.CardExpirationMonth;
 
             await DbContext.SaveChangesAsync();
+            await CustomerCacheProvider.Update(customer);
         }
 
         public async Task UpdateFarmer(UpdateFarmerDto dto, Guid accountId)
@@ -204,12 +238,10 @@ namespace FarmersMarketplace.Application.Services.Business
             if (farmer == null)
             {
                 string message = $"Account with Id {accountId} was not found.";
-                string userFacingMessage = CultureHelper.Exception("AccountNotFound");
-
-                throw new NotFoundException(message, userFacingMessage);
+                throw new NotFoundException(message, "AccountNotFound");
             }
 
-            if (farmer.Address == null) 
+            if (farmer.Address == null)
             {
                 farmer.Address = new Address() { Id = Guid.NewGuid() };
                 DbContext.ProducerAddresses.Add(farmer.Address);
@@ -221,13 +253,14 @@ namespace FarmersMarketplace.Application.Services.Business
             farmer.Phone = dto.Phone;
             farmer.Gender = dto.Gender;
             farmer.DateOfBirth = dto.DateOfBirth.ToUniversalTime();
+            farmer.AdditionalPhone = dto.AdditionalPhone;
 
             if (dto.Avatar != null && farmer.AvatarName != dto.Avatar.Name)
             {
                 var oldAvatarName = farmer.AvatarName;
                 farmer.AvatarName = await FileHelper.SaveFile(dto.Avatar, Configuration["File:Images:Account"]);
 
-                if(!oldAvatarName.IsNullOrEmpty())
+                if (!oldAvatarName.IsNullOrEmpty())
                     FileHelper.DeleteFile(oldAvatarName, Configuration["File:Images:Account"]);
             }
 
@@ -235,6 +268,8 @@ namespace FarmersMarketplace.Application.Services.Business
             {
                 var addressDto = dto.Address;
                 farmer.Address = farmer.Address ?? new Address();
+                farmer.Address.Note = dto.Address.Note;
+                farmer.Address.PostalCode = addressDto.PostalCode;
 
                 if (!AddressEqualToDto(farmer.Address, addressDto))
                 {
@@ -243,7 +278,6 @@ namespace FarmersMarketplace.Application.Services.Business
                     farmer.Address.Settlement = addressDto.Settlement;
                     farmer.Address.Street = addressDto.Street;
                     farmer.Address.HouseNumber = addressDto.HouseNumber;
-                    farmer.Address.PostalCode = addressDto.PostalCode;
 
                     var coords = await CoordinateHelper.GetCoordinates(farmer.Address);
                     farmer.Address.Latitude = coords.Latitude;
@@ -252,6 +286,7 @@ namespace FarmersMarketplace.Application.Services.Business
             }
 
             await DbContext.SaveChangesAsync();
+            await FarmerCacheProvider.Update(farmer);
         }
 
         public async Task UpdateSeller(UpdateSellerDto dto, Guid accountId)
@@ -264,9 +299,7 @@ namespace FarmersMarketplace.Application.Services.Business
             if (seller == null)
             {
                 string message = $"Account with Id {accountId} was not found.";
-                string userFacingMessage = CultureHelper.Exception("AccountNotFound");
-
-                throw new NotFoundException(message, userFacingMessage);
+                throw new NotFoundException(message, "AccountNotFound");
             }
 
             seller.Name = dto.Name;
@@ -291,6 +324,7 @@ namespace FarmersMarketplace.Application.Services.Business
                 }
 
                 seller.Address.PostalCode = addressDto.PostalCode;
+                seller.Address.Note = addressDto.Note;
 
                 if (!AddressEqualToDto(seller.Address, addressDto))
                 {
@@ -316,6 +350,8 @@ namespace FarmersMarketplace.Application.Services.Business
             seller.FirstSocialPageUrl = dto.FirstSocialPageUrl;
             seller.SecondSocialPageUrl = dto.SecondSocialPageUrl;
             await DbContext.SaveChangesAsync();
+            await SearchSynchronizer.Update(seller);
+            await SellerCacheProvider.Update(seller);
         }
 
         private async Task UpdateSellerImages(Seller seller, List<Microsoft.AspNetCore.Http.IFormFile> images)
@@ -342,12 +378,11 @@ namespace FarmersMarketplace.Application.Services.Business
                     }
                 }
             }
-
         }
 
         private async Task UpdateSellerSchedule(Seller seller, ScheduleDto dto)
         {
-            if (seller.Schedule == null) 
+            if (seller.Schedule == null)
             {
                 seller.Schedule = new Schedule() { Id = Guid.NewGuid() };
                 DbContext.Schedules.Add(seller.Schedule);
@@ -379,15 +414,15 @@ namespace FarmersMarketplace.Application.Services.Business
             if (seller == null)
             {
                 string message = $"Account with Id {accountId} was not found.";
-                string userFacingMessage = CultureHelper.Exception("AccountNotFound");
-
-                throw new NotFoundException(message, userFacingMessage);
+                throw new NotFoundException(message, "AccountNotFound");
             }
 
             seller.Categories = dto.Categories ?? seller.Categories;
             seller.Subcategories = dto.Subcategories ?? seller.Subcategories;
 
             await DbContext.SaveChangesAsync();
+            await SearchSynchronizer.Update(seller);
+            await SellerCacheProvider.Update(seller);
         }
 
         public async Task UpdateFarmerPaymentData(ProducerPaymentDataDto dto, Guid accountId)
@@ -398,9 +433,7 @@ namespace FarmersMarketplace.Application.Services.Business
             if (farmer == null)
             {
                 string message = $"Account with Id {accountId} was not found.";
-                string userFacingMessage = CultureHelper.Exception("AccountNotFound");
-
-                throw new NotFoundException(message, userFacingMessage);
+                throw new NotFoundException(message, "AccountNotFound");
             }
 
             if (farmer.PaymentData == null)
@@ -409,18 +442,27 @@ namespace FarmersMarketplace.Application.Services.Business
                 DbContext.ProducerPaymentData.Add(farmer.PaymentData);
             }
 
+            if (dto.HasOnlinePayment)
+            {
+                farmer.PaymentTypes = new List<PaymentType> { PaymentType.Online, PaymentType.Cash };
+            }
+            else
+            {
+                farmer.PaymentTypes = new List<PaymentType> { PaymentType.Cash };
+            }
+
             farmer.PaymentData.CardNumber = dto.CardNumber;
             farmer.PaymentData.AccountNumber = dto.AccountNumber;
             farmer.PaymentData.BankUSREOU = dto.BankUSREOU;
             farmer.PaymentData.BIC = dto.BIC;
-            farmer.PaymentData.HolderFullName = dto.HolderFullName;
             farmer.PaymentData.CardExpirationYear = dto.CardExpirationYear;
             farmer.PaymentData.CardExpirationMonth = dto.CardExpirationMonth;
 
             await DbContext.SaveChangesAsync();
+            await FarmerCacheProvider.Update(farmer);
         }
 
-        public async Task UpdateSellerPaymentData(UpdateProducerPaymentDataDto dto, Guid accountId)
+        public async Task UpdateSellerPaymentData(ProducerPaymentDataDto dto, Guid accountId)
         {
             var seller = await DbContext.Sellers.Include(s => s.PaymentData)
                 .FirstOrDefaultAsync(a => a.Id == accountId);
@@ -428,26 +470,23 @@ namespace FarmersMarketplace.Application.Services.Business
             if (seller == null)
             {
                 string message = $"Account with Id {accountId} was not found.";
-                string userFacingMessage = CultureHelper.Exception("AccountNotFound");
-
-                throw new NotFoundException(message, userFacingMessage);
+                throw new NotFoundException(message, "AccountNotFound");
             }
 
-            if (seller.PaymentData == null) 
+            if (seller.PaymentData == null)
             {
                 seller.PaymentData = new ProducerPaymentData { Id = Guid.NewGuid() };
                 DbContext.ProducerPaymentData.Add(seller.PaymentData);
             }
 
-            seller.PaymentData.CardNumber = dto.PaymentData.CardNumber;
-            seller.PaymentData.AccountNumber = dto.PaymentData.AccountNumber;
-            seller.PaymentData.BankUSREOU = dto.PaymentData.BankUSREOU;
-            seller.PaymentData.BIC = dto.PaymentData.BIC;
-            seller.PaymentData.HolderFullName = dto.PaymentData.HolderFullName;
-            seller.PaymentData.CardExpirationYear = dto.PaymentData.CardExpirationYear;
-            seller.PaymentData.CardExpirationMonth = dto.PaymentData.CardExpirationMonth;
+            seller.PaymentData.CardNumber = dto.CardNumber;
+            seller.PaymentData.AccountNumber = dto.AccountNumber;
+            seller.PaymentData.BankUSREOU = dto.BankUSREOU;
+            seller.PaymentData.BIC = dto.BIC;
+            seller.PaymentData.CardExpirationYear = dto.CardExpirationYear;
+            seller.PaymentData.CardExpirationMonth = dto.CardExpirationMonth;
 
-            if (dto.HasOnlinePayment) 
+            if (dto.HasOnlinePayment)
             {
                 seller.PaymentTypes = new List<PaymentType> { PaymentType.Online, PaymentType.Cash };
             }
@@ -456,8 +495,77 @@ namespace FarmersMarketplace.Application.Services.Business
                 seller.PaymentTypes = new List<PaymentType> { PaymentType.Cash };
             }
 
-            
             await DbContext.SaveChangesAsync();
+            await SearchSynchronizer.Update(seller);
+            await SellerCacheProvider.Update(seller);
+        }
+
+        public async Task<CustomerOrderDetailsVm> GetCustomerOrderDetails(Guid accountId, ReceivingMethod receivingMethod)
+        {
+            var customer = await DbContext.Customers.Include(c => c.Address)
+                .Include(c => c.PaymentData)
+                .FirstOrDefaultAsync(a => a.Id == accountId);
+
+            if (customer == null)
+            {
+                string message = $"Account with Id {accountId} was not found.";
+                throw new NotFoundException(message, "AccountNotFound");
+            }
+
+            var vm = new CustomerOrderDetailsVm
+            {
+                Name = customer.Name,
+                Surname = customer.Surname,
+                Phone = customer.Phone,
+                AdditionalPhone = customer.AdditionalPhone,
+                PaymentData = Mapper.Map<CustomerPaymentDataVm>(customer.PaymentData)
+            };
+
+            if (receivingMethod == ReceivingMethod.Delivery)
+            {
+                vm.Address = Mapper.Map<CustomerAddressVm>(customer.Address);
+            }
+
+            return vm;
+        }
+
+        public async Task<SellerForCustomerVm> GetSellerForCustomer(Guid accountId)
+        {
+            if (SellerCacheProvider.Exists(accountId))
+            {
+                var s = await SellerCacheProvider.Get(accountId);
+
+                return Mapper.Map<SellerForCustomerVm>(s);
+            }
+
+            var seller = await DbContext.Sellers.Include(c => c.Address)
+                .Include(c => c.Feedbacks)
+                .Include(c => c.Schedule)
+                    .ThenInclude(s => s.Monday)
+                .Include(f => f.Schedule)
+                    .ThenInclude(s => s.Tuesday)
+                .Include(f => f.Schedule)
+                    .ThenInclude(s => s.Wednesday)
+                .Include(f => f.Schedule)
+                    .ThenInclude(s => s.Thursday)
+                .Include(f => f.Schedule)
+                    .ThenInclude(s => s.Friday)
+                .Include(f => f.Schedule)
+                    .ThenInclude(s => s.Sunday)
+                .Include(f => f.Schedule)
+                    .ThenInclude(s => s.Saturday)
+                .FirstOrDefaultAsync(a => a.Id == accountId);
+
+            if (seller == null)
+            {
+                string message = $"Account with Id {accountId} was not found.";
+                throw new NotFoundException(message, "AccountNotFound");
+            }
+
+            await SellerCacheProvider.Set(seller);
+            var vm = Mapper.Map<SellerForCustomerVm>(seller);
+
+            return vm;
         }
     }
 

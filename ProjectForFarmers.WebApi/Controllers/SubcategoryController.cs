@@ -17,7 +17,7 @@ namespace FarmersMarketplace.WebApi.Controllers
 
         [HttpPost]
         [ProducesResponseType(204)]
-        public async Task<IActionResult> Create([FromBody] CreateSubcategoryDto dto)
+        public async Task<IActionResult> Create([FromForm] CreateSubcategoryDto dto)
         {
             await SubcategoryService.Create(dto);
             return NoContent();

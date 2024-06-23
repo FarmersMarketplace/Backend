@@ -49,7 +49,7 @@ namespace FarmersMarketplace.Application.Helpers
         public static string Property(string key)
         {
             string str = PropertyManager.GetString(key, CultureInfo.CurrentUICulture);
-
+            
             return str;
         }
     }

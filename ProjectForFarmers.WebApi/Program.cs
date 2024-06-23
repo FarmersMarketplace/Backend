@@ -12,6 +12,8 @@ using FarmersMarketplace.Persistence;
 using Hangfire;
 using Hangfire.PostgreSql;
 using FarmersMarketplace.Application.Helpers;
+using FarmersMarketplace.Elasticsearch;
+using FarmersMarketplace.Cache;
 
 namespace FarmersMarketplace.WebApi
 {
@@ -30,16 +32,17 @@ namespace FarmersMarketplace.WebApi
 
         private static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
         {
-            string connectionString = configuration.GetConnectionString("LocalConnection");
+            string connectionString = configuration.GetConnectionString("RemoteConnection");
 
+            services.AddApplication(configuration);
             services.AddPersistence(connectionString);
-            services.AddMemoryCache();
+            services.AddElasticsearch(configuration);
+            services.AddRedis(configuration);
 
             Log.Logger = new LoggerConfiguration().WriteTo.PostgreSQL(connectionString, "Logs", needAutoCreateTable: true)
                .MinimumLevel.Information().CreateLogger();
             Log.Information("The program has started.");
-
-            services.AddApplication(configuration);
+            
             services.AddControllers(options =>
             {
                 options.Filters.Add(new ProducesAttribute("application/json"));
@@ -106,7 +109,6 @@ namespace FarmersMarketplace.WebApi
             HangfireHelper.RegisterTasks(app.Services);
 
             app.UseCors("AllowAll");
-            app.UseMiddleware<CultureMiddleware>();
             app.UseMiddleware<ExceptionHandlerMiddleware>();
             app.UseRouting();
             app.UseHttpsRedirection();

@@ -133,6 +133,78 @@ namespace FarmersMarketplace.Application.Resources.Exceptions {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Feedbacks documents was not deleted successful from Elasticsearch..
+        /// </summary>
+        internal static string ElasticsearchFeedbacksNotDeleted {
+            get {
+                return ResourceManager.GetString("ElasticsearchFeedbacksNotDeleted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Feedbacks documents was not uploaded successfully to Elasticsearch..
+        /// </summary>
+        internal static string ElasticsearchFeedbacksNotUpoaded {
+            get {
+                return ResourceManager.GetString("ElasticsearchFeedbacksNotUpoaded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Orders documents was not deleted successful from Elasticsearch..
+        /// </summary>
+        internal static string ElasticsearchOrdersNotDeleted {
+            get {
+                return ResourceManager.GetString("ElasticsearchOrdersNotDeleted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Orders documents was not uploaded successfully to Elasticsearch..
+        /// </summary>
+        internal static string ElasticsearchOrdersNotUpoaded {
+            get {
+                return ResourceManager.GetString("ElasticsearchOrdersNotUpoaded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Producers documents was not deleted successful from Elasticsearch..
+        /// </summary>
+        internal static string ElasticsearchProducersNotDeleted {
+            get {
+                return ResourceManager.GetString("ElasticsearchProducersNotDeleted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Producers documents was not uploaded successfully to Elasticsearch..
+        /// </summary>
+        internal static string ElasticsearchProducersNotUpoaded {
+            get {
+                return ResourceManager.GetString("ElasticsearchProducersNotUpoaded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Products documents was not deleted successful from Elasticsearch..
+        /// </summary>
+        internal static string ElasticsearchProductsNotDeleted {
+            get {
+                return ResourceManager.GetString("ElasticsearchProductsNotDeleted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Products documents was not uploaded successfully to Elasticsearch..
+        /// </summary>
+        internal static string ElasticsearchProductsNotLoaded {
+            get {
+                return ResourceManager.GetString("ElasticsearchProductsNotLoaded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Email {0} is already associated with another account..
         /// </summary>
         internal static string EmailIsAssociatedWithAnotherAccount {
@@ -147,6 +219,24 @@ namespace FarmersMarketplace.Application.Resources.Exceptions {
         internal static string FarmNotFound {
             get {
                 return ResourceManager.GetString("FarmNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Feedback was not found..
+        /// </summary>
+        internal static string FeedbackNotFound {
+            get {
+                return ResourceManager.GetString("FeedbackNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Feedbacks was not got successfully..
+        /// </summary>
+        internal static string FeedbacksNotGotSuccessfully {
+            get {
+                return ResourceManager.GetString("FeedbacksNotGotSuccessfully", resourceCulture);
             }
         }
         
@@ -196,6 +286,15 @@ namespace FarmersMarketplace.Application.Resources.Exceptions {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Object was not found..
+        /// </summary>
+        internal static string ObjectNotFound {
+            get {
+                return ResourceManager.GetString("ObjectNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Order was not found..
         /// </summary>
         internal static string OrderNotExist {
@@ -205,11 +304,29 @@ namespace FarmersMarketplace.Application.Resources.Exceptions {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Orders was not got successfully..
+        /// </summary>
+        internal static string OrdersNotGotSuccessfully {
+            get {
+                return ResourceManager.GetString("OrdersNotGotSuccessfully", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The password and confirm password do not match..
         /// </summary>
         internal static string PasswordNotMatchToConfirmPassword {
             get {
                 return ResourceManager.GetString("PasswordNotMatchToConfirmPassword", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Producers was not got successfully..
+        /// </summary>
+        internal static string ProducersNotGotSuccessfully {
+            get {
+                return ResourceManager.GetString("ProducersNotGotSuccessfully", resourceCulture);
             }
         }
         
@@ -241,6 +358,24 @@ namespace FarmersMarketplace.Application.Resources.Exceptions {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Products was not got successfully..
+        /// </summary>
+        internal static string ProductsNotGotSuccessfully {
+            get {
+                return ResourceManager.GetString("ProductsNotGotSuccessfully", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An error occurred while retrieving data.
+        /// </summary>
+        internal static string RetrievingDataError {
+            get {
+                return ResourceManager.GetString("RetrievingDataError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Source file with name {0} was not found..
         /// </summary>
         internal static string SourceFileNotFound {
@@ -255,15 +390,6 @@ namespace FarmersMarketplace.Application.Resources.Exceptions {
         internal static string StatisticWithIdNotExist {
             get {
                 return ResourceManager.GetString("StatisticWithIdNotExist", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Failed to retrieve or parse role..
-        /// </summary>
-        internal static string String1 {
-            get {
-                return ResourceManager.GetString("String1", resourceCulture);
             }
         }
         
@@ -300,6 +426,15 @@ namespace FarmersMarketplace.Application.Resources.Exceptions {
         internal static string SubcategoryWithIdNotFound {
             get {
                 return ResourceManager.GetString("SubcategoryWithIdNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An error occurred while updating data..
+        /// </summary>
+        internal static string UpdateDataError {
+            get {
+                return ResourceManager.GetString("UpdateDataError", resourceCulture);
             }
         }
     }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore;
 using FarmersMarketplace.Domain;
+using FarmersMarketplace.Domain.Feedbacks;
 
 namespace FarmersMarketplace.Persistence.EntityTypeConfigurations
 {

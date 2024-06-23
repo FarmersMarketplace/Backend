@@ -5,6 +5,7 @@ using FarmersMarketplace.Application.Helpers;
 using FarmersMarketplace.Application.Interfaces;
 using FarmersMarketplace.Application.ViewModels.Dashboard;
 using FarmersMarketplace.Domain;
+using FarmersMarketplace.Domain.Orders;
 
 namespace FarmersMarketplace.Application.Services.Business
 {
@@ -150,7 +151,8 @@ namespace FarmersMarketplace.Application.Services.Business
                 TotalRevenueChangePercentage = await CalculatePercentageChanges(totalRevenu, previousStatistic.TotalRevenue),
                 CustomerWithHighestPaymentId = customerId,
                 HighestCustomerPayment = sum,
-                HighestCustomerPaymentPercentage = await CalculatePaymentPercentageChanges(sum, totalRevenu)
+                HighestCustomerPaymentPercentage = await CalculatePaymentPercentageChanges(sum, totalRevenu),
+                PreviousMonthTotalRevenue = previousStatistic.TotalRevenue
             };
 
             return result;
@@ -246,7 +248,8 @@ namespace FarmersMarketplace.Application.Services.Business
                 TotalRevenueChangePercentage = 100,
                 CustomerWithHighestPaymentId = customerId,
                 HighestCustomerPayment = sum,
-                HighestCustomerPaymentPercentage = await CalculatePaymentPercentageChanges(sum, totalRevenu)
+                HighestCustomerPaymentPercentage = await CalculatePaymentPercentageChanges(sum, totalRevenu),
+                PreviousMonthTotalRevenue = 0,
             };
 
             return result;
