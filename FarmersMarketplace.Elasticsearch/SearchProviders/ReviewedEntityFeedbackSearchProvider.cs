@@ -8,11 +8,11 @@ using ApplicationException = FarmersMarketplace.Application.Exceptions.Applicati
 
 namespace FarmersMarketplace.Elasticsearch.SearchProviders
 {
-    public class ReviewedEntityFeedbackSearchProivder : BaseSearchProvider<GetReviewedEntityFeedbackListDto, FeedbackDocument, ReviewedEntityFeedbackListVm, object>
+    public class ReviewedEntityFeedbackSearchProvider : BaseSearchProvider<GetReviewedEntityFeedbackListDto, FeedbackDocument, ReviewedEntityFeedbackListVm, object>
     {
         private readonly IMapper Mapper;
 
-        public ReviewedEntityFeedbackSearchProivder(IElasticClient client, IMapper mapper) : base(client)
+        public ReviewedEntityFeedbackSearchProvider(IElasticClient client, IMapper mapper) : base(client)
         {
             Mapper = mapper;
             SearchDescriptor.Index(Indecies.Feedbacks);

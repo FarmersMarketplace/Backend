@@ -52,7 +52,7 @@ namespace FarmersMarketplace.Elasticsearch
                 MapSearchProvider>();
             services.AddTransient
                <ISearchProvider<GetReviewedEntityFeedbackListDto, ReviewedEntityFeedbackListVm, object>,
-               ReviewedEntityFeedbackSearchProivder>();
+               ReviewedEntityFeedbackSearchProvider>();
             services.AddTransient
                 <ISearchProvider<GetCustomerFeedbackListDto, CustomerFeedbackListVm, object>,
                 CustomerFeedbackSearchProvider>();
